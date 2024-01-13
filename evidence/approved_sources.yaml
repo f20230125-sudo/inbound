@@ -1,0 +1,65 @@
+# Which CV parts Inbound may use for Uzair's REAL packs (local only).
+# Written by Claude on 28 Oct 2026 from CV parts in D:\claude-workspace\cv-msd\fresh whose bullets were
+# each checked against the project's repo/README/results when they were written (15-28 Oct 2026).
+# Read-only sources: Inbound copies text, never edits these files.
+# A project listed with several sources keeps every bullet variant; `preferred` decides the default order.
+
+source_root: D:\claude-workspace\cv-msd\fresh
+fixed:
+  preamble: preamble.tex          # macros incl. link macros (\rxlive etc.)
+  head: head.tex                  # identity, contact, education (approved as is)
+  tail: tail.tex                  # experience (Amaani PS-1) and research (IEEE MSN 2026, under review)
+  certification: "The Ultimate Job Ready Data Science Course, CodeWithHarry (2026)"
+  profile_templates: evidence/profiles.yaml   # approved profile sentences (relative to the inbound repo)
+
+projects:
+  backroom:        {preferred: unique-body.tex, also: [mubama-body.tex]}
+  agent-desk:      {preferred: unique-body.tex}
+  signaldesk-ai:   {preferred: unique-body.tex, also: [science-body.tex]}
+  # footnote: excluded until its bullet is reworded (Codex audit 28 Oct: unique-body.tex:30 says each
+  # component was "added one step at a time and scored"; the pilot only completed 16 C1-vs-C5 pairs).
+  # footnote:        {preferred: unique-body.tex}
+  pharma-evidence: {preferred: unique-body.tex, also: [science-body.tex]}
+  quant-copilot:   {preferred: mubama-body.tex}
+  rx-market-pulse: {preferred: mubama-body.tex, also: [analyst-body.tex, science-body.tex, digital-body.tex]}
+  property-data-warehouse: {preferred: mubama-body.tex}
+  brand-forecast-studio:   {preferred: science-body.tex}
+  gcc-market-report:       {preferred: analyst-body.tex}
+  payer-access-intelligence: {preferred: analyst-body.tex}
+  field-force-planner:     {preferred: analyst-body.tex}
+  order-desk:      {preferred: madenat-body.tex, also: [condo-body.tex]}
+  loopdesk:        {preferred: madenat-body.tex}
+  scopedesk:       {preferred: madenat-body.tex}
+  followdesk:      {preferred: madenat-body.tex}
+  content-desk:    {preferred: condo-body.tex}
+  invoice-ready:   {preferred: condo-body.tex}
+  quote-desk:      {preferred: condo-body.tex}
+  site-health-monitor: {preferred: condo-body.tex, also: [digital-body.tex]}
+  digital-demand-pulse: {preferred: digital-body.tex}
+  campaignops:     {preferred: digital-body.tex}
+
+# Heading text -> project id (headings as they appear in \resumeProjectHeading{\textbf{...}}).
+heading_map:
+  "Backroom": backroom
+  "Agent Desk": agent-desk
+  "SignalDesk AI": signaldesk-ai
+  "Footnote": footnote
+  "PharmaEvidence": pharma-evidence
+  "Quant Copilot": quant-copilot
+  "Rx Market Pulse": rx-market-pulse
+  "Property Data Warehouse": property-data-warehouse
+  "Brand Forecast Studio": brand-forecast-studio
+  "GCC Market Report": gcc-market-report
+  "Payer Access Intelligence": payer-access-intelligence
+  "Field Force Planner": field-force-planner
+  "Order Desk": order-desk
+  "LoopDesk": loopdesk
+  "ScopeDesk": scopedesk
+  "FollowDesk": followdesk
+  "Content Desk": content-desk
+  "Invoice Ready": invoice-ready
+  "Quote Desk": quote-desk
+  "Site Health Monitor": site-health-monitor
+  "Digital Demand Pulse": digital-demand-pulse
+  "CampaignOps": campaignops
+# Match on the text before the first ":" in the bold heading. "Also built:" headings are skipped.

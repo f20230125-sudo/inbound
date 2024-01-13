@@ -1,0 +1,24 @@
+id: P-D16
+thread_id: d16
+date: 2026-10-27T02:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Call for CV - PS II – Second Semester 2026-2027 - Ember Mosaic,Cedar Quay - Backend Intern
+labels: 
+attachments: jd-P-D16.pdf|application/pdf|attachments/jd-P-D16.pdf
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Call for CV - PS II – Second Semester 2026-2027 - Ember Mosaic,Cedar Quay - Backend Intern
+Ember Mosaic has expressed their interest to hire Students for PS II. Location: Cedar Quay
+*https://forms.gle/SYNTHETIC-NOT-LIVE-P-D16 <https://forms.gle/SYNTHETIC-NOT-LIVE-P-D16>*
+*Stipend*
+· AED2300 per month
+*Mode of Internship:* Hybrid
+*Job Title & JD*
+· Attached
+*CV Submission Deadline*: 08:00AM, 29 October 2026
+Mira Sen
+Synthetic PS coordinator

@@ -1,0 +1,15 @@
+id: O-H002
+thread_id: o-h002
+date: 2026-10-27T02:00:00+00:00
+from: jobalerts-noreply@linkedin.com
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: New matches: internship deadline approaching
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Vacancy | Closing date
+Synthetic internship | 29 October 2026

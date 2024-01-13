@@ -1,0 +1,24 @@
+id: P-D15
+thread_id: d15
+date: 2026-10-27T02:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Call for CV - PS II – Second Semester 2026-2027 - Dovetail Quay,Valehaven - Data Intern
+labels: 
+attachments: jd-P-D15.pdf|application/pdf|attachments/jd-P-D15.pdf
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Call for CV - PS II – Second Semester 2026-2027 - Dovetail Quay,Valehaven - Data Intern
+Dovetail Quay has expressed their interest to hire Students for PS II. Location: Valehaven
+*https://forms.gle/SYNTHETIC-NOT-LIVE-P-D15 <https://forms.gle/SYNTHETIC-NOT-LIVE-P-D15>*
+*Stipend*
+· AED2000 per month
+*Mode of Internship:* In person
+*Job Title & JD*
+· Attached
+*CV Submission Deadline*: 08:00AM, 28 October 2026
+Mira Sen
+Synthetic PS coordinator

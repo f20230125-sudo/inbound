@@ -1,0 +1,29 @@
+id: P-D07
+thread_id: d01
+date: 2026-10-27T14:10:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Fwd: Call for CV - PS II – Second Semester 2026-2027 - Cinderfinch Labs,Lumen Bay - Frontend Intern
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Reminder for the current intake.
+Deadline extended: on or before 08:00AM tomorrow
+Current intake: Cinderfinch Labs; City: Lumen Bay
+· AED2500 per month
+*Mode of Internship:* In person
+
+*Job Title & Expected Skills*
+*1. Frontend Intern*
+Expected Skills:
+· React
+· TypeScript
+· accessible HTML/CSS
+
+--- Original message ---
+> Call for CV - PS II – Second Semester 2026-2027 - Cinderfinch Labs,Lumen Bay - Frontend Intern
+> **: 08**:00AM , 28 October 2026*
