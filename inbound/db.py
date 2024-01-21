@@ -71,6 +71,23 @@ def import_messages(db, messages):
                     (message_id, digest),
                 ).fetchone()
                 if known:
+                    # M1 stored declarations without import roots/embedded MIME payloads.
+                    # Hydrate transport metadata without changing canonical content/history.
+                    for attachment in message.attachments:
+                        db.execute(
+                            "UPDATE attachments SET import_root=COALESCE(import_root,?),"
+                            "content_base64=COALESCE(content_base64,?),"
+                            "bytes_available=MAX(bytes_available,?) "
+                            "WHERE message_id=? AND filename=? AND mime=?",
+                            (
+                                attachment.import_root,
+                                attachment.content_base64,
+                                int(attachment.bytes_available),
+                                message_id,
+                                attachment.name,
+                                attachment.mime,
+                            ),
+                        )
                     counts["unchanged"] += 1
                     continue
                 counts["changed"] += 1
@@ -105,7 +122,8 @@ def import_messages(db, messages):
                 for a in message.attachments:
                     db.execute(
                         "INSERT INTO attachments(message_id,filename,mime,bytes_path,"
-                        "bytes_available,parse_status) VALUES (?,?,?,?,?,?)",
+                        "bytes_available,parse_status,import_root,content_base64) "
+                        "VALUES (?,?,?,?,?,?,?,?)",
                         (
                             message_id,
                             a.name,
@@ -113,6 +131,8 @@ def import_messages(db, messages):
                             a.bytes_path,
                             int(a.bytes_available),
                             a.parse_status,
+                            a.import_root,
+                            a.content_base64,
                         ),
                     )
                 counts["imported"] += 1

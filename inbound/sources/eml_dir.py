@@ -1,5 +1,6 @@
 """Stdlib MIME reader. It never extracts or executes attachments."""
 
+import base64
 from datetime import UTC
 from email import policy
 from email.parser import BytesParser
@@ -73,7 +74,18 @@ def parse(path, root, source):
         if filename or part.get_content_disposition() == "attachment":
             name = filename or "attachment.bin"
             safe_attachment_path(root, name)
-            attachments.append(Attachment(name, part.get_content_type()))
+            payload = part.get_payload(decode=True) or b""
+            if len(payload) > 10 * 1024 * 1024:
+                raise SourceError("Attachment exceeds 10 MB")
+            attachments.append(
+                Attachment(
+                    name,
+                    part.get_content_type(),
+                    bytes_available=bool(payload),
+                    parse_status="unsupported" if payload else "missing",
+                    content_base64=base64.b64encode(payload).decode("ascii") if payload else None,
+                )
+            )
         elif part.get_content_type() == "text/plain":
             plain.append(decoded(part))
         elif part.get_content_type() == "text/html":

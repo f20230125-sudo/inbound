@@ -13,6 +13,8 @@ class Attachment:
     bytes_path: str | None = None
     bytes_available: bool = False
     parse_status: str = "missing"
+    import_root: str | None = None
+    content_base64: str | None = None
 
 
 @dataclass(frozen=True)
