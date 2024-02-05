@@ -83,37 +83,53 @@ def effective_fields(previous, current, amendment):
     return effective
 
 
+def explicit_links(fields):
+    links = set()
+    for name in ("form_link", "apply_link"):
+        record = fields[name]
+        for candidate in record.get("candidates", [record]):
+            if candidate["status"] == "found":
+                links.add(candidate["normalized"])
+    return links
+
+
 def matching_opportunities(db, row, fields):
-    matches = set()
-    links = {
-        fields[n]["normalized"]
-        for n in ("form_link", "apply_link")
-        if fields[n]["status"] == "found"
-    }
+    matches, different_links = set(), set()
+    links = explicit_links(fields)
+    prior_opportunities = {}
     for revision in db.execute(
-        "SELECT r.opportunity_id,r.fields_json,m.thread_id,m.subject,m.provider,m.source "
+        "SELECT r.opportunity_id,r.local_fields_json,m.thread_id,m.subject,m.provider,m.source "
         "FROM opportunity_revisions r JOIN messages m ON m.id=r.message_id"
     ):
         if row["source"] != revision["source"]:
             continue
-        prior = json.loads(revision["fields_json"])
-        prior_links = {
-            prior[n]["normalized"]
-            for n in ("form_link", "apply_link")
-            if prior[n]["status"] == "found"
-        }
-        if (
-            (
-                row["thread_id"]
-                and row["provider"] == revision["provider"]
-                and row["thread_id"] == revision["thread_id"]
-            )
-            or links & prior_links
-            or normalize_subject(row["subject"]).casefold()
-            == normalize_subject(revision["subject"]).casefold()
-        ):
-            matches.add(revision["opportunity_id"])
-    return matches
+        prior = prior_opportunities.setdefault(
+            revision["opportunity_id"], {"links": set(), "subjects": set(), "threads": set()}
+        )
+        prior["links"].update(explicit_links(json.loads(revision["local_fields_json"])))
+        prior["subjects"].add(normalize_subject(revision["subject"]).casefold())
+        if revision["thread_id"]:
+            prior["threads"].add((revision["provider"], revision["thread_id"]))
+    for identity, prior in prior_opportunities.items():
+        if (row["provider"], row["thread_id"]) in prior["threads"] or links & prior["links"]:
+            matches.add(identity)
+        elif normalize_subject(row["subject"]).casefold() in prior["subjects"]:
+            if links and prior["links"]:
+                different_links.add(identity)
+            else:
+                matches.add(identity)
+    return matches, different_links
+
+
+def suggest_merge(db, opportunity_id, candidate_id, message_id, reason):
+    if candidate_id != opportunity_id:
+        db.execute(
+            "INSERT INTO merge_suggestions "
+            "(opportunity_id,candidate_id,message_id,reason) VALUES (?,?,?,?) "
+            "ON CONFLICT(opportunity_id,candidate_id) DO UPDATE SET reason=excluded.reason "
+            "WHERE excluded.reason='same_subject_different_link'",
+            (opportunity_id, candidate_id, message_id, reason),
+        )
 
 
 def latest_revision(db, opportunity_id):
@@ -298,7 +314,7 @@ def extract_messages(db, clock=None, ids=None):
             if not extracted["creates_opportunity"]:
                 continue
             check(db)
-            matches = matching_opportunities(db, row, local)
+            matches, different_links = matching_opportunities(db, row, local)
             if len(matches) == 1:
                 opportunity_id = matches.pop()
                 invalidate_reviewed_packs(db, opportunity_id)
@@ -330,18 +346,17 @@ def extract_messages(db, clock=None, ids=None):
                     (column(local["company"]["normalized"]), opportunity_id),
                 ).fetchall()
                 for candidate in {p["id"] for p in probable} | matches:
-                    db.execute(
-                        "INSERT OR IGNORE INTO merge_suggestions "
-                        "(opportunity_id,candidate_id,message_id,reason) VALUES (?,?,?,?)",
-                        (
-                            opportunity_id,
-                            candidate,
-                            row["id"],
-                            "Ambiguous identity"
-                            if matches
-                            else "Company only; no joining evidence",
-                        ),
+                    suggest_merge(
+                        db,
+                        opportunity_id,
+                        candidate,
+                        row["id"],
+                        "Ambiguous identity" if matches else "Company only; no joining evidence",
                     )
+            for candidate in different_links:
+                suggest_merge(
+                    db, opportunity_id, candidate, row["id"], "same_subject_different_link"
+                )
             check(db)
             cursor = db.execute(
                 "INSERT INTO opportunity_revisions "

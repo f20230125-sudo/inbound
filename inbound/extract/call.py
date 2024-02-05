@@ -4,10 +4,12 @@ import re
 from email.utils import parseaddr
 
 from inbound.extract.deadline import DATE, parse_deadline
+from inbound.extract.links import extract_links
 from inbound.extract.records import conflict, field, stamp
 from inbound.extract.roles import parse_roles
 from inbound.extract.stipend import parse_stipend
-from inbound.triage.normalize import current_body, normalize, normalize_subject
+from inbound.extract.subject import body_identity, split_subject
+from inbound.triage.normalize import current_body, normalize
 from inbound.triage.rules import classify
 
 ATTACK = re.compile(
@@ -60,6 +62,37 @@ def combine_deadlines(candidates, name="deadline"):
     values = {c["normalized"] for c in candidates}
     result = candidates[0] if len(values) == 1 else conflict(name, candidates)
     result["name"] = name
+    return result
+
+
+def identity_field(name, observations):
+    if not observations:
+        return field(name)
+    candidates = [
+        field(name, o["source_text"], o["value"])
+        for o in observations
+    ]
+    values = {o["value"].casefold() for o in observations}
+    result = candidates[0]
+    if len(values) > 1:
+        if name == "city" and values == {"dso", "dubai"}:
+            result = field(
+                name,
+                "; ".join(o["source_text"] for o in observations),
+                list(dict.fromkeys(o["value"] for o in observations)),
+            )
+        else:
+            result = conflict(
+                name,
+                [
+                    stamp(c, o["message_id"], o["source"])
+                    for c, o in zip(candidates, observations, strict=True)
+                ],
+            )
+    elif observations[0]["source"] == "body":
+        stamp(result, observations[0]["message_id"], "body")
+    if len(observations) > 1:
+        result["observations"] = observations
     return result
 
 
@@ -124,89 +157,34 @@ def extract_call(message, attachments=()):
         "kind",
     ):
         fields[name] = field(name)
-    title = normalize_subject(message.subject)
-    tail = re.sub(r"^Call for CV\s*-\s*", "", title, flags=re.IGNORECASE)
-    tail = re.sub(
-        r"^PS II\s*-\s*Second Semester\s+\d{4}-\d{4}\s*-\s*", "", tail, flags=re.IGNORECASE
-    )
-    core = re.sub(r"\s+-\s+[^,]+$", "", tail)
-    if "," in core:
-        company, city = core.rsplit(",", 1)
-        # Locate the unnormalised spelling so zero-width characters remain in the evidence.
-        original = message.subject
-        invisible = r"[\u200b\u200c\u200d\ufeff]*"
-        pattern = (
-            "".join(invisible + (r"\s+" if ch == " " else re.escape(ch)) for ch in company.strip())
-            + invisible
-        )
-        match = re.search(pattern, original)
-        raw_company = company.strip()
-        if match:
-            raw_company = match.group()
-        fields["company"] = field("company", raw_company, normalize(company))
-        fields["city"] = field("city", city.strip(), city.strip())
-        observed = [
-            {
-                "value": city.strip(),
-                "source": "subject",
-                "source_text": city.strip(),
-                "message_id": message.provider_id,
-            }
-        ]
-        body_city = re.search(r"(?:Location|City)\s*:\s*([^\n;]+)", body, re.IGNORECASE)
-        if body_city:
-            value = body_city[1].strip()
-            if value != city.strip():
+    subject_parts = split_subject(message.subject)
+    body_parts = body_identity(body)
+    for name in ("company", "city"):
+        observed = []
+        for source, parts in (("subject", subject_parts), ("body", body_parts)):
+            if parts.get(name):
                 observed.append(
                     {
-                        "value": value,
-                        "source": "body",
-                        "source_text": value,
+                        "value": normalize(parts[name]),
+                        "source": source,
+                        "source_text": parts[name] if source == "subject" else parts["raw"],
                         "message_id": message.provider_id,
                     }
                 )
-                if {o["value"].casefold() for o in observed} == {"dso", "dubai"}:
-                    fields["city"] = field(
-                        "city",
-                        "; ".join(o["value"] for o in observed),
-                        [o["value"] for o in observed],
-                        observations=observed,
-                    )
-                else:
-                    fields["city"] = conflict(
-                        "city",
-                        [
-                            stamp(
-                                field("city", o["source_text"], o["value"]),
-                                message.provider_id,
-                                o["source"],
-                            )
-                            for o in observed
-                        ],
-                    )
-    urls = list(dict.fromkeys(re.findall(r"https?://[^\s<>*]+", body)))
-    for url in urls:
-        parsed = re.fullmatch(r"https?://([^/?#]+)([^#]*)", url, re.IGNORECASE)
-        if not parsed or "@" in parsed[1] or not re.fullmatch(r"[\w.-]+", parsed[1]):
-            continue
-        if parsed[1].casefold() == "forms.gle":
-            name = "form_link"
-        elif re.search(r"(?:^|/)(?:apply|careers?|jobs?)(?:/|$)", parsed[2], re.IGNORECASE):
-            name = "apply_link"
-        elif any(
-            url in line and re.search(r"company website", line, re.IGNORECASE)
-            for line in body.splitlines()
-        ):
-            name = "company_website"
-        else:
-            continue
-        candidate = field(name, url, url)
-        previous = fields[name]
-        fields[name] = (
-            conflict(name, [previous, candidate])
-            if previous["normalized"] and previous["normalized"] != url
-            else candidate
-        )
+        if name == "city":
+            body_city = re.search(r"(?:Location|City)\s*:\s*([^\n;]+)", body, re.IGNORECASE)
+            if body_city:
+                raw = body_city[1].strip()
+                observed.append(
+                    {
+                        "value": normalize(raw),
+                        "source": "body",
+                        "source_text": raw,
+                        "message_id": message.provider_id,
+                    }
+                )
+        fields[name] = identity_field(name, observed)
+    extract_links(body, fields)
     result["kind"] = "direct_apply" if fields["apply_link"]["status"] == "found" else "ps_call"
     kind_quote = (
         fields["apply_link"]["raw"] if result["kind"] == "direct_apply" else message.subject

@@ -153,3 +153,14 @@ Where this section conflicts with §0-§12, this section wins. M1-M4 run on **28
 **Private runs.** Codex never reads `private/`. Claude alone runs the pipeline on the real export and reports only sanitized aggregates (counts, pass/fail) to Codex and in the repo.
 
 **M1 deliverables and gate:** as listed in `D:\claude-workspace\neovara\personal-agent\codex-round3.md` §5 (files, 190 fixtures with 64/116/10 export files plus 5 EML edge cases, tests `test_settings/sources/import/triage/synth/policy/pause/ledger/egress/baseline`). Gate: ruff + pytest pass; offline CLI imports 190 then 0 on repeat; dev baseline with confusion matrix and denominators; no held-out tuning; git index has no private/local artifacts.
+
+## 14. Amendment 2 (28 Oct 2026, 03:20 Dubai, after M2)
+
+**Opportunity grouping.** Equal normalised subjects join only when the messages do not carry *different* explicit form/apply links. Same thread id or the same link always joins. Equal subject + different links ⇒ separate opportunities plus a `merge_suggestion` (reason `same_subject_different_link`) for Uzair to review. Rationale: a silent join would mix two calls' deadlines; a suggestion costs one click. This reproduces the frozen manifest groups.
+
+**Real-format variants (from Claude's local run on Uzair's real export; described here with fictional names only).** Rules must also handle:
+1. *Direct apply without a form:* subject `Call for CV - <Company>,<City>` (no "PS II" part); body says `please apply directly through the link below` (or "apply directly", "careers page") followed by a bare `https://` URL on its own line that is not `forms.gle`/`docs.google.com/forms`, possibly long with `%`-encoded query strings and possibly wrapped across lines. ⇒ `kind=direct_apply`, `apply_link` found (full URL, unwrapped), form_link/stipend/deadline unknown.
+2. *Company and role with no city:* subject `... – <Company>- <Role>` (hyphen glued to the company, space before the role) and body opening `*<Company>*- *<Role>*,has expressed their interest ...`. ⇒ company found, role found from the subject, city unknown (never guessed).
+3. *Company — City - Role:* subject `... – <Company> — <City> - <Role>` (em dash between company and city, hyphen before the role) and body `*<Company> — <City>, *has expressed ...`. ⇒ company, city and role all found. Dash unification must not lose which separator was which before splitting.
+4. *Company from the body:* when the subject split is ambiguous, the body sentence `<X> has expressed their interest` (asterisks/commas tolerated) confirms the company; if subject and body disagree, keep both as observations, do not guess.
+These go in as unit tests with fictional names (not added to the frozen 190; the dataset stays frozen). Real-mail results are reported separately and labelled "rules tuned on these messages".
