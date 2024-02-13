@@ -7,7 +7,7 @@ private/
 node_modules/
 __pycache__/
 *.pyc
-packs/
+/packs/
 public/
 web/dist/
 .codex-runs/

@@ -6,7 +6,10 @@ from inbound.triage.normalize import normalize
 
 HEADING = re.compile(r"^\s*\**\s*(?:\(\d+\)|\d+\.|Role\s+\d+:)\s*(.+?)\s*\**$", re.IGNORECASE)
 STOP = re.compile(
-    r"^(?:CV |Deadline|Closing |Conditions|Mode |Stipend|Mira |Synthetic |Note\b)", re.IGNORECASE
+    r"^(?:CV |Deadline|Closing |Conditions|Mode |Stipend|Mira |Synthetic |Note\b|"
+    r"(?:Please\s+)?apply\s+(?:directly|through|via|at\s+https?)\b|"
+    r"(?:Please\s+)?submit\s+(?:your|the)\s+(?:CV|resume|application)\b)",
+    re.IGNORECASE,
 )
 
 
@@ -42,22 +45,46 @@ def parse_roles(text, subject, identity):
                 continuation = False
                 continue
             bullet = re.match(r"^\s*[·•\-]\s+(.+)", clean)
-            inline = re.match(r"^(?:Expected Skills|Requirements)\s*:\s*(.*)", clean, re.IGNORECASE)
+            inline = re.match(
+                r"^(?:Expected Skills|Requirements|Responsibilities)\s*:\s*(.*)",
+                clean,
+                re.IGNORECASE,
+            )
             values = (
                 [bullet[1]] if bullet else (inline[1].split(";") if inline and inline[1] else [])
             )
-            if continuation and not bullet and not inline and clean and active["requirements"]:
+            section_heading = bool(clean.endswith(":")) or bool(
+                re.fullmatch(
+                    r"(?:Expected Skills|Requirements|Responsibilities|Qualifications|Key Skills)",
+                    clean,
+                    re.IGNORECASE,
+                )
+            )
+            if (
+                continuation
+                and not bullet
+                and not inline
+                and clean
+                and not section_heading
+                and active["requirements"]
+            ):
                 continued = clean.split(";")
                 active["requirements"][-1]["text"] += " " + continued[0].strip()
                 values = continued[1:]
                 quotes.append(line)
             if bullet or inline:
                 quotes.append(line)
-            continuation = bool(inline and inline[1]) or bool(continuation and not bullet)
             for value in values:
                 active["requirements"] = active["requirements"] or []
                 qid = f"{active['id']}-q{len(active['requirements']) + 1}"
                 active["requirements"].append({"id": qid, "text": value.strip()})
+            continuation = bool(
+                clean
+                and not section_heading
+                and active["requirements"]
+                and not re.search(r"[.!?]$", active["requirements"][-1]["text"])
+                and (bullet or inline or continuation)
+            )
     if not roles:
         title = split_subject(subject)["role"]
         if title:
