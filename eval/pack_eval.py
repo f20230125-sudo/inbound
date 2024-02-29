@@ -51,7 +51,7 @@ def score(lines, projects):
     }
 
 
-def evaluate(db, report_dir=None):
+def evaluate(db, report_dir=None, *, settings=None):
     check(db)
     definitions = json.loads((REPO / "synth/cases.json").read_text("utf8"))
     subset = definitions["pack_subset"]
@@ -89,7 +89,7 @@ def evaluate(db, report_dir=None):
         try:
             if opportunity is None:
                 raise ValueError("Frozen opportunity missing")
-            pack = create_pack(db, opportunity[0], demo=True)
+            pack = create_pack(db, opportunity[0], demo=True, settings=settings)
             projects = [p["id"] for p in pack["selection"]["projects"]]
             ranked = score(labels, projects)
             result.update(

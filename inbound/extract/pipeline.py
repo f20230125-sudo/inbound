@@ -290,7 +290,11 @@ def extract_messages(db, clock=None, ids=None):
             declarations.append(declaration)
             parsed.append(parse_attachment(declaration))
         check(db)
-        extracted = extract_call(message_from_row(row, declarations), parsed)
+        category = db.execute(
+            'SELECT COALESCE(corrected_category,category) FROM triage WHERE message_id=?',
+            (row['id'],),
+        ).fetchone()[0]
+        extracted = extract_call(message_from_row(row, declarations), parsed, category=category)
         check(db)
         with db:
             for attachment, result in zip(attachments, parsed, strict=True):
