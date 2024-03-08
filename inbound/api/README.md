@@ -85,3 +85,17 @@ can use `ASYNC_WORK=False` to execute the same worker synchronously without a li
 Inbox filters other than category, and run filters, are client-side for this
 190-message dataset. Source strings are plain text, never HTML. External form and
 application URLs are browser anchors only; no endpoint fetches or submits them.
+
+M4b presentation contract fixes:
+
+- Settings includes `source_format` (`export` or `eml`) from trusted configuration.
+  Import still accepts `{}` and cannot be pointed at another folder from the browser.
+- Today entries include `display_title`, effective `city`, and `attention_reason`.
+  Calls use effective company/role/city; unknown company falls back to the normalized
+  subject. Original subject remains available as source evidence. The CLI uses the
+  same title and explicit blocker/expiry/conflict reason.
+- GET `/api/packs/<id>/preview` returns an actual PNG of the PDF's first page. It uses
+  exactly the download artifact confinement guard, renders locally with the installed
+  PDFium dependency, and serializes rasterization. It adds no subprocess or transport.
+  This supports mobile and headless browsers without relying on a native PDF plugin;
+  the restrictive page CSP stays intact. The HTML evidence remains available.

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "strict": true,
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "tsBuildInfoFile": "../.local/tsbuild-m4b/tsconfig.node.tsbuildinfo",
     "target": "es2023",
     "lib": ["ES2023", "DOM"],
     "types": ["node"],

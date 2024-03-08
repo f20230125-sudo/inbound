@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from inbound.extract.pipeline import latest_revision, opportunity_state
+from inbound.triage.normalize import normalize, normalize_subject
 
 DUBAI = ZoneInfo("Asia/Dubai")
 
@@ -78,6 +79,7 @@ def today(db, now=None):
                 "id": state["id"],
                 "kind": "call",
                 "company": state["fields"]["company"]["normalized"],
+                "city": state["fields"]["city"]["normalized"],
                 "roles": state["fields"]["roles"]["normalized"],
                 "status": state["status"],
                 "mode": state["fields"]["mode"]["normalized"],
@@ -114,6 +116,20 @@ def today(db, now=None):
             }
         )
     for entry in entries:
+        company = entry.get("company")
+        roles = entry.get("roles") or []
+        entry["display_title"] = (
+            " · ".join(
+                normalize(str(value))
+                for value in (
+                    company,
+                    roles[0]["title"] if roles else "Role unknown",
+                    entry.get("city") or "City unknown",
+                )
+            )
+            if company
+            else normalize_subject(entry["subject"])
+        )
         group = deadline_group(entry["deadline"], now)
         entry["deadline_group"] = group
         entry["deadline_label"] = (
@@ -134,6 +150,15 @@ def today(db, now=None):
         )
         if entry["deadline"] and entry["deadline"].get("past_at_receipt"):
             entry["deadline_label"] += " · Deadline passed before receipt"
+        entry["attention_reason"] = (
+            "Deadline conflicting — review required"
+            if entry["deadline"] and entry["deadline"]["status"] == "conflicting"
+            else "Blocked: " + entry["blocked_reason"]
+            if entry["blocked_reason"]
+            else "Conflicting fields — review required: " + ", ".join(entry["conflicts"])
+            if entry["conflicts"]
+            else entry["deadline_label"]
+        )
         if (
             entry["blocked_reason"]
             or entry["conflicts"]
@@ -217,5 +242,8 @@ def plain_text(summary):
         for row in summary[key]:
             value = (row["deadline"] or {}).get("normalized")
             deadline = display(value) if value else "Unknown"
-            lines.append(f"{row['kind']} · {row['subject']} · {deadline} · {row['deadline_label']}")
+            lines.append(
+                f"{row['kind']} · {row['display_title']} · {deadline} · "
+                f"{row['attention_reason']}"
+            )
     return "\n".join(lines) + "\n"
