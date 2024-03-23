@@ -3,6 +3,7 @@ import { Link, NavLink, Route, Routes, useLocation } from 'react-router';
 import type { Run, Settings } from './types';
 import { request } from './lib/api';
 import { date } from './lib/format';
+import { useServerClock } from './lib/clock';
 import { PauseControl, Failure, Loading } from './components/shared';
 import { Button } from './components/ui/button';
 import TodayPage from './pages/Today';
@@ -18,6 +19,7 @@ export function useDesk() { return useContext(Context)!; }
 const titles = ['Today / Inbox', 'Opportunity / Pack', 'Settings / Runs'];
 export default function App() {
     const [settings, setSettings] = useState<Settings>();
+    const clock = useServerClock(settings?.clock || '', settings?.frozen_clock ?? true);
     const [error, setError] = useState(false);
     const [activeWork, setActiveWork] = useState(false);
     const [dark, setDark] = useState(() => localStorage.getItem('inbound-theme') === 'dark');
@@ -33,6 +35,11 @@ export default function App() {
         setError(true);
     } }, []);
     useEffect(() => { void refresh(); }, [refresh, location.pathname]);
+    useEffect(() => {
+        const visible = () => { if (!document.hidden) void refresh(); };
+        document.addEventListener('visibilitychange', visible);
+        return () => document.removeEventListener('visibilitychange', visible);
+    }, [refresh]);
     useEffect(() => { document.documentElement.classList.toggle('dark', dark); }, [dark]);
     useEffect(() => {
         const checkRuns = () => { if (!document.hidden)
@@ -82,5 +89,5 @@ export default function App() {
         paused: boolean;
     }>('/settings', settings?.csrf_token, { paused }); setSettings(v => v && { ...v, paused: result.paused }); }
     const todayLink = `/${sessionStorage.getItem('inbound-inbox-query') || ''}`;
-    return <><a className="skip-link" href="#main">Skip to content</a><header className="app-header"><div><Link to="/" className="brand">Inbound</Link><p>{settings?.mode === 'replay' ? 'Synthetic replay · Read-only' : 'Local · Offline'}</p></div><div className="header-actions">{settings && <PauseControl paused={settings.paused} replay={settings.mode === 'replay'} save={savePause} active={activeWork}/>}<Button variant="outline" aria-pressed={dark} onClick={() => { setDark(v => !v); localStorage.setItem('inbound-theme', dark ? 'light' : 'dark'); }}>Dark mode</Button></div></header><div className="desk-shell"><nav aria-label="Primary"><NavLink to={todayLink} end>{titles[0]}</NavLink><NavLink to={sessionStorage.getItem('inbound-last-opportunity') || '/opportunity'}>{titles[1]}</NavLink><NavLink to="/settings">{titles[2]}</NavLink></nav><main id="main" tabIndex={-1}><h1 id="page-title" tabIndex={-1}>{title}</h1><div className="meta clock"><p>Dubai time · UTC+04:00</p>{settings?.frozen_clock && <p>Frozen synthetic clock: {date(settings.clock)} · Dubai</p>}</div><div role="status" className="sr-only">{title}</div>{error ? <Failure text="Settings could not be loaded." retry={() => void refresh()}/> : !settings ? <Loading text="Loading settings…"/> : <Context.Provider value={{ settings, refresh, savePause }}><Routes><Route path="/" element={<TodayPage />}/><Route path="/opportunity/:id?" element={<OpportunityPage />}/><Route path="/settings" element={<SettingsPage />}/><Route path="*" element={<p>Choose a call from <Link to="/">Today / Inbox</Link></p>}/></Routes></Context.Provider>}</main></div></>;
+    return <><a className="skip-link" href="#main">Skip to content</a><header className="app-header"><div><Link to="/" className="brand">Inbound</Link><p>{settings?.mode === 'replay' ? 'Synthetic replay · Read-only' : 'Local · Offline'}</p></div><div className="header-actions">{settings && <PauseControl paused={settings.paused} replay={settings.mode === 'replay'} save={savePause} active={activeWork}/>}<Button variant="outline" aria-pressed={dark} onClick={() => { setDark(v => !v); localStorage.setItem('inbound-theme', dark ? 'light' : 'dark'); }}>Dark mode</Button></div></header><div className="desk-shell"><nav aria-label="Primary"><NavLink to={todayLink} end>{titles[0]}</NavLink><NavLink to={sessionStorage.getItem('inbound-last-opportunity') || '/opportunity'}>{titles[1]}</NavLink><NavLink to="/settings">{titles[2]}</NavLink></nav><main id="main" tabIndex={-1}><h1 id="page-title" tabIndex={-1}>{title}</h1><div className="meta clock"><p>Dubai time · UTC+04:00</p>{settings?.frozen_clock && <p>Frozen synthetic clock: {date(settings.clock)} · Dubai</p>}</div><div role="status" className="sr-only">{title}</div>{error ? <Failure text="Settings could not be loaded." retry={() => void refresh()}/> : !settings ? <Loading text="Loading settings…"/> : <Context.Provider value={{ settings: { ...settings, clock }, refresh, savePause }}><Routes><Route path="/" element={<TodayPage />}/><Route path="/opportunity/:id?" element={<OpportunityPage />}/><Route path="/settings" element={<SettingsPage />}/><Route path="*" element={<p>Choose a call from <Link to="/">Today / Inbox</Link></p>}/></Routes></Context.Provider>}</main></div></>;
 }

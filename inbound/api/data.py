@@ -124,6 +124,8 @@ def matching_locations(message, name, quote):
 
 
 def opportunity(db, oid, *, clock=None, demo=False):
+    from inbound.application_activity import latest
+
     if not db.execute("SELECT 1 FROM opportunities WHERE id=?", (oid,)).fetchone():
         abort(404)
     state = opportunity_state(db, oid, clock=clock)
@@ -182,6 +184,7 @@ def opportunity(db, oid, *, clock=None, demo=False):
         )
     ]
     state["review_history"] = history(db, oid)
+    state["outside_application"] = latest(db, oid)
     try:
         registry = load_registry(db, "demo" if demo else "public")
     except ValueError:
