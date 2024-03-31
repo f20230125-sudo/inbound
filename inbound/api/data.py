@@ -125,6 +125,7 @@ def matching_locations(message, name, quote):
 
 def opportunity(db, oid, *, clock=None, demo=False):
     from inbound.application_activity import latest
+    from inbound.attachment_recovery import public_record
 
     if not db.execute("SELECT 1 FROM opportunities WHERE id=?", (oid,)).fetchone():
         abort(404)
@@ -178,13 +179,15 @@ def opportunity(db, oid, *, clock=None, demo=False):
     state["packs"] = [
         dict(r)
         for r in db.execute(
-            "SELECT id,revision_id,status,created_at,provisional FROM packs "
+            "SELECT id,revision_id,status,created_at,provisional,content_version FROM packs "
             "WHERE opportunity_id=? ORDER BY created_at DESC,id DESC",
             (oid,),
         )
     ]
     state["review_history"] = history(db, oid)
     state["outside_application"] = latest(db, oid)
+    state["attachment_recoveries"] = [public_record(row) for row in db.execute(
+        "SELECT * FROM attachment_recoveries WHERE opportunity_id=? ORDER BY id", (oid,))]
     try:
         registry = load_registry(db, "demo" if demo else "public")
     except ValueError:
