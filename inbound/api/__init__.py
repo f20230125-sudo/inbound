@@ -1,4 +1,4 @@
-"""Loopback-only offline desk API. No endpoint accesses an external URL."""
+"""Loopback-only desk API. Only Gmail sync reaches out, read-only, via sources/gmail_api.py."""
 
 import hmac
 import json
@@ -26,6 +26,7 @@ from flask import (
 from itsdangerous import BadSignature, URLSafeSerializer
 from werkzeug.exceptions import HTTPException
 
+from inbound import gmail_sync
 from inbound.api import data
 from inbound.application_activity import ActivityConflict, applied_time, latest, record
 from inbound.attachment_recovery import RecoveryConflict, TooLarge, confirm, preview
@@ -35,6 +36,7 @@ from inbound.extract.pipeline import latest_revision
 from inbound.ledger import timestamp
 from inbound.pause import PausedError, check, set_paused
 from inbound.settings import REPO, Settings
+from inbound.sources.gmail_api import GmailError
 from inbound.triage.taxonomy import CATEGORIES
 from inbound.work import execute, start_run
 
@@ -607,6 +609,37 @@ def create_app(config=None):
     @app.get("/api/runs")
     def get_runs():
         return output(data.runs(db()))
+
+    @app.get("/api/gmail")
+    def gmail_status():
+        if app.config["APP_MODE"] == "replay":
+            return output({"connected": False, "read_only": True, "available": False})
+        return output({**gmail_sync.status(settings, db()), "available": True})
+
+    @app.post("/api/gmail/sync")
+    def gmail_sync_now():
+        if body():
+            abort(400)
+        if not gmail_sync.connected(settings):
+            abort(409, "Gmail is not connected")
+        try:
+            result = gmail_sync.sync(settings, transport=app.config.get("GMAIL_TRANSPORT"))
+        except PausedError:
+            abort(423, "Inbound is paused")
+        except (GmailError, OSError, ValueError, KeyError) as exc:
+            abort(502, f"Gmail sync failed ({type(exc).__name__})")
+        return output({**gmail_sync.status(settings, db()), "result": result})
+
+    @app.post("/api/gmail/poll")
+    def gmail_poll():
+        value = body()
+        if set(value) != {"enabled", "minutes"}:
+            abort(400, "enabled and minutes required")
+        try:
+            gmail_sync.set_poll(db(), enabled=value["enabled"], minutes=value["minutes"])
+        except ValueError as exc:
+            abort(400, str(exc))
+        return output(gmail_sync.status(settings, db()))
 
     @app.get("/")
     @app.get("/<path:path>")
