@@ -1,5 +1,6 @@
 """Loopback-only desk API. Only Gmail sync reaches out, read-only, via sources/gmail_api.py."""
 
+import hashlib
 import hmac
 import json
 import os
@@ -609,6 +610,28 @@ def create_app(config=None):
     @app.get("/api/runs")
     def get_runs():
         return output(data.runs(db()))
+
+    @app.get("/api/version")
+    def version():
+        """A cheap token that changes whenever anything the desk shows changes."""
+        connection = db()
+        parts = [
+            tuple(connection.execute(
+                "SELECT (SELECT COALESCE(MAX(version),0) FROM snapshots),"
+                "(SELECT COUNT(*) FROM messages),"
+                "(SELECT COALESCE(MAX(id),0) FROM review_events),"
+                "(SELECT COUNT(*) FROM category_history),"
+                "(SELECT COUNT(*)||':'||COALESCE(MAX(id),'') FROM packs),"
+                "(SELECT GROUP_CONCAT(status,'') FROM packs),"
+                "(SELECT COALESCE(MAX(id),0)||':'||COUNT(finished_at) FROM runs),"
+                "(SELECT COALESCE(SUM(content_version),0) FROM opportunities),"
+                "(SELECT value FROM settings WHERE key='paused')"
+            ).fetchone()),
+        ]
+        if app.config["APP_MODE"] != "replay":
+            parts.append(gmail_sync.status(settings, connection).get("last_sync_at"))
+        token = hashlib.sha256(json.dumps(parts, default=str).encode()).hexdigest()[:16]
+        return output({"version": token})
 
     @app.get("/api/gmail")
     def gmail_status():

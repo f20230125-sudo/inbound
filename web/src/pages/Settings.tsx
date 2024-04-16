@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { useDesk } from '../App';
 import { request } from '../lib/api';
+import { alertsEnabled, setAlertsEnabled } from '../lib/live';
 import { date, label } from '../lib/format';
 import type { Run, Settings } from '../types';
 import { Button } from '../components/ui/button';
@@ -14,7 +15,7 @@ export function PayloadPolicySummary({ settings }: {
             ['Approved private-field allowlist', settings.payload_policy.allowlist.join(', ') || 'Empty'],
             ['Synthetic/public payloads', 'Subject to policy; live transport disabled in this build'],
             ['Current model execution', settings.execution], ['External network services', 'Only read-only Gmail sync, and only after you connect it'],
-            ['Gmail', 'Read-only; see Gmail below'], ['Notifications', 'Not implemented in this build'],
+            ['Gmail', 'Read-only; see Gmail below'], ['Notifications', 'Browser notifications on this PC only, if you turn them on'],
         ].map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{value}</dd></div>)}</dl></Section>;
 }
 export function DataPaths({ settings }: {
@@ -113,6 +114,22 @@ export function GmailControl() {
         {message && <p role="status">{message}</p>}
     </Section>;
 }
+export function AlertsControl() {
+    const supported = typeof Notification !== 'undefined';
+    const [on, setOn] = useState(() => alertsEnabled());
+    const [message, setMessage] = useState('');
+    async function toggle() {
+        if (on) { setAlertsEnabled(false); setOn(false); setMessage('Alerts turned off.'); return; }
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') { setMessage('The browser did not allow notifications. Allow them for this page in the browser settings.'); return; }
+        setAlertsEnabled(true); setOn(true); setMessage('Alerts turned on.');
+    }
+    return <Section title="Alerts on this PC" id="alerts">
+        <p>While the desk is open, this browser shows a notification for a new PS call, and for a deadline within 12 hours that you have not applied to or skipped. Nothing is sent anywhere else.</p>
+        {supported ? <Button onClick={() => void toggle()} aria-pressed={on}>{on ? 'Turn off alerts' : 'Turn on alerts'}</Button> : <p>This browser does not support notifications.</p>}
+        {message && <p role="status">{message}</p>}
+    </Section>;
+}
 export default function SettingsPage() {
     const { settings, savePause } = useDesk();
     const [runs, setRuns] = useState<Run[]>();
@@ -133,5 +150,5 @@ export default function SettingsPage() {
     const b = settings.budgets;
     return <><a href="#runs">Jump to runs</a><div className="settings-grid"><div><Section title="Pause"><PauseControl paused={settings.paused} replay={settings.mode === 'replay'} save={savePause} active={active}/></Section><Section title="Budgets"><p>Offline mode — live model calls are disabled.</p><p>Changing a budget does not enable a provider.</p><dl>{[
             ['Daily model call limit', b.daily_call_limit], ['Daily model spend limit', `${b.daily_spend_limit} ${b.currency}`], ['Calls used today', b.calls_used_today], ['Spend used today', b.spend_used_today === null ? 'Not recorded' : `${b.spend_used_today} ${b.currency}`], ['Budget resets at', b.resets_at ? `${date(b.resets_at)} · Dubai` : 'Not recorded · Asia/Dubai'],
-        ].map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{value}</dd></div>)}</dl><p>Model comparison: Not run</p><StatusBadge value="Not run"/></Section><GmailControl/><PayloadPolicySummary settings={settings}/><DataPaths settings={settings}/><ImportControl runs={runs} refreshRuns={refreshRuns}/></div><RunLedger runs={runs} error={error} refresh={refreshRuns}/></div></>;
+        ].map(([key, value]) => <div key={key}><dt>{key}</dt><dd>{value}</dd></div>)}</dl><p>Model comparison: Not run</p><StatusBadge value="Not run"/></Section><GmailControl/><AlertsControl/><PayloadPolicySummary settings={settings}/><DataPaths settings={settings}/><ImportControl runs={runs} refreshRuns={refreshRuns}/></div><RunLedger runs={runs} error={error} refresh={refreshRuns}/></div></>;
 }
