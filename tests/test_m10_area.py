@@ -40,3 +40,9 @@ def test_zero_width_subject_and_comma_company_with_area():
 def test_a_genuinely_different_body_company_still_conflicts():
     fields = extract(PREFIX + "Alpha Labs,Port Selene", "*Beta Labs,Port Selene,Marina, *")
     assert fields["company"]["status"] == "conflicting"
+
+
+def test_area_rule_does_not_hide_a_company_that_really_differs():
+    # Body company "Alpha, Labs" is not the subject's "Alpha": keep the conflict visible.
+    fields = extract(PREFIX + "Alpha,Port Selene", "*Alpha, Labs,Port Selene, *")
+    assert fields["company"]["status"] == "conflicting"

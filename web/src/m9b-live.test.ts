@@ -16,6 +16,10 @@ function today(parts: Partial<Today>): Today {
 }
 
 describe('alertsFor', () => {
+    it('treats a call first seen in any Today list as new (it may already be blocked or drafted)', () => {
+        const value = today({ attention: [entry(8, null, { status: 'blocked' })] });
+        expect(alertsFor(value, now, []).map(a => a.key)).toEqual(['new:8']);
+    });
     it('alerts once for a new PS call and never for admin notices', () => {
         const value = today({ new_calls: [entry(1, null), entry(2, null, { kind: 'ps_admin' })] });
         expect(alertsFor(value, now, []).map(a => a.key)).toEqual(['new:1']);
@@ -32,6 +36,10 @@ describe('alertsFor', () => {
             ],
             outside_applications: [{ id: 7, display_title: 'Call 7', outside_application: {} as never }],
         });
-        expect(alertsFor(value, now, []).map(a => a.key)).toEqual(['due12:3']);
+        const keys = alertsFor(value, now, []).map(a => a.key);
+        expect(keys.filter(k => k.startsWith('due12:'))).toEqual(['due12:3:2026-10-28T08:00:00+04:00']);
+        // An amended deadline is a new alert; the old one stays deduplicated.
+        const amended = today({ deadlines_48h: [entry(3, '2026-10-28T09:00:00+04:00')] });
+        expect(alertsFor(amended, now, keys).map(a => a.key)).toEqual(['due12:3:2026-10-28T09:00:00+04:00']);
     });
 });
