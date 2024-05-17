@@ -16,6 +16,7 @@ from inbound.ledger import timestamp
 from inbound.pause import check
 from inbound.provenance import locations
 from inbound.sources.base import MAX_BYTES, safe_attachment_path
+from inbound.steps import Empty, Kind, Reference, emit
 
 
 class RecoveryConflict(RuntimeError):
@@ -204,5 +205,7 @@ def confirm(db, settings, opportunity_id, attachment_id, *, content_hash, expect
             })),
         )
         check(db)
+        emit(db, Kind.RECOVERED, Empty(), entity_type="opportunity", entity_id=opportunity_id,
+             revision_id=row['revision_id'], references=(Reference("message", row['message_id']),))
         return public_record(db.execute("SELECT * FROM attachment_recoveries WHERE id=?",
                                         (cursor.lastrowid,)).fetchone())

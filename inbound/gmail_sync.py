@@ -9,6 +9,7 @@ import threading
 import time
 from contextlib import closing
 from datetime import UTC, datetime, timedelta
+from uuid import uuid4
 
 from inbound.db import connect
 from inbound.pause import check, is_paused
@@ -138,7 +139,9 @@ def fetch_new(settings, client, *, query=DEFAULT_QUERY, limit=MAX_PER_SYNC):
 
 def unimported(settings):
     """Saved messages not yet in the database (e.g. a crash between download and import)."""
-    saved = {path.stem for path in mail_dir(settings).glob("*.json")}
+    folder = mail_dir(settings)
+    rejected = {path.stem for path in folder.glob("*.rejected")}
+    saved = {path.stem for path in folder.glob("*.json")} - rejected
     if not saved:
         return set()
     with closing(connect(settings.db_path)) as db:
@@ -168,7 +171,22 @@ def sync(settings, *, transport=None, clock=None):
     if not _SYNC_LOCK.acquire(blocking=False):
         return {"skipped": "another Gmail check is running"}
     try:
-        return _sync(settings, transport=transport, clock=clock)
+        from inbound.steps import Empty, Kind, emit, scope
+
+        with scope(correlation_id=uuid4().hex, source='private'):
+            def record_step(kind):
+                with closing(connect(settings.db_path)) as db, db:
+                    emit(db, kind, Empty())
+
+            record_step(Kind.GMAIL_STARTED)
+            try:
+                result = _sync(settings, transport=transport, clock=clock)
+            except Exception:
+                record_step(Kind.GMAIL_FAILED)
+                raise
+            record_step(Kind.GMAIL_FINISHED if result.get('status', 'success') == 'success'
+                        else Kind.GMAIL_FAILED)
+            return result
     finally:
         _SYNC_LOCK.release()
 
@@ -191,6 +209,10 @@ def _sync(settings, *, transport, clock):
     finally:
         client.close()
     result = dict(fetched)
+    from inbound.steps import Fetch, Kind, emit
+
+    with closing(connect(settings.db_path)) as db, db:
+        emit(db, Kind.GMAIL_FETCHED, Fetch(**fetched))
     # Import whenever saved mail is missing from the database, not only after new downloads.
     if unimported(settings):
         with closing(connect(settings.db_path)) as db:

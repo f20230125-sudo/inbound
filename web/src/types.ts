@@ -206,8 +206,26 @@ export interface AgentState {
     gmail_connected: boolean;
     briefing: { text: string; href: string }[];
     counts: { decisions: number; drafts: number };
+    decision_counts?: { calls: number; notices: number; follow_ups: number; emails_to_sort: number };
     decisions: { id: string; title: string; reason: string; action: string; href: string; deadline?: Field }[];
     freshness: { uncertain: boolean; gmail_success_at: string | null; snapshot_at: string | null; next_check_at: string | null };
+}
+export interface AgentStep {
+    id: number;
+    text: string;
+    href: string;
+    occurred_at: string;
+    kind: string;
+    phase: 'progress' | 'committed_result';
+    outcome: string;
+}
+export interface StepsPage {
+    steps: AgentStep[];
+    after: number;
+    has_more: boolean;
+    label: string | null;
+    recording_id?: number;
+    through?: number;
 }
 export interface ApplicationActivity {
     id: number;
