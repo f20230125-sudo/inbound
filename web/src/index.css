@@ -318,3 +318,19 @@ th, td { vertical-align: top; padding: 10px 6px; border-bottom: 1px solid var(--
   .dispatch-columns { display: block; }
   .dispatch-columns .section { padding: 20px 0; }
 }
+.memory-page { max-width: 72rem; }
+.memory-intro { max-width: 60rem; margin-block-end: 1.5rem; }
+.memory-toolbar { display: flex; flex-wrap: wrap; gap: .5rem; margin-block: 1rem; }
+.memory-entry { padding-block: 1.5rem; border-block-start: 1px solid var(--border); scroll-margin-top: 1rem; }
+.memory-entry h3 { font-size: 1.125rem; font-weight: 600; margin-block-end: .4rem; }
+.memory-markdown { overflow-wrap: anywhere; margin-block: 1rem; }
+.memory-markdown p, .memory-markdown ul, .memory-markdown ol, .memory-markdown pre { margin-block: .6rem; }
+.memory-markdown ul { list-style: disc; padding-inline-start: 1.5rem; }
+.memory-markdown ol { list-style: decimal; padding-inline-start: 1.5rem; }
+.memory-markdown h4 { font-weight: 600; }
+.memory-markdown pre { white-space: pre-wrap; }
+.memory-source { font-size: .875rem; overflow-wrap: anywhere; }
+.memory-source div { margin-block: .5rem; }
+.memory-source dt { font-weight: 600; }
+.memory-editor { display: grid; gap: .6rem; max-width: 48rem; }
+.memory-editor select { border: 1px solid var(--border); padding: .5rem; border-radius: .375rem; background: var(--background); }

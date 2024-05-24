@@ -1,6 +1,7 @@
 """Fresh synthetic-only browser fixture; loopback server, no external transport."""
 
 import os
+import shutil
 import sys
 from contextlib import closing
 from dataclasses import replace
@@ -15,6 +16,7 @@ from inbound.api import create_app
 from inbound.db import connect, import_messages
 from inbound.demo import build_demo
 from inbound.extract.pipeline import extract_messages
+from inbound.memory import refresh as refresh_memory
 from inbound.models import Attachment, Message
 from inbound.packs.build import create_pack
 from inbound.settings import Settings
@@ -25,7 +27,15 @@ def main():
     root = Path(mkdtemp(prefix="m4b-e2e-", dir=ROOT / ".local"))
     settings = Settings(data_root=root)
     build_demo(settings)
+    shutil.copytree(ROOT / "fixtures/memory", root / "memory")
+    for device in ("desktop", "mobile"):
+        for scheme in ("light", "dark"):
+            name = f"{device}-{scheme}"
+            (root / "memory" / f"curated-{name}.md").write_text(
+                f"---\nname: Curated {name}\ndescription: Fictional browser fixture\n"
+                f"type: user\nsource: {name}\n---\nFictional curated memory.\n", encoding="utf8")
     with closing(connect(settings.db_path)) as db:
+        refresh_memory(db, settings, source="synthetic")
         now = datetime(2026, 10, 28, 5, tzinfo=UTC)
         missing = Message(
             provider_id="M8-desktop-light", thread_id="M8-desktop-light",

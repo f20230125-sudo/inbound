@@ -63,7 +63,7 @@ def test_migrations_are_applied_once(tmp_path):
     db = connect(path)
     db.close()
     db = connect(path)
-    assert db.execute("SELECT count(*) FROM schema_migrations").fetchone()[0] == 8
+    assert db.execute("SELECT count(*) FROM schema_migrations").fetchone()[0] == 9
     db.execute("UPDATE schema_migrations SET sha256='altered'")
     db.commit()
     db.close()
