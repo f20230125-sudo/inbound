@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import sqlite3
 import threading
 from contextlib import closing
@@ -32,6 +33,15 @@ def guard(db):
         raise MemoryConflict("Import is running; refresh memory after publication")
 
 
+def readable_title(document):
+    if document.get('title'):
+        return document['title']
+    description = document.get('description', '').strip()
+    if description:
+        return re.split(r'[.;!\n]|,\s', description, maxsplit=1)[0].strip() or description
+    return document['name'].replace('-', ' ').replace('_', ' ').capitalize()
+
+
 def project(row):
     doc = json.loads(row["document_json"])
     return (
@@ -51,6 +61,7 @@ def project(row):
             )
         }
         | {
+            "display_title": readable_title(doc),
             "influence": "remembered",
             "scope": "Local retrieval only; no active behavior rule",
             "conflicts": json.loads(row["conflicts_json"]),

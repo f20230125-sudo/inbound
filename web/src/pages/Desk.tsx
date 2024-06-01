@@ -55,8 +55,8 @@ export default function DeskPage() {
             </div>
         </section>
         <div className="scout-command"><label htmlFor="scout-command">Ask Scout or give a command</label>
-            <input id="scout-command" ref={command} readOnly placeholder="Commands arrive in M15" aria-describedby="command-help" />
-            <p id="command-help" className="meta"><span>Commands arrive in M15.</span> Use the controls below for now. <span aria-hidden="true">Ctrl / ⌘ K</span></p>
+            <input id="scout-command" ref={command} readOnly placeholder="Use the page controls for now" aria-describedby="command-help" />
+            <p id="command-help" className="meta"><span>Use the page controls for now.</span> <span aria-hidden="true">Ctrl / ⌘ K</span></p>
         </div>
         <div className="dispatch-columns">
             <Section title="Your next decisions" id="decisions">

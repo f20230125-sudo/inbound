@@ -161,6 +161,8 @@ export interface Message {
     }[];
 }
 export interface Entry {
+    preference_score?: number;
+    preference_reasons?: { rule_id: string; version: number; text: string; evidence: string; score: number; href: string }[];
     id: number;
     kind: string;
     display_title: string;
@@ -300,6 +302,8 @@ export interface Pack extends PackRef {
     }[];
 }
 export interface MemoryDocument {
+    title?: string;
+    display_title?: string;
     name: string;
     description: string;
     type: 'user' | 'feedback' | 'project' | 'reference';
@@ -326,4 +330,36 @@ export interface MemorySnapshot {
     items: MemoryRecord[];
     error: 'invalid_snapshot' | null;
     published: boolean;
+}
+
+export interface LearnedRule {
+    id: string;
+    kind: 'sender' | 'preference';
+    status: 'suggested' | 'active' | 'undone';
+    version: number;
+    title: string;
+    scope: string;
+    mailbox?: string;
+    subject?: string | null;
+    category?: string;
+    effect?: string;
+    origin_type: string;
+    origin_id: string | null;
+    changed_at: string;
+    match_count: number;
+    examples: { message_id: number; subject: string }[];
+    recent_uses: { message_id: number; subject: string; used_at: string; version: number }[];
+    versions: { version: number; status: string; changed_at: string }[];
+    conflicts?: string[];
+}
+export interface RulePreview {
+    match_count: number;
+    eligible_count: number;
+    token: string;
+    examples: { message_id: number; subject: string; manual_correction: boolean }[];
+}
+export interface SenderReviewSnapshot {
+    unresolved_total: number;
+    stored_total: number;
+    groups: { mailbox: string | null; count: number; mixed: boolean; examples: { message_id: number; subject: string }[] }[];
 }

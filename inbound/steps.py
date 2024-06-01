@@ -13,6 +13,10 @@ from inbound.triage.taxonomy import CATEGORIES
 
 
 class Kind(StrEnum):
+    RULE_SUGGESTED = "learning.suggested"
+    RULE_ACTIVATED = "action.rule_activated"
+    RULE_UNDONE = "action.rule_undone"
+    RULE_MATCHED = "learning.matched"
     MEMORY_PUBLISHED = "memory.published"
     MEMORY_CHANGED = "action.memory_changed"
     GMAIL_STARTED = "gmail.started"
@@ -100,7 +104,7 @@ class MemoryPublication:
 
 _CONTEXT = ContextVar("agent_step_context", default=None)
 STAGES = {"queued", "import", "triage", "extraction", "provenance", "snapshot", "pack"}
-ENTITIES = {"message", "opportunity", "pack", "run", "snapshot", "memory", "memory_snapshot"}
+ENTITIES = {"message", "opportunity", "pack", "run", "snapshot", "memory", "memory_snapshot", "rule"}
 FACT_TYPES = {k: Empty for k in Kind}
 FACT_TYPES.update(
     {
@@ -144,7 +148,9 @@ def identifier(value):
 
 
 def provenance(db, entity_type, entity_id):
-    if entity_type == "memory":
+    if entity_type == "rule":
+        rows = db.execute("SELECT source FROM learned_rules WHERE id=?", (entity_id,)).fetchall()
+    elif entity_type == "memory":
         rows = db.execute("SELECT source FROM memories WHERE id=?", (entity_id,)).fetchall()
     elif entity_type == "memory_snapshot":
         rows = db.execute("SELECT source FROM memories WHERE version<=?", (entity_id,)).fetchall()
@@ -295,6 +301,10 @@ def emit(
 
 
 TEMPLATES = {
+    Kind.RULE_SUGGESTED: "I suggested a scoped rule for your review.",
+    Kind.RULE_ACTIVATED: "You activated a rule. Its scope and Undo are in Memory.",
+    Kind.RULE_UNDONE: "You undid a rule. Its future influence is disabled.",
+    Kind.RULE_MATCHED: "I used your scoped rule on matching stored work.",
     Kind.MEMORY_PUBLISHED: "I refreshed the saved memory snapshot.",
     Kind.MEMORY_CHANGED: "You changed a saved memory.",
     Kind.GMAIL_STARTED: "I started a Gmail check.",
@@ -393,8 +403,10 @@ def project(row):
         op = next((r for r in refs if r["entity_type"] == "opportunity"), None)
         if op:
             href = f"/opportunity/{op['entity_id']}#pack"
-    if entity in {"memory", "memory_snapshot"}:
+    if entity in {"memory", "memory_snapshot", "rule"}:
         href = f"/memory#memory-{identity}" if entity == "memory" else "/memory"
+    if entity == "rule":
+        href = f"/memory#rule-{identity}"
     return result | {"facts": facts, "source_refs": refs, "text": text, "href": href}
 
 
