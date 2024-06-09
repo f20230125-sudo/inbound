@@ -10,10 +10,10 @@ while (!existsSync(path.join(repo, 'CODEX_BRIEF.md'))) {
 }
 const port = process.env.INBOUND_E2E_PORT || '5081';
 export default defineConfig({
-    testDir: './tests/e2e', outputDir: path.join(repo, '.local/playwright-m14'), timeout: 180000,
+    testDir: './tests/e2e', outputDir: path.join(repo, '.local/playwright-m15'), timeout: 180000,
     expect: { timeout: 15000 }, fullyParallel: false, workers: 1,
     globalTeardown: './tests/e2e_teardown.ts',
-    reporter: [['list'], ['json', { outputFile: path.join(repo, '.local/reports/m14-playwright.json') }]],
+    reporter: [['list'], ['json', { outputFile: path.join(repo, '.local/reports/m15-playwright.json') }]],
     use: { baseURL: `http://127.0.0.1:${port}`, browserName: 'chromium', trace: 'retain-on-failure' },
     projects: (['light', 'dark'] as const).flatMap(colorScheme => [
         { name: `desktop-${colorScheme}`, use: { colorScheme, viewport: { width: 1440, height: 900 } } },

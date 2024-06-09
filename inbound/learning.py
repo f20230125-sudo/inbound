@@ -199,12 +199,15 @@ def suggest_sender(db, message_id, category, *, subject):
     )
 
 
-def change(db, rid, action, *, expected_version):
+def change(db, rid, action, *, expected_version, expected_generation=None):
     if action not in {"activate", "undo"} or type(expected_version) is not int:
         raise ValueError("Supported rule action and version required")
     db.execute("BEGIN IMMEDIATE")
     with db:
-        guard(db)
+        if expected_generation is None:
+            guard(db)
+        else:
+            guard(db, expected_generation)
         row = get(db, rid)
         if row["version"] != expected_version:
             raise LearningConflict("Rule changed; refresh before saving")
@@ -349,7 +352,7 @@ def suggest_preference(db, effect):
     return result
 
 
-def instruction(db, text):
+def instruction(db, text, *, expected_generation=None):
     if not isinstance(text, str) or len(text) > 300:
         raise ValueError("A supported explicit instruction is required")
     normal = text.strip().casefold().rstrip(".")
@@ -371,6 +374,10 @@ def instruction(db, text):
     }[found[1] or found[2]]
     db.execute("BEGIN IMMEDIATE")
     with db:
+        if expected_generation is None:
+            guard(db)
+        else:
+            guard(db, expected_generation)
         definition = {"effect": effect}
         existing = db.execute(
             "SELECT id FROM learned_rules WHERE kind=? AND definition_json=? "
@@ -415,6 +422,7 @@ def skip_suggestion(db, oid, reason):
     normal = reason.strip().casefold().rstrip(".")
     effects = {
         "requires relocation": "avoid_relocation",
+        "it requires relocation": "avoid_relocation",
         "relocation required": "avoid_relocation",
         "prefer remote roles": "prefer_remote",
         "prefer hybrid roles": "prefer_hybrid",

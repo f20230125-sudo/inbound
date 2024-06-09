@@ -7,6 +7,7 @@ import { Activity } from '../components/activity';
 import { Briefing, ScoutFace } from '../components/scout';
 import { DeadlineDisplay, Loading, Section } from '../components/shared';
 import { Button } from '../components/ui/button';
+import { ScoutCommand } from '../components/scout-command';
 
 export default function DeskPage() {
     const { settings, refresh, setRecordedReplay } = useDesk();
@@ -14,7 +15,6 @@ export default function DeskPage() {
     const [disconnected, setDisconnected] = useState(false);
     const [checking, setChecking] = useState(false);
     const [checkError, setCheckError] = useState('');
-    const command = useRef<HTMLInputElement>(null);
     const work = useRef<HTMLAnchorElement>(null);
     const load = useCallback(async () => {
         try { const value = await request<AgentState>('/agent/state'); setState(value); setDisconnected(false); }
@@ -29,14 +29,7 @@ export default function DeskPage() {
         window.addEventListener(DATA_CHANGED, update);
         return () => { active = false; clearInterval(timer); document.removeEventListener('visibilitychange', update); window.removeEventListener(DATA_CHANGED, update); };
     }, [load, settings.paused]);
-    useEffect(() => {
-        const shortcut = (event: KeyboardEvent) => {
-            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); command.current?.focus(); }
-            if (event.key === 'Escape' && document.activeElement === command.current) { event.preventDefault(); work.current?.focus(); }
-        };
-        window.addEventListener('keydown', shortcut);
-        return () => window.removeEventListener('keydown', shortcut);
-    }, []);
+    const returnToWork = useCallback(() => work.current?.focus(), []);
     async function checkNow() {
         setChecking(true); setCheckError('');
         try { await request('/gmail/sync', settings.csrf_token, {}); window.dispatchEvent(new Event(DATA_CHANGED)); await refresh(); await load(); }
@@ -54,10 +47,7 @@ export default function DeskPage() {
                 {checkError && <p role="alert">{checkError}</p>}
             </div>
         </section>
-        <div className="scout-command"><label htmlFor="scout-command">Ask Scout or give a command</label>
-            <input id="scout-command" ref={command} readOnly placeholder="Use the page controls for now" aria-describedby="command-help" />
-            <p id="command-help" className="meta"><span>Use the page controls for now.</span> <span aria-hidden="true">Ctrl / ⌘ K</span></p>
-        </div>
+        <ScoutCommand returnToWork={returnToWork} />
         <div className="dispatch-columns">
             <Section title="Your next decisions" id="decisions">
                 {state?.decision_counts && <p className="meta">{state.decision_counts.calls} calls · {state.decision_counts.notices} notices · {state.decision_counts.follow_ups} follow-ups · {state.decision_counts.emails_to_sort} emails to sort</p>}
