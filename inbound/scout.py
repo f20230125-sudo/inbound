@@ -14,6 +14,7 @@ from inbound.extract.pipeline import latest_revision, opportunity_state
 from inbound.learning_preferences import EFFECTS, preference_fit, relocation_evidence
 from inbound.packs.matching import contains, skill_matches
 from inbound.steps import project
+from inbound.triage.normalize import ZERO_WIDTH
 
 COMMANDS = {'skip', 'remember', 'forget', 'check', 'pause'}
 EXAMPLES = ["What's due this week?", 'What changed since yesterday?',
@@ -81,6 +82,16 @@ def opportunities(db, now, replay):
     return result
 
 
+def title_of(op):
+    """A readable call name even when the company is unknown or conflicting."""
+    if op.get('company'):
+        return op['company'].translate(ZERO_WIDTH)
+    subject = re.sub(r'^(?:(?:fwd|re):\s*)*call for cv\s*[-–]\s*(?:ps ii\s*[-–]\s*'
+                     r'second semester\s*\d{4}\s*-\s*\d{4}\s*[-–]\s*)?', '',
+                     (op['mail']['subject'] or '').translate(ZERO_WIDTH), flags=re.IGNORECASE)
+    return subject.strip() or f"Call {op['id']}"
+
+
 def matches(text, title):
     words = re.findall(r'\w+', re.sub(r'^(?:my|the)\s+', '', text.casefold()))
     haystack = re.findall(r'\w+', (title or '').casefold())
@@ -115,8 +126,9 @@ def query(db, text, now, *, replay=False, selection=None, demo=False):
     if intent.kind == 'find':
         return find(db, intent.entity, now, replay, demo)
     if intent.kind == 'why':
-        candidates = [(f"opportunity:{o['id']}", f"{o['company']} · {o['city']} · call {o['id']}", o)
-                      for o in opportunities(db, now, replay) if matches(intent.entity, o['company'])]
+        candidates = [(f"opportunity:{o['id']}", f"{title_of(o)} · call {o['id']}", o)
+                      for o in opportunities(db, now, replay)
+                      if matches(intent.entity, f"{o['company'] or ''} {o['mail']['subject']}")]
         op, choices = choose(candidates, selection)
         if op is None:
             return reply('Choose the call you mean.' if choices else 'No matching stored call found.',
@@ -131,12 +143,12 @@ def due(db, now, replay):
     day = now.astimezone(DUBAI).date()
     start = day - timedelta(days=day.weekday())
     end = start + timedelta(days=7)
-    groups = {'timed': [], 'date_only': [], 'uncertain': []}
+    groups = {'timed': [], 'date_only': [], 'uncertain': [], 'past': []}
     for op in opportunities(db, now, replay):
         if op['status'] in {'skipped', 'submitted_by_me'} or latest(db, op['id']):
             continue
-        add_deadline(groups, op['company'], op['fields']['deadline'], start, end,
-                     citations.revision(db, op['revision_id']))
+        add_deadline(groups, title_of(op), op['fields']['deadline'], start, end,
+                     citations.revision(db, op['revision_id']), now)
     for row in db.execute(
         "SELECT m.*,e.fields_json FROM messages m JOIN message_extractions e ON e.message_id=m.id "
         "JOIN triage t ON t.message_id=m.id WHERE COALESCE(t.corrected_category,t.category)='ps_admin'"
@@ -150,7 +162,8 @@ def due(db, now, replay):
                                  'Message · administrative deadline',
                                  {'subject': row['subject'], 'deadline': deadline},
                                  f"/work#message-{row['id']}", row['sent_at'], row['source'])
-            add_deadline(groups, row['subject'], deadline, start, end, ref)
+            add_deadline(groups, row['subject'], deadline, start, end, ref, now)
+    groups['timed'].sort(key=lambda i: i['text'].split(': ', 1)[-1])
     counts = ', '.join(f'{len(v)} {k.replace("_", " ")}' for k, v in groups.items())
     return reply(f'Dubai week: {start} through {end - timedelta(days=1)} (inclusive). '
                  f'{counts}. Uncertain dates cannot be placed in this range. Showing up to 20 per group.',
@@ -160,7 +173,7 @@ def due(db, now, replay):
                  items=[i for values in groups.values() for i in values[:20]])
 
 
-def add_deadline(groups, title, deadline, start, end, ref):
+def add_deadline(groups, title, deadline, start, end, ref, now=None):
     value = deadline.get('normalized')
     status = deadline['status']
     if status not in {'found', 'inferred'} or not isinstance(value, str):
@@ -174,10 +187,41 @@ def add_deadline(groups, title, deadline, start, end, ref):
         return
     if start <= day < end:
         group = 'date_only' if len(value) == 10 else 'timed'
-        shown = value if group == 'date_only' else datetime.fromisoformat(value).astimezone(
-            DUBAI).isoformat()
-        groups[group].append(item(f'{title}: {shown} · {status} · '
-                                  + ('time unknown' if group == 'date_only' else 'Dubai'), ref))
+        if now is not None and (day < now.astimezone(DUBAI).date() if group == 'date_only'
+                                else datetime.fromisoformat(value) <= now):
+            # Already passed: kept visible, but after everything still open.
+            groups.setdefault('past', []).append(item(f'{title}: {when(value)} · passed', ref))
+            return
+        groups[group].append(item(f'{title}: {when(value)} · {status}', ref))
+
+
+def when(value):
+    """A deadline as Uzair reads it: Dubai date and time, or date only."""
+    if len(value) == 10:
+        return f'{date.fromisoformat(value):%a %d %b} · time unknown'
+    return f'{datetime.fromisoformat(value).astimezone(DUBAI):%a %d %b, %H:%M} Dubai'
+
+
+def stamp(value):
+    """A stored UTC timestamp as a short Dubai time."""
+    return f'{datetime.fromisoformat(value).astimezone(DUBAI):%d %b %H:%M}'
+
+
+def collapse(entries):
+    """Fold repeated identical steps (e.g. a quiet Gmail check every 2 minutes) into one line."""
+    seen, out = {}, []
+    for text, at, ref in entries:
+        if text in seen:
+            first = seen[text]
+            first['count'] += 1
+            first['earliest'] = at
+            continue
+        record = {'text': text, 'latest': at, 'earliest': at, 'count': 1, 'ref': ref}
+        seen[text] = record
+        out.append(record)
+    return [item(f"{stamp(r['latest'])} · {r['text']}" if r['count'] == 1 else
+                 f"{stamp(r['earliest'])}-{stamp(r['latest'])[-5:]} · {r['text']} "
+                 f"({r['count']} times)", r['ref']) for r in out]
 
 
 def activity(db, intent, now, replay):
@@ -193,7 +237,7 @@ def activity(db, intent, now, replay):
         + 'ORDER BY id DESC LIMIT 101',
         (start.timestamp() / 86400 + 2440587.5, finish.timestamp() / 86400 + 2440587.5)
     ).fetchall()
-    items = [item(f"{r['occurred_at']} · {project(r)['text']}", citations.step(r)) for r in rows[:100]]
+    items = collapse([(project(r)['text'], r['occurred_at'], citations.step(r)) for r in rows[:100]])
     if intent.kind == 'changed':
         # Committed call revisions count as changes even when no journal step describes them
         # (revisions imported before the journal existed are never backfilled as steps).
@@ -205,7 +249,7 @@ def activity(db, intent, now, replay):
             + 'ORDER BY julianday(r.created_at) DESC,r.id DESC LIMIT 50',
             (start.timestamp() / 86400 + 2440587.5, finish.timestamp() / 86400 + 2440587.5),
         ).fetchall()
-        items = [item(f"{r['created_at']} · {r['company'] or 'A call'}: a revision was recorded.",
+        items = [item(f"{stamp(r['created_at'])} · {r['company'] or 'A call'}: a revision was recorded.",
                       citations.revision(db, r['id'])) for r in revisions] + items
     return reply(f'Committed recorded work from {start.isoformat()} through '
                  f'{finish.astimezone(DUBAI).isoformat()} · Dubai. '
@@ -232,7 +276,7 @@ def why(db, op):
         if triage['rule_id'].startswith('learned:'):
             refs.append(citations.rule(db, triage['rule_id'].split(':')[1]))
         items.append(item(f"Classification: {triage['reason']} (rule {triage['rule_id']}).", *refs))
-    return reply(f"{op['company']}: current stored blockers, rule matches and conflicts.", items=items)
+    return reply(f"{title_of(op)}: current stored blockers, rule matches and conflicts.", items=items)
 
 
 def find(db, term, now, replay, demo):
@@ -275,8 +319,9 @@ def prepare(db, intent, now, *, replay, selection):
                      suggestions=EXAMPLES[:5])
     action = {'kind': intent.kind, 'entity': intent.entity, 'value': intent.value}
     if intent.kind == 'skip':
-        candidates = [(f"opportunity:{o['id']}", f"{o['company']} · {o['city']} · call {o['id']}", o)
-                      for o in opportunities(db, now, replay) if matches(intent.entity, o['company'])]
+        candidates = [(f"opportunity:{o['id']}", f"{title_of(o)} · call {o['id']}", o)
+                      for o in opportunities(db, now, replay)
+                      if matches(intent.entity, f"{o['company'] or ''} {o['mail']['subject']}")]
         op, choices = choose(candidates, selection)
         if op is None:
             return reply('Choose the call you mean.' if choices else 'No matching stored call found.',
