@@ -11,7 +11,41 @@ export function mergeSteps(previous: AgentStep[], incoming: AgentStep[]) {
     return [...byId.values()].sort((a, b) => a.id - b.id).slice(-100);
 }
 
-function stepItem(step: AgentStep) {
+/** A Gmail check that found nothing: started, "No new messages", finished. */
+export function quiet(step: AgentStep) {
+    return step.kind === 'gmail.started' || step.kind === 'gmail.finished'
+        || (step.kind === 'gmail.fetched' && /no new messages/i.test(step.text));
+}
+
+type Row = AgentStep | { fold: AgentStep[] };
+
+/** Fold each run of quiet Gmail checks into one row, so real work stays visible. */
+export function foldQuiet(steps: AgentStep[]): Row[] {
+    const rows: Row[] = [];
+    let run: AgentStep[] = [];
+    const flush = () => {
+        if (run.filter(s => s.kind === 'gmail.fetched').length > 1) rows.push({ fold: run });
+        else rows.push(...run);
+        run = [];
+    };
+    for (const step of steps) {
+        if (quiet(step)) run.push(step);
+        else { flush(); rows.push(step); }
+    }
+    flush();
+    return rows;
+}
+
+function stepItem(row: Row) {
+    if ('fold' in row) {
+        const checks = row.fold.filter(s => s.kind === 'gmail.fetched');
+        const first = row.fold[0], last = row.fold[row.fold.length - 1];
+        return <li key={`fold-${first.id}`} data-step-id={last.id}>
+            <p><Link to={last.href}>I checked Gmail {checks.length} times. No new messages.</Link></p>
+            <p className="meta"><time dateTime={first.occurred_at}>{date(first.occurred_at)}</time> to <time dateTime={last.occurred_at}>{date(last.occurred_at)}</time></p>
+        </li>;
+    }
+    const step = row;
     return <li key={step.id} data-step-id={step.id}>
         <p><Link to={step.href}>{step.text}</Link></p>
         <p className="meta"><time dateTime={step.occurred_at}>{date(step.occurred_at)}</time> · {step.phase === 'progress' ? 'In progress' : step.outcome}</p>
@@ -151,14 +185,17 @@ export function Activity({ onReplayChange }: { onReplayChange?: (value: boolean)
         <div className="actions">{recording ? <Button variant="outline" onClick={resume}>Return to live activity</Button> : <Button variant="outline" onClick={() => void replay()}>Replay last check</Button>}
             {pending > 0 && <Button variant="outline" onClick={showActivity}>New activity ({pending})</Button>}</div>
         {error && <p role="status">Activity connection unavailable. Saved steps remain visible; retrying locally.</p>}
-        {!loaded ? <p>Loading activity…</p> : !steps.length ? <p>No steps recorded.</p> : <>
-            {steps.length > 10 && <details><summary>Earlier activity ({steps.length - 10})</summary>
-                <ol className="work-log" aria-label="Earlier activity">{steps.slice(0, -10).map(stepItem)}</ol>
-            </details>}
-            <ol ref={list} className="work-log" aria-label={recording ? 'Recorded activity' : 'Live activity'}>
-                {steps.slice(-10).map(stepItem)}
-            </ol>
-        </>}
+        {!loaded ? <p>Loading activity…</p> : !steps.length ? <p>No steps recorded.</p> : (() => {
+            const rows = foldQuiet(steps);
+            return <>
+                {rows.length > 10 && <details><summary>Earlier activity ({rows.length - 10})</summary>
+                    <ol className="work-log" aria-label="Earlier activity">{rows.slice(0, -10).map(stepItem)}</ol>
+                </details>}
+                <ol ref={list} className="work-log" aria-label={recording ? 'Recorded activity' : 'Live activity'}>
+                    {rows.slice(-10).map(stepItem)}
+                </ol>
+            </>;
+        })()}
         <p className="sr-only" aria-live="polite" aria-atomic="true">{recording ? '' : announcement}</p>
         <Link className="dispatch-footer" to="/settings#runs">View runs</Link>
     </>;
