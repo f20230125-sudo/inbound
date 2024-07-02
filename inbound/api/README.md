@@ -30,7 +30,8 @@ source paths and bodies are not included in background errors.
 | GET `/api/settings` | Mode, Pause, capabilities, zero disabled budgets, payload policy, configured paths, clock, timezone; CSRF in local mode only |
 | POST `/api/settings` | `{ "paused": true }` or false; sole editable setting in the offline build |
 | GET `/api/today` | `snapshot`, `attention`, `deadlines_48h`, `date_only`, `uncertain_deadlines`, `new_calls`, `admin_tasks`, Pause and clock |
-| GET `/api/messages?category=ps_call` | Array; effective and original categories, original rule/reason/quote, append-only correction history, source text, fields and opportunity link |
+| GET `/api/messages?category=ps_call` | Summary array without bodies; effective and original categories, original rule/reason/quote, append-only correction history, fields and opportunity link |
+| GET `/api/messages/<id>` | Source body on demand; subject, sender, sent time, completeness and provenance; read-only while paused, same replay sanitization and database exclusion |
 | POST `/api/messages/<id>/category` | `{ "category": "academic" }`; records another correction, including Undo; returns effective and previous categories |
 | GET `/api/opportunities` | Array of stored opportunity states with effective fields and revision IDs |
 | GET `/api/opportunities/<id>` | Full fields and conflict candidates, revisions, source bodies, sent-time anchors, attachment locations, roles/coverage/evidence, packs and human-event history |
