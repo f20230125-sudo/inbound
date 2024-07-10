@@ -1,0 +1,8 @@
+[
+  {"id":"teams","thread":"assignment","sender":"no-reply@teams.mail.microsoft","subject":"CS F212: Assignment 2 due","body":"Course: CS F212\nAssignment: Assignment 2\nDue: 29 October 2026 at 11:30 PM","sent":"2026-10-27T08:00:00+04:00"},
+  {"id":"erp","thread":"quiz","sender":"bitserp@bits-pilani.ac.in","subject":"CS F211 Quiz 1","body":"Course: CS F211\nQuiz: Quiz 1\nQuiz scheduled for 28 October 2026 at 6:00 PM.","sent":"2026-10-27T09:00:00+04:00"},
+  {"id":"case","thread":"case","sender":"faculty@dubai.bits-pilani.ac.in","subject":"Case study submission","body":"Course: Principles of Management\nSubmission: Case study 3\nSubmit by 29 October 2026.","sent":"2026-10-27T10:00:00+04:00"},
+  {"id":"revision","thread":"quiz","sender":"bitserp@bits-pilani.ac.in","subject":"Re: CS F211 Quiz 1 rescheduled","body":"Course: CS F211\nQuiz: Quiz 1\nQuiz rescheduled to 29 October 2026 at 9:00 AM.\nOn Tuesday, faculty wrote:\n> Quiz scheduled for 28 October 2026 at 6:00 PM.","sent":"2026-10-28T08:00:00+04:00"},
+  {"id":"seating","thread":"seating","sender":"bitserp@bits-pilani.ac.in","subject":"Mid sem exam seating plan","body":"CS F212 seating plan published on 28 October 2026. Room allocation only.","sent":"2026-10-27T11:00:00+04:00"},
+  {"id":"unknown","thread":"lab","sender":"bitserp@bits-pilani.ac.in","subject":"CS F213 Lab report","body":"Course: CS F213\nLab: Lab report 4\nPlease submit. The due date will be announced.","sent":"2026-10-27T12:00:00+04:00"}
+]

@@ -24,7 +24,7 @@ def main(argv=None):
     ingest.add_argument("--path", type=Path, required=True)
     ingest.add_argument("--provenance", choices=("synthetic", "private"), required=True)
     for name in ("triage", "extract", "pause", "resume", "baseline", "demo", "digest",
-                 "serve", "eval"):
+                 "serve", "eval", "briefing"):
         sub.add_parser(name)
     evidence = sub.add_parser('evidence')
     evidence.add_argument('action', choices=['import'])
@@ -121,6 +121,23 @@ def main(argv=None):
 
             return evaluate()
         with closing(connect(settings.db_path)) as db:
+            if args.command == 'briefing':
+                from datetime import UTC, datetime
+
+                from inbound.briefing import compose, generate, plain_text
+
+                row = db.execute("SELECT value FROM settings WHERE key='demo_clock'").fetchone()
+                now = datetime.fromisoformat(row[0]) if row else datetime.now(UTC)
+                readonly = os.environ.get('APP_MODE', 'local') == 'replay' or db.execute(
+                    "SELECT value FROM settings WHERE key='paused'").fetchone()[0] == '1'
+                if os.environ.get('APP_MODE', 'local') == 'replay' and db.execute(
+                    "SELECT 1 FROM messages WHERE source<>'synthetic'").fetchone():
+                    raise ValueError('Replay requires exclusively synthetic messages')
+                if os.environ.get('APP_MODE', 'local') == 'replay' and db.execute(
+                    "SELECT 1 FROM tasks WHERE source<>'synthetic'").fetchone():
+                    raise ValueError('Replay requires exclusively synthetic tasks')
+                print(plain_text(compose(db, now) if readonly else generate(db, now)), end='')
+                return 0
             if args.command == 'attach':
                 from inbound.attachment_recovery import confirm, preview
 

@@ -17,7 +17,7 @@ interface Evidence {
     newer_information: boolean;
     content: Record<string, unknown>;
 }
-const suggestions = ["What's due this week?", 'What changed since yesterday?', 'What do you know about my projects?'];
+const suggestions = ["What's due this week?", 'What assignments are due?', 'What changed since yesterday?', 'What do you know about my projects?'];
 
 function SourceRecord({ record }: { record: Record<string, unknown> }) {
     return <div className="scout-source"><p>{String(record.status || 'Recorded')} · {typeof record.normalized === 'string' ? record.normalized : ''}</p>
@@ -29,6 +29,9 @@ function SourceRecord({ record }: { record: Record<string, unknown> }) {
 
 function EvidenceContent({ value }: { value: Evidence }) {
     const content = value.content;
+    if (value.entity_type === 'task') return <><h4>{String(content.course || 'Course unknown')} · {String(content.title)}</h4>
+        <SourceRecord record={content.deadline as Record<string, unknown>} /><blockquote>{String(content.source_quote)}</blockquote>
+    </>;
     if (value.entity_type === 'memory') return <><h4>{String(content.display_title || content.name)}</h4><SafeMarkdown text={String(content.content || '')} /></>;
     if (value.entity_type === 'revision' || value.entity_type === 'message') return <><h4>{String(content.subject)}</h4>
         <p>Sent {date(String(content.sent_at || value.snapshot_at))}</p>
@@ -60,11 +63,15 @@ export function ScoutCommand({ returnToWork }: { returnToWork: () => void }) {
     useEffect(() => {
         try { sessionStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch { /* In-memory history remains bounded when storage is unavailable. */ }
     }, [history]);
+    // A live update must not close what Uzair is reading: citations already keep the cited
+    // version, so the panel stays open and says that newer information arrived.
+    const [changedSince, setChangedSince] = useState(false);
     useEffect(() => {
-        const changed = () => setEvidence(undefined);
+        const changed = () => setChangedSince(true);
         window.addEventListener(DATA_CHANGED, changed);
         return () => window.removeEventListener(DATA_CHANGED, changed);
     }, []);
+    useEffect(() => { setChangedSince(false); }, [evidence]);
     useEffect(() => { if (evidence) evidencePanel.current?.focus(); }, [evidence]);
     useEffect(() => {
         const shortcut = (event: KeyboardEvent) => {
@@ -109,7 +116,7 @@ export function ScoutCommand({ returnToWork }: { returnToWork: () => void }) {
     return <div className="scout-command">
         <form onSubmit={event => { event.preventDefault(); void ask(); }}>
             <label htmlFor="scout-command">Ask Scout or give a command</label>
-            <div className="scout-input-row"><input id="scout-command" ref={input} value={question} maxLength={500} onChange={event => setQuestion(event.target.value)} placeholder="What's due this week?" aria-describedby="command-help" aria-controls={open ? 'scout-conversation' : undefined} /><Button type="submit" disabled={busy || !question.trim()}>Ask Scout</Button></div>
+            <div className="scout-input-row"><input id="scout-command" ref={input} readOnly={busy} value={question} maxLength={500} onChange={event => setQuestion(event.target.value)} placeholder="What's due this week?" aria-describedby="command-help" aria-controls={open ? 'scout-conversation' : undefined} /><Button type="submit" disabled={busy || !question.trim()}>Ask Scout</Button></div>
         </form>
         <p id="command-help" className="meta">Local, supported requests · Ctrl / ⌘ K · Questions work while paused</p>
         <div className="actions">{suggestions.map(text => <Button key={text} variant="ghost" disabled={busy} onClick={() => void ask(text)}>{text}</Button>)}</div>
@@ -132,7 +139,7 @@ export function ScoutCommand({ returnToWork }: { returnToWork: () => void }) {
             </li>)}</ol>
             {evidence && <section ref={evidencePanel} tabIndex={-1} className="scout-evidence" aria-label="Cited evidence"><h3>{evidence.label}</h3>
                 <p className="meta">Cited version {String(evidence.version).slice(0, 12)}{evidence.snapshot_at ? ` · Snapshot ${date(evidence.snapshot_at)}` : ''}</p>
-                {evidence.newer_information && <p className="review">Newer information exists. This is the original cited version.</p>}
+                {(evidence.newer_information || changedSince) && <p className="review">Newer information exists. This is the original cited version.</p>}
                 <EvidenceContent value={evidence} />
                 <Link to={evidence.href}>Open source workspace</Link>
                 <Button variant="ghost" onClick={() => setEvidence(undefined)}>Close evidence</Button>

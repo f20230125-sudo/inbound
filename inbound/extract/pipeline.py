@@ -470,4 +470,7 @@ def extract_messages(db, clock=None, ids=None):
     check(db)
     with db:
         refresh_urgency(db, now)
+        from inbound.tasks import extract_tasks
+
+        extract_tasks(db)
     return counts
