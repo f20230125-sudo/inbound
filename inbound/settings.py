@@ -18,6 +18,9 @@ class Settings:
     data_root: Path | None = None
     database: Path | None = None
     offline: bool = True
+    # The public demo runs a read-only replay of fictional data on a host without a D:
+    # drive. Only app.py sets this; Settings.from_env() never does.
+    hosted_replay: bool = False
     personal_contacts: tuple[str, ...] = (
         "noor@contacts.demo.invalid",
         "ishan@contacts.demo.invalid",
@@ -26,11 +29,11 @@ class Settings:
 
     def __post_init__(self):
         self.root = self.root.resolve()
-        if self.root.drive.upper() != "D:":
+        if self.root.drive.upper() != "D:" and not self.hosted_replay:
             raise ValueError("Repository must be on D:")
         if self.data_root is not None:
             self.data_root = self.data_root.resolve()
-            if self.data_root.drive.upper() != "D:":
+            if self.data_root.drive.upper() != "D:" and not self.hosted_replay:
                 raise ValueError("Configured data root must be on D:")
         else:
             self.data_root = self.root / ".local"
