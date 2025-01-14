@@ -1,0 +1,16 @@
+id: O-H042
+thread_id: o-h042
+date: 2026-10-27T02:00:00+00:00
+from: hostels@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Maintenance notice — digest item 4
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Digest item
+Topic | Detail
+Maintenance notice | Synthetic correspondence for review.

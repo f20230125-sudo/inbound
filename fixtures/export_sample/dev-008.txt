@@ -1,0 +1,29 @@
+id: P-D08
+thread_id: d02-forward-P-D08
+date: 2026-10-27T20:20:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Fwd: Call for CV - Ternspire Systems,Glassport - Backend Intern
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Reminder for the current intake.
+Revised deadline: on or before 08:00AM tomorrow
+Current intake: Ternspire Systems; City: Glassport
+· AED2000 per month
+*Mode of Internship:* In person
+*https://forms.gle/SYNTHETIC-NOT-LIVE-P-D02 <https://forms.gle/SYNTHETIC-NOT-LIVE-P-D02>*
+*Job Title & Expected Skills*
+*1. Backend Intern*
+Expected Skills:
+· Python
+· Flask
+· SQL
+
+--- Original message ---
+> Call for CV - Ternspire Systems,Glassport - Backend Intern
+> 4:00 PM, 27 October 2026

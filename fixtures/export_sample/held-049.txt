@@ -1,0 +1,16 @@
+id: O-H013
+thread_id: o-h013
+date: 2026-10-27T02:00:00+00:00
+from: jobs-noreply@linkedin.com
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: New internship vacancies — digest item 5
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Digest item
+Topic | Detail
+New internship vacancies | Synthetic correspondence for review.

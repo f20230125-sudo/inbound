@@ -1,0 +1,16 @@
+[project]
+name = "inbound"
+version = "0.1.0"
+description = "Offline personal inbox triage"
+requires-python = ">=3.14"
+
+[tool.ruff]
+line-length = 100
+cache-dir = ".local/ruff-cache"
+extend-exclude = ["private", ".local", ".venv"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "--basetemp=.local/pytest-m1"
+cache_dir = ".local/pytest-cache"

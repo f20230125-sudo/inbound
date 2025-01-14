@@ -1,0 +1,14 @@
+id: O-H017
+thread_id: o-h017
+date: 2026-10-27T02:00:00+00:00
+from: f20990001@students.demo.invalid
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Call for CV help
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Can we talk through this CV together?
