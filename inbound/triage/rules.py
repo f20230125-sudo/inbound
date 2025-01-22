@@ -1,7 +1,8 @@
 import re
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from email.utils import parseaddr
+from zoneinfo import ZoneInfo
 
 from inbound.pause import check
 from inbound.triage.normalize import current_body, normalize_subject
@@ -85,8 +86,11 @@ def classify(sender, subject, body, personal_contacts=None):
 
 
 def urgency(deadline, now):
-    if not deadline or len(deadline) == 10:
+    if not deadline:
         return "normal"
+    if len(deadline) == 10:
+        days = (date.fromisoformat(deadline) - now.astimezone(ZoneInfo("Asia/Dubai")).date()).days
+        return "high" if 0 <= days <= 2 else "normal"
     due = datetime.fromisoformat(deadline)
     if due.tzinfo is None:
         return "normal"

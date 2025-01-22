@@ -1,0 +1,169 @@
+import json
+from dataclasses import replace
+from datetime import timedelta
+
+import pytest
+
+from inbound.db import import_messages
+from inbound.extract.pipeline import extract_messages
+from inbound.pause import PausedError, set_paused
+from inbound.triage.rules import triage_messages
+from tests.m2_helpers import CLOCK, message
+
+
+def run(db, messages):
+    import_messages(db, messages)
+    triage_messages(db)
+    return extract_messages(db, clock=lambda: CLOCK)
+
+
+@pytest.mark.parametrize(
+    "anchor,reminder", [("P-D01", "P-D07"), ("P-D02", "P-D08"), ("P-D03", "P-D09")]
+)
+def test_matching_and_amendment(database, anchor, reminder):
+    run(database, [message(reminder), message(anchor)])
+    assert database.execute("SELECT count(*) FROM opportunities").fetchone()[0] == 1
+    rows = database.execute("SELECT * FROM opportunity_revisions ORDER BY id").fetchall()
+    assert len(rows) == 2
+    effective = json.loads(rows[-1]["fields_json"])
+    assert effective["deadline"]["status"] == "inferred"
+    assert effective["form_link"]["normalized"].endswith(anchor)
+    assert extract_messages(database)["revisions"] == 0
+
+
+def test_conflicting_quotes_and_review_invalidation(database):
+    original = message("P-D01")
+    run(database, [original])
+    database.execute("CREATE TABLE packs (id INTEGER, opportunity_id INTEGER, status TEXT)")
+    database.execute("INSERT INTO packs VALUES(1,1,'reviewed')")
+    database.commit()
+    newer = replace(
+        original,
+        provider_id="amendment",
+        sent_at=original.sent_at + timedelta(hours=2),
+        body_text="CV Submission Deadline: 29 October 2026, 08:00AM",
+    )
+    run(database, [newer])
+    assert database.execute("SELECT status FROM packs").fetchone()[0] == "needs_review"
+    field = json.loads(
+        database.execute(
+            "SELECT fields_json FROM opportunity_revisions ORDER BY id DESC"
+        ).fetchone()[0]
+    )["deadline"]
+    assert field["status"] == "conflicting" and field["normalized"] is None
+    assert len(field["candidates"]) == 2
+    assert all(c["source_text"] and c["provenance"]["message_id"] for c in field["candidates"])
+
+
+def test_company_only_suggestion_and_blocker(database):
+    run(database, [message("P-D01"), message("P-D04"), message("P-D17")])
+    assert database.execute("SELECT count(*) FROM opportunities").fetchone()[0] == 3
+    assert database.execute("SELECT count(*) FROM merge_suggestions").fetchone()[0] >= 1
+    assert database.execute(
+        "SELECT blocked_reason FROM opportunities WHERE status='blocked'"
+    ).fetchone()[0]
+
+
+def test_admin_no_opportunity_and_urgency(database):
+    run(database, [message("P-D21"), message("P-D22"), message("P-D23")])
+    assert database.execute("SELECT count(*) FROM opportunities").fetchone()[0] == 0
+    assert database.execute("SELECT count(*) FROM message_extractions").fetchone()[0] == 3
+    assert database.execute("SELECT count(*) FROM triage WHERE urgency='high'").fetchone()[0] == 2
+
+
+def test_late_import_retains_sent_order_and_effective_amendment(database):
+    run(database, [message("P-D07")])
+    run(database, [message("P-D01")])
+    from inbound.extract.pipeline import opportunity_state
+
+    state = opportunity_state(database, 1, clock=lambda: CLOCK)
+    assert state["fields"]["deadline"]["status"] == "inferred"
+    assert state["fields"]["deadline"]["provenance"]["message_id"] == "P-D07"
+    assert state["fields"]["form_link"]["provenance"]["message_id"] == "P-D01"
+    assert state["expired"] is False
+
+
+def test_missing_deadline_has_unknown_expiry(database):
+    run(database, [message("P-D10")])
+    from inbound.extract.pipeline import opportunity_state
+
+    assert opportunity_state(database, 1, clock=lambda: CLOCK)["expired"] is None
+
+
+def test_non_deadline_extension_does_not_authorize_supersession(database):
+    original = message("P-D01")
+    run(database, [original])
+    newer = replace(
+        original,
+        provider_id="unqualified",
+        sent_at=original.sent_at + timedelta(hours=1),
+        body_text="Expected Skills: database extension development\n"
+        "CV Submission Deadline: 29 October 2026, 08:00AM",
+    )
+    run(database, [newer])
+    from inbound.extract.pipeline import opportunity_state
+
+    assert opportunity_state(database, 1)["fields"]["deadline"]["status"] == "conflicting"
+
+
+def test_quoted_relative_retains_older_anchor_in_conflict(database):
+    original = replace(message("P-D01"), body_text="Deadline: tomorrow at 08:00AM")
+    run(database, [original])
+    newer = replace(
+        original,
+        provider_id="next-day",
+        sent_at=original.sent_at + timedelta(days=1),
+        body_text="Deadline: 29 October 2026, 08:00AM\n--- Original message ---\n"
+        "> Deadline: tomorrow at 08:00AM",
+    )
+    run(database, [newer])
+    from inbound.extract.pipeline import opportunity_state
+
+    deadline = opportunity_state(database, 1)["fields"]["deadline"]
+    assert deadline["status"] == "conflicting"
+    assert {c["normalized"] for c in deadline["candidates"]} == {
+        "2026-10-28T08:00:00+04:00",
+        "2026-10-29T08:00:00+04:00",
+    }
+    assert deadline["candidates"][0]["anchor"] == original.sent_at.isoformat()
+
+
+def test_identical_subject_is_joining_evidence_even_with_different_links(database):
+    original = message("P-D01")
+    same_subject = replace(
+        original,
+        provider_id="new-link",
+        thread_id="different-thread",
+        body_text=original.body_text.replace(
+            "SYNTHETIC-NOT-LIVE-P-D01", "SYNTHETIC-NOT-LIVE-example"
+        ),
+    )
+    run(database, [original, same_subject])
+    assert database.execute("SELECT count(*) FROM opportunities").fetchone()[0] == 1
+    from inbound.extract.pipeline import opportunity_state
+
+    link = opportunity_state(database, 1)["fields"]["form_link"]
+    assert link["status"] == "conflicting" and len(link["candidates"]) == 2
+
+
+def test_pause_entry_and_between_stages(database, monkeypatch):
+    from inbound.extract import pipeline
+
+    run(database, [])
+    set_paused(database, True)
+    with pytest.raises(PausedError):
+        extract_messages(database)
+    set_paused(database, False)
+    import_messages(database, [message("P-D15")])
+    triage_messages(database)
+    real_parse = pipeline.parse_attachment
+
+    def pause_after_attachment(a):
+        result = real_parse(a)
+        set_paused(database, True)
+        return result
+
+    monkeypatch.setattr(pipeline, "parse_attachment", pause_after_attachment)
+    with pytest.raises(PausedError):
+        extract_messages(database)
+    assert database.execute("SELECT count(*) FROM opportunity_revisions").fetchone()[0] == 0

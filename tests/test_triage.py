@@ -65,7 +65,7 @@ def test_urgency_without_inventing_dates():
     assert urgency("2026-10-28T08:00:00+04:00", now) == "high"
     assert urgency("2026-11-02T08:00:00+04:00", now) == "normal"
     assert urgency("2026-10-27T08:00:00+04:00", now) == "normal"
-    assert urgency("2026-10-29", now) == "normal"
+    assert urgency("2026-10-29", now) == "high"  # M2: calendar-date urgency, no invented time.
     assert urgency(None, now) == "normal"
 
 
