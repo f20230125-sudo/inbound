@@ -14,3 +14,4 @@ web/dist/
 .ruff_cache/
 .pytest_cache/
 *.egg-info/
+MORNING.md
