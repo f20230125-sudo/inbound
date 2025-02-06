@@ -1,7 +1,8 @@
 import re
 
 from inbound.extract.records import field
-from inbound.triage.normalize import normalize, normalize_subject
+from inbound.extract.subject import split_subject
+from inbound.triage.normalize import normalize
 
 HEADING = re.compile(r"^\s*\**\s*(?:\(\d+\)|\d+\.|Role\s+\d+:)\s*(.+?)\s*\**$", re.IGNORECASE)
 STOP = re.compile(
@@ -58,10 +59,9 @@ def parse_roles(text, subject, identity):
                 qid = f"{active['id']}-q{len(active['requirements']) + 1}"
                 active["requirements"].append({"id": qid, "text": value.strip()})
     if not roles:
-        title_match = re.search(r",.+?\s-\s(.+)$", normalize_subject(subject))
-        if title_match:
-            title = title_match[1]
-            roles.append({"id": f"{identity}-r1", "title": title, "requirements": None})
+        title = split_subject(subject)["role"]
+        if title:
+            roles.append({"id": f"{identity}-r1", "title": normalize(title), "requirements": None})
             quotes.append(title)
             subject_only = True
     for role in roles:
