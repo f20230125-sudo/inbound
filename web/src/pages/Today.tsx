@@ -1,12 +1,12 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useSearchParams } from 'react-router';
+import { Link, useLocation, useSearchParams } from 'react-router';
 import { useDesk } from '../App';
 import { request, useResource } from '../lib/api';
 import { categories, date, deadlineGroup, fieldValue, label, normalizeSubject, opportunityTitle, statuses } from '../lib/format';
 import type { Entry, Message, Opportunity, Today } from '../types';
 import { Button } from '../components/ui/button';
 import { DeadlineDisplay, Failure, Highlight, Loading, Section, SnapshotBanner, StatusBadge } from '../components/shared';
-function remember(id: string) { sessionStorage.setItem('inbound-inbox-scroll', String(window.scrollY)); sessionStorage.setItem('inbound-inbox-focus', id); }
+function remember(id: string) { sessionStorage.setItem('inbound-inbox-query', window.location.search); sessionStorage.setItem('inbound-inbox-scroll', String(window.scrollY)); sessionStorage.setItem('inbound-inbox-focus', id); }
 export function AdminNotice({ entry, now }: {
     entry: Entry;
     now: string;
@@ -99,6 +99,9 @@ export default function TodayPage() {
     const [mobile, setMobile] = useState(() => window.innerWidth <= 700);
     useEffect(() => { const resize = () => setMobile(window.innerWidth <= 700); window.addEventListener('resize', resize); return () => window.removeEventListener('resize', resize); }, []);
     const [params, setParams] = useSearchParams();
+    const location = useLocation();
+    const sourceTarget = /^#message-\d+$/.test(location.hash);
+    const expanded = params.get('all') === '1' || sourceTarget;
     useEffect(() => { sessionStorage.setItem('inbound-inbox-query', params.size ? `?${params}` : ''); }, [params]);
     const category = params.get('category') || '';
     const attention = params.get('attention') || '';
@@ -116,9 +119,9 @@ export default function TodayPage() {
     }).sort((a, b) => {
         const da = ops.get(a.opportunity_id || 0)?.fields.deadline || a.fields.admin_deadline;
         const db = ops.get(b.opportunity_id || 0)?.fields.deadline || b.fields.admin_deadline;
-        const newest = b.received_at.localeCompare(a.received_at) || a.id - b.id;
+        const newest = new Date(b.received_at).getTime() - new Date(a.received_at).getTime() || a.id - b.id;
         if (sort === 'oldest')
-            return a.received_at.localeCompare(b.received_at) || a.id - b.id;
+            return new Date(a.received_at).getTime() - new Date(b.received_at).getTime() || a.id - b.id;
         if (sort === 'deadline')
             return deadlineGroup(da, settings.clock) - deadlineGroup(db, settings.clock) || String(da?.normalized || '').localeCompare(String(db?.normalized || '')) || a.id - b.id;
         if (sort === 'review') {
@@ -127,7 +130,8 @@ export default function TodayPage() {
         }
         return newest;
     });
-    function filter(key: string, value: string) { setParams(previous => { const next = new URLSearchParams(previous); if (value)
+    const visible = expanded ? filtered : filtered.slice(0, 25);
+    function filter(key: string, value: string) { setParams(previous => { const next = new URLSearchParams(previous); next.delete('all'); if (value)
         next.set(key, value);
     else
         next.delete(key); return next; }, { replace: true }); }
@@ -144,5 +148,5 @@ export default function TodayPage() {
             ['attention', 'Attention:', attention, { '': 'All messages', due: 'Due within 48 hours', overdue: 'Overdue', review: 'Needs review', corrected: 'Corrected' }],
             ['status', 'Application status:', status, { '': 'All statuses', ...statuses }],
             ['sort', 'Sort:', sort, { '': 'Newest first', oldest: 'Oldest first', deadline: 'Earliest deadline', review: 'Needs review first' }],
-        ].map(([key, text, value, options]) => <label key={String(key)}>{String(text)}<select aria-label={String(text)} value={String(value)} onChange={e => filter(String(key), e.target.value)}>{Object.entries(options).map(([v, t]) => <option key={v} value={v}>{t}</option>)}</select></label>)}<Button variant="outline" onClick={() => setParams({})}>Clear filters</Button></div><p role="status">{announcement}</p>{inbox.error || calls.error ? <Failure text="Inbox could not be loaded." retry={() => { inbox.reload(); calls.reload(); }}/> : !inbox.value || !calls.value ? <Loading text="Loading Today and Inbox…"/> : !filtered.length ? <p>No messages match these filters.</p> : <>{mobile ? <>{filtered.map((m, i) => <div key={m.id}>{sort === 'deadline' && (i === 0 || deadlineGroup(ops.get(filtered[i - 1].opportunity_id || 0)?.fields.deadline || filtered[i - 1].fields.admin_deadline, settings.clock) !== deadlineGroup(ops.get(m.opportunity_id || 0)?.fields.deadline || m.fields.admin_deadline, settings.clock)) && <h3>{['Supported upcoming timed deadlines', 'Date-only deadlines', 'Overdue deadlines', 'Unknown / conflicting / not applicable'][deadlineGroup(ops.get(m.opportunity_id || 0)?.fields.deadline || m.fields.admin_deadline, settings.clock)]}</h3>}<MessageCard message={m} op={ops.get(m.opportunity_id || 0)} done={done}/></div>)}</> : <div className="inbox-table"><table><caption>Triaged inbox</caption><thead><tr>{['Message', 'Received', 'Category', 'Why', 'Deadline / call', 'Correct category'].map(t => <th scope="col" key={t}>{t}</th>)}</tr></thead><tbody>{filtered.map((m, i) => <Fragment key={m.id}>{sort === 'deadline' && (i === 0 || deadlineGroup(ops.get(filtered[i - 1].opportunity_id || 0)?.fields.deadline || filtered[i - 1].fields.admin_deadline, settings.clock) !== deadlineGroup(ops.get(m.opportunity_id || 0)?.fields.deadline || m.fields.admin_deadline, settings.clock)) && <tr><th colSpan={6} scope="rowgroup">{['Supported upcoming timed deadlines', 'Date-only deadlines', 'Overdue deadlines', 'Unknown / conflicting / not applicable'][deadlineGroup(ops.get(m.opportunity_id || 0)?.fields.deadline || m.fields.admin_deadline, settings.clock)]}</th></tr>}<MessageRow message={m} op={ops.get(m.opportunity_id || 0)} done={done}/></Fragment>)}</tbody></table></div>}</>}</Section></>;
+        ].map(([key, text, value, options]) => <label key={String(key)}>{String(text)}<select aria-label={String(text)} value={String(value)} onChange={e => filter(String(key), e.target.value)}>{Object.entries(options).map(([v, t]) => <option key={v} value={v}>{t}</option>)}</select></label>)}<Button variant="outline" onClick={() => setParams({})}>Clear filters</Button></div><p role="status">{announcement}</p>{inbox.error || calls.error ? <Failure text="Inbox could not be loaded." retry={() => { inbox.reload(); calls.reload(); }}/> : !inbox.value || !calls.value ? <Loading text="Loading Today and Inbox…"/> : !filtered.length ? <p>No messages match these filters.</p> : <>{mobile ? <>{visible.map((m, i) => <div key={m.id}>{sort === 'deadline' && (i === 0 || deadlineGroup(ops.get(visible[i - 1].opportunity_id || 0)?.fields.deadline || visible[i - 1].fields.admin_deadline, settings.clock) !== deadlineGroup(ops.get(m.opportunity_id || 0)?.fields.deadline || m.fields.admin_deadline, settings.clock)) && <h3>{['Supported upcoming timed deadlines', 'Date-only deadlines', 'Overdue deadlines', 'Unknown / conflicting / not applicable'][deadlineGroup(ops.get(m.opportunity_id || 0)?.fields.deadline || m.fields.admin_deadline, settings.clock)]}</h3>}<MessageCard message={m} op={ops.get(m.opportunity_id || 0)} done={done}/></div>)}</> : <div className="inbox-table"><table><caption>Triaged inbox</caption><thead><tr>{['Message', 'Received', 'Category', 'Why', 'Deadline / call', 'Correct category'].map(t => <th scope="col" key={t}>{t}</th>)}</tr></thead><tbody>{visible.map((m, i) => <Fragment key={m.id}>{sort === 'deadline' && (i === 0 || deadlineGroup(ops.get(visible[i - 1].opportunity_id || 0)?.fields.deadline || visible[i - 1].fields.admin_deadline, settings.clock) !== deadlineGroup(ops.get(m.opportunity_id || 0)?.fields.deadline || m.fields.admin_deadline, settings.clock)) && <tr><th colSpan={6} scope="rowgroup">{['Supported upcoming timed deadlines', 'Date-only deadlines', 'Overdue deadlines', 'Unknown / conflicting / not applicable'][deadlineGroup(ops.get(m.opportunity_id || 0)?.fields.deadline || m.fields.admin_deadline, settings.clock)]}</th></tr>}<MessageRow message={m} op={ops.get(m.opportunity_id || 0)} done={done}/></Fragment>)}</tbody></table></div>}{filtered.length > 25 && <Button variant="outline" aria-expanded={expanded} onClick={() => { const next = new URLSearchParams(params); if (expanded) next.delete('all'); else next.set('all', '1'); setParams(next, { replace: true }); }}>{expanded ? 'Show fewer messages' : `Show all ${filtered.length}`}</Button>}<p className="meta">Showing {visible.length} of {filtered.length} messages</p></>}</Section></>;
 }

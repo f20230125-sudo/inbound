@@ -1,97 +1,139 @@
 # Inbound
 
-Inbound is a personal inbox desk. M1 imports local mail exports and classifies messages.
-M2 extracts evidence-bearing fields, bounded PDF/DOCX JDs and opportunity revisions.
-M3 imports approved public evidence and builds verified, offline application previews.
-It makes no outward actions. The desk UI remains later work.
+I built this for me. Inbound is a personal agent that triages my inbox and turns
+each internship call into an evidence-backed CV pack. I review the pack and submit
+it myself.
 
-Use the supplied Python 3.14 venv from this repository in PowerShell:
+Internship calls arrive as forwarded emails, reminders, inline job descriptions,
+and attachments. Inbound groups revisions, shows deadlines and unknowns, and
+matches role requirements to my approved project evidence. The local desk shows
+what needs attention, the source for each fact, and what evidence is missing.
+
+It never sends mail, fills forms, or submits applications. "Submitted by me" only
+records an action I took. Private mail never leaves the PC. No cloud model runs on
+private data. This build runs offline and has no live mail or model connection.
+
+## Architecture
+
+- Python imports local text exports or EML files into SQLite. Imports publish a
+  snapshot only after triage, extraction, and source indexing finish.
+- Rules classify mail and extract fields. Fields retain source quotes and an
+  explicit found, inferred, unknown, or conflicting status. Reminders add revisions.
+- An approved evidence registry supplies CV claims. Deterministic ranking selects
+  project bullets and exposes gaps. Email text cannot supply new CV claims.
+- Local Tectonic renders the PDF. Checks cover layout, identity, approved skills,
+  and bullet provenance. Unreadable job descriptions produce provisional previews
+  that need acknowledgement before review.
+- Flask serves a loopback API and the React/TypeScript desk. A persistent Pause
+  control stops imports, extraction, and pack work. A ledger records local runs.
+
+```mermaid
+flowchart LR
+    A[Local mail exports] --> B[Rules: triage and extraction]
+    B --> C[(SQLite snapshots and revisions)]
+    C --> D[Deterministic ranking]
+    E[Approved CV evidence] --> D
+    D --> F[Local PDF build and checks]
+    C --> G[Flask API and React desk]
+    F --> G
+    G --> H[My review and manual submission]
+```
+
+## Run the fictional demo
+
+Use the repository root in PowerShell. The supplied environment has Python
+libraries, web dependencies, Tectonic, and its offline compilation cache already
+provisioned. Dependencies are recorded in [requirements-lock.txt](requirements-lock.txt)
+and [web/package-lock.json](web/package-lock.json). The PDF builder's local paths
+are in [inbound/packs/build.py](inbound/packs/build.py); another machine needs those
+paths and the cached compiler set up first.
 
 ```powershell
 $env:PATH = "$PWD\.venv\Scripts;$env:PATH"
 $env:PYTHONPYCACHEPREFIX = "$PWD\.local\pycache"
-python -m synth.generate
-python -m inbound import --source export --path fixtures/export_sample --provenance synthetic
-python -m inbound import --source export --path fixtures/export_sample --provenance synthetic
-python -m inbound import --source eml --path fixtures/eml_sample --provenance synthetic
-python -m inbound triage
-python -m inbound extract
-python -m inbound baseline
-python -m eval.extract_baseline
-python -m inbound evidence import
-python -m inbound pack 1 --demo
-python -m eval.pack_eval
-python -m inbound pause
-python -m inbound resume
-ruff check .
-pytest --basetemp=.local/pytest-m3
+npm --prefix web run build
+python -m inbound demo
+python -m inbound serve
 ```
 
-The first export import adds 190 messages; repeats and the five EML alternates add zero.
-Each message identity is scoped by provider (`mail` for both file formats). Changed content
-is counted as `changed` and appended to history; the original message remains intact.
-M1 triage uses that original snapshot. Transport encoding, newline endings, byte availability,
-attachment file locations, and export notes are excluded from content identity.
+Open <http://127.0.0.1:5000>. The demo uses fictional mail and Sara Qamar's fictional
+CV evidence. Its clock is frozen to the evaluation snapshot so deadlines remain
+reproducible. Start at Today / Inbox, open a call, inspect its source text and role
+coverage, then review the PDF and checks. Settings / Runs shows Pause and the ledger.
 
-All runtime data, reports, and test caches default to `.local/`. Triage and extraction
-baselines write `.local/reports/m1.json`/`m1.md` and `m2.json`/`m2.md`, scoring only the
-64 dev messages. Held-out and attacks are not scored in these baselines. Extraction
-sets urgency from the effective deadline using a clock; the dev baseline injects
-2026-10-28T02:30+04:00. Model comparison is explicitly not run.
+The demo stores its database and pack files under `.local/`. It does not need mail
+credentials. For a separate local export, configure `INBOUND_DATA_ROOT` and import
+with an explicit provenance:
 
-Each call retains message-local fields and an effective revision snapshot. Explicit
-deadline amendments supersede prior values; competing statements retain quoted candidates.
-Quoted relative dates retain their original sent-time anchor. Missing/unreadable JDs block
-review. `inbound.extract.pipeline.opportunity_state(db, id, clock=...)` computes expiry;
-an unknown/conflicting deadline yields `expired=None`. New revisions invalidate reviewed
-packs through the M2 invalidation hook. M3 binds each pack to its source revision.
+```powershell
+python -m inbound import --source export --path <export-folder> --provenance synthetic
+python -m inbound digest
+```
 
-`synth/cases.json` is the gold authority transcribed from the frozen manifest and audit
-(`r4-20261028-01`, including the P-H25 unknown stipend). It contains source definitions,
-independently authored gold fields and attachment plans. Regeneration is byte stable;
-`fixtures/manifest.json` records membership, seed, clock and SHA-256 hashes. M2 materializes
-text PDFs and paragraph/table DOCX documents, including corrupt, image-only and missing
-variants. The two attachment-bearing EML alternates contain actual MIME payloads. Import
-does not parse documents; extraction does. Reimporting an unchanged M1 message hydrates
-its attachment location without changing its canonical identity/history. Legacy attachments
-without a stored root remain blocked until the source is reimported.
+Use `--source eml` for EML files. Real local exports require `--provenance private`;
+that flag does not enable model access. See [SPEC.md](SPEC.md) for the export format
+and [.env.example](.env.example) for local settings. Attachments must be exported
+with their bytes and relative file paths. A filename alone cannot provide a JD.
 
-Provenance is required import configuration, never a message header. The model payload
-boundary denies private, unknown and mixed sources. The offline model stub raises on a
-cache miss. Inherited API keys and notifier flags cannot enable networking. Tests deny
-sockets, DNS and subprocesses except the exact cached, untrusted Tectonic build.
-Pause persists in SQLite and blocks work at stage boundaries;
-pause/resume remain available. Run records contain counts and error types, never bodies or
-exception messages.
+## Evaluation
 
-`.env.example` documents optional `INBOUND_DATA_ROOT` and `INBOUND_PERSONAL_CONTACTS`.
-Environment files are not loaded automatically. A configured writable root must be on D:.
-Forward-only migrations live in `inbound/migrations/`; applied migration hashes are checked.
-No real mail is included. Claude alone runs imports against real data and makes commits.
+These are synthetic results, not a measurement of accuracy on my inbox. The first
+blind run is preserved in [eval/results.json](eval/results.json). The separate
+[eval/results-after-fixes.json](eval/results-after-fixes.json) records fixes for
+wrapped deadline times and inline numbered roles. After those fixes, held-out data
+is no longer blind for those classes. M6 changes presentation and import plumbing;
+it does not rerun or replace either evaluation record.
 
-M3 keeps public evidence and fictional demo evidence in separate registry scopes. `evidence import`
-reads only manifest-approved CV project files and the public portfolio data; it never edits those
-sources. It imports 21 approved CV projects (51 bullet variants) and 52 curated skills. A missing
-portfolio project keeps its CV evidence. Tests use committed snapshots; the sole source-file test
-hashes every public CV TeX file before and after a demo build. `python -m inbound.evidence.snapshot`
-regenerates snapshots from the reviewed sources and fictional manifest.
+All counts below come from those committed JSON files. Applicable-field scores
+include correctly unknown values. Populated-field scores exclude gold unknowns.
 
-`pack <opportunity_id> --demo` uses Sara Qamar's five fictional projects and replaces every identity,
-education, experience, research, link and PDF metadata record. Omit `--demo` for a local public-CV
-pack after importing evidence; Claude runs that real-CV check. Fixed real parts must match
-`evidence/approved_fixed.yaml` hashes. Approved profiles may require Uzair's review; verification
-reports that flag and whether a tailored family was available. Requirement text never supplies
-CV claims. Model ranking has an interface only and is reported as **not run**.
+| Metric | First blind run | After fixes |
+|---|---:|---:|
+| Dev triage messages | 64 | 64 |
+| Held-out triage messages | 116 | 116 |
+| Dev / held-out triage macro-F1 | 1.0 / 1.0 | 1.0 / 1.0 |
+| Dev / held-out PS-call recall | 1.0 / 1.0 | 1.0 / 1.0 |
+| Dev applicable fields | 266/266 | 266/266 |
+| Dev populated fields | 177/177 | 177/177 |
+| Dev full records | 24/24 | 24/24 |
+| Dev exact deadlines | 22/22 | 22/22 |
+| Dev silently wrong deadlines | 0 | 0 |
+| Held-out applicable fields | 365/387 | 368/387 |
+| Held-out populated fields | 228/250 | 231/250 |
+| Held-out full records | 23/36 | 24/36 |
+| Held-out exact deadlines | 31/33 | 32/33 |
+| Held-out role titles | 36/39 | 38/39 |
+| Held-out requirement associations | 84/95 | 89/95 |
+| Held-out abstentions | 154 | 152 |
+| Held-out silently wrong deadlines | 1 | 0 |
+| Dev admin deadline recall | 2/2 | 2/2 |
+| Held-out admin deadline recall | 3/4 | 3/4 |
+| Packs built, frozen subset | 8/8 | 8/8 |
+| Normal packs passing checks | 6/6 | 6/6 |
+| Provisional previews passing checks | 2/2 | 2/2 |
+| CV bullets traced to approved evidence | 64/64 | 64/64 |
+| Fixed CV requirement support | 18/18 | 18/18 |
+| Ranked CV requirement support | 18/18 | 18/18 |
+| Forbidden action attempts | 0 | 0 |
+| Model comparison | Not run | Not run |
 
-Pack files live under `.local/packs/<id>/`: `body.tex`, generated/copy-checked parts, the named PDF,
-`build.log`, `selection.json`, `verification.json` and capped `answers.txt`. Tectonic runs with
-`--only-cached --untrusted`, the pre-filled `.local/tectonic-cache/cache` cache and a 120-second
-timeout. A failed compilation or verification leaves a blocked pack and a failed ledger row.
-Blocked JDs produce visibly labelled provisional previews, which require blocker acknowledgement
-before review. A newer opportunity revision makes the prior reviewed pack stale and requires a
-rebuild. `inbound.packs.build.set_status` enforces those rules; it never submits anything.
+Extraction still misses fields and whole records. An unknown deadline is not proof
+that a call is still open. Perfect triage on this dataset does not imply perfect
+triage on other mail.
 
-`python -m eval.pack_eval` writes `.local/reports/m3.json` and `m3.md` for the eight frozen cases,
-retaining failures in the denominator. Ranking coverage uses the manifest's human support labels
-and the fixed p1–p4/two-bullet/all-approved-skills baseline. These are fictional pack results, not
-real-mail evaluation. `.local/reports/m3-cv-hashes.json` contains all before/after source hashes.
+## Limits and build process
+
+Extraction is rules-only. Unfamiliar wording and layouts can fail. Text PDFs and
+DOCX paragraphs and tables are supported; scanned attachments need another path.
+Missing or unreadable attachments block normal review.
+
+The builders authored the synthetic dataset and its labels. Held-out variants give
+some separation, but they are not an independent external benchmark. The ranking
+ties the fixed general CV baseline at 18/18 supported requirements. This evaluation
+does not establish a ranking improvement. Model comparison was not run.
+
+Claude Code planned the work and verified each milestone. Codex wrote code milestone
+by milestone. Claude ran the private-mail pipeline locally and shared sanitized
+findings. Codex reproduced those findings with fictional data. Claude reviews and
+commits the changes. [SPEC.md](SPEC.md) and [DESIGN.md](DESIGN.md) record the
+contract, including the amendments made after each review.
