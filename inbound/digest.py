@@ -4,6 +4,7 @@ import json
 from datetime import UTC, datetime, timedelta
 from zoneinfo import ZoneInfo
 
+from inbound.application_activity import latest
 from inbound.extract.pipeline import latest_revision, opportunity_state
 from inbound.presentation import opportunity_labels
 from inbound.triage.normalize import normalize_subject
@@ -65,10 +66,19 @@ def today(db, now=None):
         "uncertain_deadlines": [],
         "new_calls": [],
         "admin_tasks": [],
+        "outside_applications": [],
     }
     entries = []
     for row in db.execute("SELECT id FROM opportunities"):
         state = opportunity_state(db, row["id"], clock=lambda: now)
+        activity = latest(db, row["id"])
+        if activity:
+            result["outside_applications"].append({
+                "id": state["id"],
+                **opportunity_labels(db, state, state["normalized_subject"]),
+                "outside_application": activity,
+            })
+            continue
         if state["status"] in {"submitted_by_me", "skipped"}:
             continue
         revision = latest_revision(db, row["id"])
@@ -182,6 +192,9 @@ def today(db, now=None):
         return (1, -datetime.fromisoformat(due(entry)).timestamp(), str(entry["id"]))
 
     result["attention"].sort(key=attention_order)
+    result["outside_applications"].sort(
+        key=lambda e: (e["outside_application"]["follow_up"] or "9999", e["id"])
+    )
     for key in ("deadlines_48h", "date_only"):
         result[key].sort(key=lambda e: (due(e), str(e["id"])))
     result["new_calls"].sort(key=received)
@@ -220,6 +233,14 @@ def plain_text(summary):
         lines += ["Snapshot may be out of date", "New mail may be missing."]
     if snapshot["latest_import_failure"]:
         lines += ["Latest import failed. Showing the last successful snapshot."]
+    lines += ["", "Outside applications / follow-ups"]
+    for entry in summary["outside_applications"]:
+        activity = entry["outside_application"]
+        lines.append(
+            f"{entry['display_title']} · Applied (outside Inbound) on {display(activity['applied_at'])}"
+        )
+        if activity["follow_up"]:
+            lines.append(f"Follow-up: {display(activity['follow_up'])} · Local task only")
     for label, key in [
         ("Overdue / blocked", "attention"),
         ("Deadlines within 48 hours", "deadlines_48h"),

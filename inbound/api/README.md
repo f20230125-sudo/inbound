@@ -64,6 +64,31 @@ Submission uses the same expected IDs, `"status": "submitted_by_me"`, and
 the human's declaration and performs no external action. Pipeline statuses cannot
 be manufactured through either status endpoint.
 
+M7 adds `POST /api/opportunities/<id>/applied` for an application the human made
+outside Inbound. Its JSON body requires `applied_at` (ISO time with timezone),
+`human_submission: true`, `expected_revision_id`, and `expected_activity_id`
+(null for the first record); `note` (up to 1000 characters) and `follow_up`
+(`YYYY-MM-DD`, a local task only) are optional. Read the expected IDs from the
+opportunity detail, including `outside_application.id`. Stale writes return 409;
+an exact retry returns the existing record. Corrections append `applied_outside`
+events to `review_history`, including both applied and recorded times and the
+preceding activity ID. No pack is required or marked reviewed, and the pipeline
+status and JD/deadline warnings remain intact. Today shows the latest declarations
+in `outside_applications`, ordered by follow-up date, instead of active call groups.
+These timeline rows live in the existing `review_events` table, so no schema
+migration or staged-import table publication change is required.
+
+The equivalent CLI is `python -m inbound applied <id> --at <ISO>
+[--note ...] [--follow-up YYYY-MM-DD] --i-applied-myself`. It checks local mode,
+Pause, active imports and the revision/activity versions before appending.
+
+The desk anchors to the server clock, advances by browser elapsed wall time, and
+reloads Today every minute and on visible tab return. Demo/replay clocks remain
+frozen. The browser fixture alone enables `TEST_CLOCK=True`; with `DEMO=True`,
+`POST /api/test/clock` accepts `{ "now": "<ISO time with timezone>" }` to replace
+the frozen clock. It has the normal POST guards and returns 404 unless both
+configuration flags are enabled. There is no environment switch for this hook.
+
 Import runs through import, triage, extraction, provenance indexing and snapshot
 publication. Work stages run in a temporary local SQLite copy; publication is one
 transaction. Failure or Pause leaves the last successful data and snapshot intact.
