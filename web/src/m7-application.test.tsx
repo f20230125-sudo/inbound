@@ -25,7 +25,7 @@ it('requires a checkbox and sends editable applied time, note and local follow-u
     await screen.findByText('Outside application saved.');
     expect(reload).toHaveBeenCalled();
     expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({ human_submission: true, applied_at: '2026-10-27T20:00:00+04:00',
-        note: 'Used my own CV.', follow_up: '2026-11-02', expected_revision_id: 7, expected_activity_id: null });
+        note: 'Used my own CV.', follow_up: '2026-11-02', expected_revision_id: 7, expected_content_version: 0, expected_activity_id: null });
 });
 
 it.each(['paused', 'replay'])('disables the outside declaration while %s', state => {

@@ -33,7 +33,7 @@ def applied_time(value):
 
 def record(
     db, opportunity_id, *, applied_at, human_submission, expected_revision_id,
-    expected_activity_id, note="", follow_up=None, mode="local",
+    expected_activity_id, note="", follow_up=None, mode="local", expected_content_version=0,
 ):
     if mode != "local":
         raise ValueError("Outside applications are available in local mode")
@@ -60,8 +60,10 @@ def record(
         if not db.execute("SELECT 1 FROM opportunities WHERE id=?", (opportunity_id,)).fetchone():
             raise LookupError("Opportunity not found")
         revision = latest_revision(db, opportunity_id)
+        version = db.execute("SELECT content_version FROM opportunities WHERE id=?",
+                             (opportunity_id,)).fetchone()[0]
         previous = latest(db, opportunity_id)
-        if revision["id"] != expected_revision_id:
+        if revision["id"] != expected_revision_id or version != expected_content_version:
             raise ActivityConflict("This opportunity changed. Reload the latest revision.")
         # A lost response may be retried using the version from before this exact write.
         if previous and all(previous[k] == v for k, v in details.items()) and (

@@ -37,6 +37,11 @@ def main(argv=None):
     applied.add_argument('--note', default='')
     applied.add_argument('--follow-up')
     applied.add_argument('--i-applied-myself', action='store_true')
+    attach = sub.add_parser('attach')
+    attach.add_argument('opportunity_id', type=int)
+    attach.add_argument('--attachment', required=True)
+    attach.add_argument('--file', type=Path, required=True)
+    attach.add_argument('--preview', action='store_true')
     args = parser.parse_args(argv)
     try:
         settings = Settings.from_env()
@@ -55,6 +60,25 @@ def main(argv=None):
 
             return evaluate()
         with closing(connect(settings.db_path)) as db:
+            if args.command == 'attach':
+                from inbound.attachment_recovery import confirm, preview
+
+                matches = db.execute(
+                    "SELECT a.id FROM attachments a JOIN opportunity_revisions r "
+                    "ON r.message_id=a.message_id WHERE r.opportunity_id=? AND a.filename=?",
+                    (args.opportunity_id, args.attachment),
+                ).fetchall()
+                if len(matches) != 1:
+                    raise ValueError("Select one unambiguous attachment on this call")
+                options = {"path": args.file, "mode": os.environ.get('APP_MODE', 'local')}
+                result = preview(db, settings, args.opportunity_id, matches[0][0], **options)
+                if not args.preview:
+                    result = confirm(db, settings, args.opportunity_id, matches[0][0],
+                                     **{k: result[k] for k in (
+                                         'content_hash', 'expected_revision_id',
+                                         'expected_content_version')}, **options)
+                print(json.dumps(result))
+                return 0
             if args.command == 'applied':
                 from inbound.application_activity import latest, record
                 from inbound.extract.pipeline import latest_revision
@@ -69,6 +93,10 @@ def main(argv=None):
                     follow_up=args.follow_up, expected_revision_id=revision['id'],
                     expected_activity_id=previous['id'] if previous else None,
                     mode=os.environ.get('APP_MODE', 'local'),
+                    expected_content_version=db.execute(
+                        "SELECT content_version FROM opportunities WHERE id=?",
+                        (args.opportunity_id,),
+                    ).fetchone()[0],
                 )
                 print(json.dumps(result))
                 return 0

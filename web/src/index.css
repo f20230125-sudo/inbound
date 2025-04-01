@@ -280,3 +280,6 @@ th, td { vertical-align: top; padding: 10px 6px; border-bottom: 1px solid var(--
 .inbox-table select { font-size: 12px; }
 :root.dark { --muted-foreground: oklch(0.75 0 0); }
 .section { border: 1px solid var(--border); }
+
+.jd-preview { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 24rem; overflow-y: auto; font: inherit; }
+.attachment-recovery input[type=file] { max-width: 100%; }
