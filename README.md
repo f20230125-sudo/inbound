@@ -11,12 +11,15 @@ what needs attention, the source for each fact, and what evidence is missing.
 
 It never sends mail, fills forms, or submits applications. "Submitted by me" only
 records an action I took. Private mail never leaves the PC. No cloud model runs on
-private data. This build runs offline and has no live mail or model connection.
+private data. Mail arrives live from Gmail through a read-only connection I switch
+on myself; nothing else in Inbound uses the network, and no model runs on my mail.
 
 ## Architecture
 
-- Python imports local text exports or EML files into SQLite. Imports publish a
-  snapshot only after triage, extraction, and source indexing finish.
+- Gmail sync (read-only scope) checks for new mail every few minutes, saves each
+  message and its attachments under my private data folder, and runs the import.
+  Local text exports and EML folders also work. Imports publish a snapshot only after
+  triage, extraction, and source indexing finish.
 - Rules classify mail and extract fields. Fields retain source quotes and an
   explicit found, inferred, unknown, or conflicting status. Reminders add revisions.
 - An approved evidence registry supplies CV claims. Deterministic ranking selects
@@ -29,7 +32,7 @@ private data. This build runs offline and has no live mail or model connection.
 
 ```mermaid
 flowchart LR
-    A[Local mail exports] --> B[Rules: triage and extraction]
+    A[Gmail, read-only, every few minutes] --> B[Rules: triage and extraction]
     B --> C[(SQLite snapshots and revisions)]
     C --> D[Deterministic ranking]
     E[Approved CV evidence] --> D
@@ -74,6 +77,37 @@ Use `--source eml` for EML files. Real local exports require `--provenance priva
 that flag does not enable model access. See [SPEC.md](SPEC.md) for the export format
 and [.env.example](.env.example) for local settings. Attachments must be exported
 with their bytes and relative file paths. A filename alone cannot provide a JD.
+
+## Connect Gmail (read-only)
+
+Inbound asks Google for one permission, `gmail.readonly`. It can read mail and
+attachments; it cannot send, delete, label, or change anything. The code may only
+call Google's token endpoint and the Gmail read API, and tests fail if any send or
+modify scope or endpoint appears. One-time setup, done by me in my own Google account:
+
+1. In Google Cloud Console, create a project and enable the **Gmail API**.
+2. Configure the OAuth consent screen. Choose **Internal** if my Workspace allows it.
+   Otherwise choose **External**, leave it in **Testing**, and add my address as a test
+   user; Google then expires the sign-in after 7 days, so I reconnect weekly.
+3. Create an OAuth client of type **Desktop app** and download its JSON into my private
+   data folder (the folder `INBOUND_DATA_ROOT` points to).
+4. Connect and switch on live checks:
+
+```powershell
+$env:INBOUND_DATA_ROOT = "<private data folder>"
+python -m inbound gmail connect --client-secret "$env:INBOUND_DATA_ROOT\client_secret.json"
+python -m inbound gmail poll --on --minutes 2
+python -m inbound serve          # the desk checks Gmail while it runs
+python -m inbound watch          # or: keep checking without the desk open
+```
+
+`gmail connect` prints a Google consent link; I open it, approve read-only access, and
+the token is saved in `<data folder>\gmail\token.json`, never in the repository. The
+first check reads the last 30 days (spam, trash, drafts and my own sent mail are
+skipped); later checks ask Gmail only for what changed. Settings / Runs shows the
+account, last and next check, and a **Check Gmail now** button. Pause stops checks.
+A Workspace administrator can block third-party apps; if so, the connect step fails
+with Google's message and the export path above still works.
 
 ## Evaluation
 

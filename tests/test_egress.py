@@ -8,6 +8,9 @@ import pytest
 
 from inbound.__main__ import main
 
+# The single read-only Gmail exception (SPEC Amendment 3a).
+GMAIL = Path("inbound/sources/gmail_api.py")
+
 
 def test_runtime_denial():
     with pytest.raises(AssertionError):
@@ -29,8 +32,12 @@ def test_package_has_no_transports():
                 for alias in node.names:
                     if alias.name == "subprocess" and path == Path("inbound/packs/build.py"):
                         continue
+                    if alias.name == "httpx" and path == GMAIL:
+                        continue
                     assert alias.name.split(".")[0] not in forbidden
             if isinstance(node, ast.ImportFrom):
+                if path == GMAIL and node.module in {"http.server", "urllib.parse"}:
+                    continue
                 assert (node.module or "").split(".")[0] not in forbidden
             if (
                 isinstance(node, ast.Call)
