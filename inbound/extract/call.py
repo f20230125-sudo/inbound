@@ -87,6 +87,31 @@ def combine_deadlines(candidates, name="deadline"):
     return result
 
 
+def align_area(subject_parts, body_parts):
+    """Body `Company,City,Area` vs subject `Company,City`: the area is extra, not a conflict.
+
+    The body splitter cuts at the last comma, so `Harbor Finch,Port Selene,Marina Quarter`
+    reads as company `Harbor Finch,Port Selene`. When the body text starts with exactly the
+    subject's company followed by a comma, re-read it as company + city (+ area). Anything
+    else, such as a genuinely different company, is left for identity_field to flag.
+    """
+    company, body_company = subject_parts.get("company"), body_parts.get("company")
+    if not company or not body_company or normalize(company) == normalize(body_company):
+        return body_parts
+    text = ",".join(p for p in (body_company, body_parts.get("city")) if p)
+    prefix = normalize(company) + ","
+    if not normalize(text).startswith(prefix):
+        return body_parts
+    # Split by comma count, not character length: the subject may carry zero-width spaces.
+    pieces = text.split(",")
+    cut = normalize(company).count(",") + 1
+    rest = [p.strip() for p in pieces[cut:] if p.strip()]
+    if not rest:
+        return body_parts
+    return {**body_parts, "company": ",".join(pieces[:cut]).strip(), "city": rest[0],
+            "area": ", ".join(rest[1:]) or None}
+
+
 def identity_field(name, observations):
     if not observations:
         return field(name)
@@ -181,6 +206,7 @@ def extract_call(message, attachments=(), *, category=None):
         fields[name] = field(name)
     subject_parts = split_subject(message.subject)
     body_parts = body_identity(body)
+    body_parts = align_area(subject_parts, body_parts)
     for name in ("company", "city"):
         observed = []
         for source, parts in (("subject", subject_parts), ("body", body_parts)):
