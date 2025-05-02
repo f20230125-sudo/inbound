@@ -63,7 +63,8 @@ def parse_roles(text, subject, identity):
                 active = None
                 continuation = False
                 continue
-            bullet = re.match(r"^\s*[·•\-]\s+(.+)", clean)
+            # Company PDFs often bullet with en or em dashes ("– Good Python.").
+            bullet = re.match(r"^\s*[·•\-–—]\s+(.+)", clean)
             inline = re.match(
                 r"^(?:Expected Skills|Requirements|Responsibilities)\s*:\s*(.*)",
                 clean,
