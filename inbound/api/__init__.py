@@ -247,6 +247,17 @@ def create_app(config=None):
     def get_today():
         return output(today(db(), current_time()))
 
+    @app.get("/api/agent/state")
+    def get_agent_state():
+        from inbound.agent import agent_state
+
+        replay = app.config["APP_MODE"] == "replay"
+        return output(agent_state(
+            db(), current_time(),
+            gmail=None if replay else gmail_sync.status(settings, db()),
+            syncing=False if replay else gmail_sync.is_syncing(),
+        ))
+
     @app.post("/api/test/clock")
     def set_test_clock():
         if not app.config["DEMO"] or not app.config["TEST_CLOCK"]:

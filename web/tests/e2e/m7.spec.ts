@@ -13,15 +13,19 @@ test('Today changes deadline group without navigation when the frozen demo clock
         const summary = await (await page.request.get('/api/today')).json();
         const candidate = summary.deadlines_48h.find((e: { deadline: { normalized: string } }) => new Date(e.deadline.normalized).getTime() === new Date('2026-10-28T08:00:00+04:00').getTime());
         expect(candidate).toBeTruthy();
-        await page.goto('/');
+        await page.goto('/work');
         const upcoming = page.locator('[data-slot=card]').filter({ has: page.getByRole('heading', { name: 'Deadlines within 48 hours', exact: true }) });
-        const overdue = page.locator('[data-slot=card]').filter({ has: page.getByRole('heading', { name: 'Overdue / blocked', exact: true }) });
+        const overdue = page.locator('[data-slot=card]').filter({ has: page.getByRole('heading', { name: 'Past deadlines', exact: true, includeHidden: true }) });
         await expect(upcoming.locator(`[data-case="${candidate.provider_id}"]`)).toHaveCount(1);
         await setClock('2026-10-28T08:01:00+04:00');
         await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
         await expect(upcoming.locator(`[data-case="${candidate.provider_id}"]`)).toHaveCount(0);
         await expect(overdue.locator(`[data-case="${candidate.provider_id}"]`)).toHaveCount(1);
-        await expect(page).toHaveURL(/\/$/);
+        await expect(page).toHaveURL(/\/work$/);
+        await expect(page.locator('#past-deadlines')).not.toHaveAttribute('open', '');
+        await page.locator('#past-deadlines > summary').click();
+        await overdue.getByRole('button', { name: /View all/ }).click();
+        await expect(overdue.locator(`[data-case="${candidate.provider_id}"]`)).toBeVisible();
         await audit(page);
     } finally { await setClock(original); }
 });
@@ -47,7 +51,7 @@ test('record and correct an outside application with visible history and a Today
     await expect(page.getByText('Applied (outside Inbound) on 28 Oct 2026, 06:45', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('note: Fictional outside application.', { exact: true }).first()).toBeVisible();
     await audit(page);
-    await page.getByRole('link', { name: 'Back to Today / Inbox', exact: true }).click();
+    await page.getByRole('link', { name: 'Back to Work', exact: true }).click();
     const applications = page.locator('[data-slot=card]').filter({ has: page.getByRole('heading', { name: 'Outside applications / follow-ups', exact: true }) });
     await expect(applications).toContainText('Applied (outside Inbound) on 28 Oct 2026, 06:45');
     await expect(applications).toContainText('Follow-up: 02 Nov 2026');
