@@ -6,6 +6,7 @@ from datetime import UTC, date, datetime
 from inbound.extract.pipeline import latest_revision
 from inbound.ledger import timestamp
 from inbound.pause import check
+from inbound.steps import Empty, Kind, emit
 
 
 class ActivityConflict(RuntimeError):
@@ -78,4 +79,6 @@ def record(
             "VALUES (?,?,'applied_outside',?,?)",
             (opportunity_id, revision["id"], timestamp(), json.dumps(details)),
         )
+        emit(db, Kind.APPLIED, Empty(), entity_type="opportunity", entity_id=opportunity_id,
+             revision_id=revision['id'])
         return latest(db, opportunity_id)

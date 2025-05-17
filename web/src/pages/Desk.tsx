@@ -1,20 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { useDesk } from '../App';
-import type { AgentState, Run } from '../types';
-import { DATA_CHANGED, request, useResource } from '../lib/api';
-import { date, label } from '../lib/format';
+import type { AgentState } from '../types';
+import { DATA_CHANGED, request } from '../lib/api';
+import { Activity } from '../components/activity';
 import { Briefing, ScoutFace } from '../components/scout';
-import { DeadlineDisplay, Failure, Loading, Section } from '../components/shared';
+import { DeadlineDisplay, Loading, Section } from '../components/shared';
 import { Button } from '../components/ui/button';
 
 export default function DeskPage() {
-    const { settings, refresh } = useDesk();
+    const { settings, refresh, setRecordedReplay } = useDesk();
     const [state, setState] = useState<AgentState>();
     const [disconnected, setDisconnected] = useState(false);
     const [checking, setChecking] = useState(false);
     const [checkError, setCheckError] = useState('');
-    const runs = useResource<Run[]>('/runs', true);
     const command = useRef<HTMLInputElement>(null);
     const work = useRef<HTMLAnchorElement>(null);
     const load = useCallback(async () => {
@@ -61,6 +60,7 @@ export default function DeskPage() {
         </div>
         <div className="dispatch-columns">
             <Section title="Your next decisions" id="decisions">
+                {state?.decision_counts && <p className="meta">{state.decision_counts.calls} calls · {state.decision_counts.notices} notices · {state.decision_counts.follow_ups} follow-ups · {state.decision_counts.emails_to_sort} emails to sort</p>}
                 {state ? state.decisions.length ? <ol className="decision-list">{state.decisions.map(item => <li key={item.id}>
                     <h3>{item.title}</h3><p>{item.reason}</p>
                     {item.deadline && <DeadlineDisplay record={item.deadline} now={settings.clock} />}
@@ -69,12 +69,7 @@ export default function DeskPage() {
                 <Link ref={work} className="dispatch-footer" to="/work">Open all work</Link>
             </Section>
             <Section title="My latest work" id="latest-work">
-                <p className="meta">Recorded runs · most recent first</p>
-                {runs.error ? <Failure text="Run ledger could not be loaded." retry={runs.reload} /> : !runs.value ? <Loading text="Loading runs…" /> : !runs.value.length ? <p>No runs recorded.</p> : <ol className="work-log">{runs.value.slice(0, 5).map(run => <li key={run.id}>
-                    <p><Link to={`/settings?run=${run.id}#runs`}>{label(run.kind)} · {label(run.status)}</Link></p>
-                    <p className="meta"><time dateTime={run.finished_at || run.started_at}>{date(run.finished_at || run.started_at)}</time>{run.status === 'running' && run.stage ? ` · ${label(run.stage)}` : ''}</p>
-                </li>)}</ol>}
-                <Link className="dispatch-footer" to="/settings#runs">View activity</Link>
+                <Activity onReplayChange={setRecordedReplay} />
             </Section>
         </div>
     </div>;
