@@ -299,3 +299,31 @@ export interface Pack extends PackRef {
         };
     }[];
 }
+export interface MemoryDocument {
+    name: string;
+    description: string;
+    type: 'user' | 'feedback' | 'project' | 'reference';
+    content: string;
+}
+export interface MemoryRecord extends MemoryDocument {
+    id: string;
+    origin: 'imported' | 'local';
+    source: 'private' | 'synthetic';
+    file: string;
+    local_file: string | null;
+    version: number;
+    status: 'remembered' | 'disabled';
+    influence: 'remembered';
+    scope: string;
+    changed_at: string;
+    conflicts: string[];
+    source_content: MemoryDocument | null;
+    citation: { entity_type: 'memory'; entity_id: string; version: number };
+}
+export interface MemorySnapshot {
+    version: number;
+    published_at: string | null;
+    items: MemoryRecord[];
+    error: 'invalid_snapshot' | null;
+    published: boolean;
+}

@@ -113,6 +113,45 @@ account, last and next check, and a **Check Gmail now** button. Pause stops chec
 A Workspace administrator can block third-party apps; if so, the connect step fails
 with Google's message and the export path above still works.
 
+## Scout's memory
+
+Claude supplies the curated snapshot as UTF-8 Markdown files directly under
+`<data_root>/memory/`. Each file has front matter like this fictional example:
+
+```markdown
+---
+name: Sara's profile
+description: Fictional applicant profile
+type: user
+source: sara-profile
+---
+Sara studies at Port Selene College.
+```
+
+Types are `user`, `feedback`, `project` and `reference`. The optional `source` is a
+stable source identity; keep it unchanged across renames. Without it, identity follows
+the filename, independently of the title. Metadata must be a flat scalar map.
+
+Open **Memory** to refresh, add, edit, disable or forget a memory. Local additions
+and imported-memory edits go under `<data_root>/memory-local/`; the curated files
+remain untouched. A changed curated source shows a conflict alongside its local edit.
+Forgetting an imported memory persists a suppression, removes it from retrieval and
+clears its stored memory-version contents. Historical chats and generated artifacts
+may still contain text; journal events retain only typed IDs and counts.
+
+`python -m inbound serve` checks these directories every minute in local mode. Pause
+and a running message import defer scans. Page reads and replay mode never scan.
+Limits: 128 Markdown files across both roots, 64 KiB per file and 2 MiB total;
+directory enumeration is also bounded. Links/junctions are rejected, files are never
+read recursively, and malformed or changing snapshots keep the previous valid version.
+A previously published directory disappearing is incomplete; an existing empty
+directory deliberately removes its entries. Markdown supports headings, lists, links,
+code and bold text; HTML and image syntax remain inert text.
+
+M13 memories are remembered context only. They cannot activate behavior, override
+message evidence, approve skills or become CV evidence. Active learning rules arrive
+in M14. The committed `fixtures/memory/` snapshot contains fictional test data only.
+
 ## Evaluation
 
 These are synthetic results, not a measurement of accuracy on my inbox. The first
