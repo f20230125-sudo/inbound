@@ -6,6 +6,10 @@ from inbound import memory
 
 
 def register(app, db, output, settings):
+    @app.errorhandler(memory.MemoryConflict)
+    def memory_conflict(exc):
+        return output({'error': 'conflict', 'message': str(exc)}, 409)
+
     @app.get("/api/memory")
     def get_memory():
         if request.args:

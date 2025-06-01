@@ -32,7 +32,7 @@ def main():
         for scheme in ("light", "dark"):
             name = f"{device}-{scheme}"
             (root / "memory" / f"curated-{name}.md").write_text(
-                f"---\nname: Curated {name}\ndescription: Fictional browser fixture\n"
+                f"---\nname: Curated {name}\ntitle: Curated {name}\ndescription: Fictional browser fixture\n"
                 f"type: user\nsource: {name}\n---\nFictional curated memory.\n", encoding="utf8")
     with closing(connect(settings.db_path)) as db:
         refresh_memory(db, settings, source="synthetic")
@@ -49,6 +49,14 @@ def main():
                                      subject=f"Call for CV - Recovery {device} {theme},DSO "
                                              "- Backend Intern")
                              for device in ("desktop", "mobile") for theme in ("light", "dark")])
+        import_messages(db, [replace(missing,
+            provider_id=f'M14-{device}-{scheme}-{index}',
+            thread_id=f'M14-{device}-{scheme}-{index}',
+            sender=f'learning-{device}-{scheme}@fiction.demo.invalid',
+            subject='Studio notes' if index < 3 else 'Lunch invitation',
+            body_text='Fictional sender review example.', attachments=())
+            for device in ('desktop', 'mobile') for scheme in ('light', 'dark')
+            for index in (1, 2, 3)])
         triage_messages(db)
         extract_messages(db)
         oid = db.execute(

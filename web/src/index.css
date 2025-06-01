@@ -334,3 +334,7 @@ th, td { vertical-align: top; padding: 10px 6px; border-bottom: 1px solid var(--
 .memory-source dt { font-weight: 600; }
 .memory-editor { display: grid; gap: .6rem; max-width: 48rem; }
 .memory-editor select { border: 1px solid var(--border); padding: .5rem; border-radius: .375rem; background: var(--background); }
+
+.memory-entry, #sender-review { overflow-wrap: anywhere; min-width: 0; }
+.memory-entry select { max-width: 100%; width: 100%; margin-block: .4rem .8rem; padding: .5rem; border: 1px solid var(--border); background: var(--background); }
+.memory-entry form { max-width: 48rem; }
