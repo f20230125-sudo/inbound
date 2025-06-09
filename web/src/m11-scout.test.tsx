@@ -43,7 +43,7 @@ it('shows disconnection from a failed state read, keeps the saved decisions, and
     expect(screen.getByRole('img', { name: 'Scout: Needs decision' })).toBeTruthy();
     fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
     expect(document.activeElement).toBe(screen.getByLabelText('Ask Scout or give a command'));
-    expect(screen.getByLabelText('Ask Scout or give a command').getAttribute('readonly')).toBe('');
+    expect(screen.getByLabelText('Ask Scout or give a command').getAttribute('maxlength')).toBe('500');
     fireEvent.keyDown(window, { key: 'Escape' });
     const action = screen.getByRole('link', { name: 'Open all work' });
     expect(document.activeElement).toBe(action);

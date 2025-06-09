@@ -138,7 +138,9 @@ def create_app(config=None):
                 set(value) != {"paused"} or type(value.get("paused")) is not bool
             ):
                 abort(400, "Only the boolean Pause setting is editable")
-            pause_only = request.path == "/api/settings" and set(value) == {"paused"}
+            pause_only = (request.path == "/api/settings" and set(value) == {"paused"}) or (
+                request.path == '/api/scout/pause' and set(value) == {'ticket'}
+            )
             if not pause_only:
                 check(db())
                 if (
@@ -458,7 +460,10 @@ def create_app(config=None):
 
     @app.post("/api/opportunities/<int:oid>/status")
     def opportunity_status(oid):
-        value = body()
+        return change_opportunity_status(oid, body())
+
+    def change_opportunity_status(oid, value, *, expected_generation=None,
+                                  expected_revision=None, expected_content_version=None):
         action = value.get("status")
         if action not in ("skipped", "undo_skip") or set(value) - {"status", "reason"}:
             abort(400, "Only skip and undo_skip are allowed")
@@ -467,11 +472,18 @@ def create_app(config=None):
         connection = db()
         connection.execute("BEGIN IMMEDIATE")
         with connection:
-            check(connection)
+            from inbound.memory import guard as mutation_guard
+
+            mutation_guard(connection, expected_generation)
             row = connection.execute("SELECT * FROM opportunities WHERE id=?", (oid,)).fetchone()
             if row is None:
                 abort(404)
             revision = latest_revision(connection, oid)
+            if (expected_revision is not None and revision['id'] != expected_revision) or (
+                expected_content_version is not None
+                and row['content_version'] != expected_content_version
+            ):
+                abort(409, 'Call changed; ask again before skipping')
             if action == "skipped":
                 if row["status"] in {"skipped", "submitted_by_me"}:
                     abort(409, "Transition unavailable")
@@ -724,6 +736,9 @@ def create_app(config=None):
     def gmail_sync_now():
         if body():
             abort(400)
+        return run_gmail_check()
+
+    def run_gmail_check():
         if not gmail_sync.connected(settings):
             abort(409, "Gmail is not connected")
         try:
@@ -756,4 +771,7 @@ def create_app(config=None):
             abort(404)
         return send_from_directory(directory, path if path and target.is_file() else "index.html")
 
+    from inbound.api.scout import register as register_scout
+
+    register_scout(app, db, output, settings, current_time, change_opportunity_status, run_gmail_check)
     return app
