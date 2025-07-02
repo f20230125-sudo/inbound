@@ -292,6 +292,10 @@ def create_app(config=None):
             abort(400, "Unknown category")
         return output(data.messages(db(), category))
 
+    @app.get("/api/messages/<int:mid>")
+    def get_message_source(mid):
+        return output(data.message_source(db(), mid))
+
     @app.post("/api/messages/<int:mid>/category")
     def category(mid):
         value = body()
