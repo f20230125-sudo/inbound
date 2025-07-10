@@ -175,6 +175,18 @@ export interface Entry {
     stipend?: unknown;
     status?: string;
 }
+
+export interface CollegeTask {
+    id: number; course: string | null; title: string; state: string; version: number;
+    actionable: boolean; snoozed_until?: string | null; deadline: Field;
+    source_quote: string; message_id: number;
+    history: { id: number; message_id: number; source_quote: string; deadline_json: string; sent_at: string }[];
+}
+export interface DailyDispatch {
+    needs_refresh?: boolean;
+    id: number | null; day: string; created_at: string; greeting: string; freshness: string; empty: string;
+    items: { kind: string; text: string; href: string; source_refs: { entity_type: string; entity_id: number | string }[]; evidence?: { title: string; deadline: Field } }[];
+}
 export interface Snapshot {
     imported_at: string | null;
     latest_message_at: string | null;
@@ -185,6 +197,7 @@ export interface Snapshot {
     } | null;
 }
 export interface Today {
+    college_tasks?: CollegeTask[];
     decision_queue: Entry[];
     past_deadlines: Entry[];
     outside_applications?: { id: number; display_title: string; outside_application: ApplicationActivity }[];

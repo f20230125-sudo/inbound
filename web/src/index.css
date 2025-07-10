@@ -352,3 +352,9 @@ th, td { vertical-align: top; padding: 10px 6px; border-bottom: 1px solid var(--
 .scout-evidence { border: 1px solid var(--border); padding: 1rem; margin-block: 1rem; }
 .scout-evidence h3, .scout-evidence h4 { font-weight: 600; }
 .scout-source blockquote { border-inline-start: 2px solid var(--border); padding-inline-start: .75rem; white-space: pre-wrap; margin-block: .75rem; }
+/* College work uses the same quiet, source-first layout as the rest of Work. */
+.college-task { padding-block: 1.25rem; border-top: 1px solid var(--border); }
+.college-task h3 { overflow-wrap: anywhere; }
+.college-task blockquote { white-space: pre-wrap; overflow-wrap: anywhere; margin-block: .75rem; }
+.college-task input { max-width: 100%; padding: .4rem; border: 1px solid var(--border); border-radius: .25rem; }
+#daily-briefing li { margin-block: .6rem; overflow-wrap: anywhere; }

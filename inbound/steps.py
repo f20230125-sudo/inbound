@@ -5,6 +5,7 @@ import re
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import asdict, dataclass
+from datetime import datetime
 from enum import StrEnum
 from uuid import uuid4
 
@@ -13,6 +14,13 @@ from inbound.triage.taxonomy import CATEGORIES
 
 
 class Kind(StrEnum):
+    TASK_FOUND = "task.found"
+    TASK_REVISED = "task.revised"
+    TASK_DONE = "action.task_done"
+    TASK_SNOOZED = "action.task_snoozed"
+    TASK_NOT_MINE = "action.task_not_mine"
+    TASK_UNDONE = "action.task_undone"
+    BRIEFING = "briefing.prepared"
     RULE_SUGGESTED = "learning.suggested"
     RULE_ACTIVATED = "action.rule_activated"
     RULE_UNDONE = "action.rule_undone"
@@ -104,7 +112,8 @@ class MemoryPublication:
 
 _CONTEXT = ContextVar("agent_step_context", default=None)
 STAGES = {"queued", "import", "triage", "extraction", "provenance", "snapshot", "pack"}
-ENTITIES = {"message", "opportunity", "pack", "run", "snapshot", "memory", "memory_snapshot", "rule"}
+ENTITIES = {"message", "opportunity", "pack", "run", "snapshot", "memory", "memory_snapshot", "rule",
+            "task", "briefing"}
 FACT_TYPES = {k: Empty for k in Kind}
 FACT_TYPES.update(
     {
@@ -148,7 +157,10 @@ def identifier(value):
 
 
 def provenance(db, entity_type, entity_id):
-    if entity_type == "rule":
+    if entity_type in {"task", "briefing"}:
+        table = 'tasks' if entity_type == 'task' else 'briefings'
+        rows = db.execute(f'SELECT source FROM {table} WHERE id=?', (entity_id,)).fetchall()
+    elif entity_type == "rule":
         rows = db.execute("SELECT source FROM learned_rules WHERE id=?", (entity_id,)).fetchall()
     elif entity_type == "memory":
         rows = db.execute("SELECT source FROM memories WHERE id=?", (entity_id,)).fetchall()
@@ -190,6 +202,7 @@ def emit(
     source=None,
     dedupe_key=None,
     references: tuple[Reference, ...] = (),
+    occurred_at=None,
 ):
     if not isinstance(kind, Kind) or type(facts) is not FACT_TYPES[kind]:
         raise ValueError("Typed event facts required")
@@ -206,7 +219,7 @@ def emit(
     if kind == Kind.READY and not facts.passed:
         raise ValueError("A ready draft requires passed checks")
     if isinstance(facts, Alert) and (
-        facts.alert_type not in {"new_call", "deadline"}
+        facts.alert_type not in {"new_call", "deadline", "task_deadline"}
         or facts.reason
         not in {"eligible", "requested", "opening", "disabled", "unavailable", "failed"}
     ):
@@ -273,13 +286,17 @@ def emit(
         else:
             refs.insert(0, Reference(entity_type, entity_id))
     now = timestamp()
+    if occurred_at is not None and (
+        not isinstance(occurred_at, datetime) or occurred_at.tzinfo is None
+    ):
+        raise ValueError('Timezone-aware event clock required')
     db.execute(
         "INSERT INTO agent_steps(occurred_at,recorded_at,actor,kind,run_id,correlation_id,"
         "entity_type,entity_id,revision_id,snapshot_version,phase,outcome,facts_json,"
         "source_refs_json,dedupe_key,source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
         "ON CONFLICT(dedupe_key) DO NOTHING",
         (
-            now,
+            occurred_at.isoformat() if occurred_at else now,
             now,
             actor,
             kind.value,
@@ -301,6 +318,13 @@ def emit(
 
 
 TEMPLATES = {
+    Kind.TASK_FOUND: "I found a college task in the saved messages.",
+    Kind.TASK_REVISED: "I recorded a college task revision. Its source history is available.",
+    Kind.TASK_DONE: "You marked this college task done.",
+    Kind.TASK_SNOOZED: "You snoozed this college task.",
+    Kind.TASK_NOT_MINE: "You marked this college task as not yours.",
+    Kind.TASK_UNDONE: "You undid your college task action.",
+    Kind.BRIEFING: "I prepared your daily briefing from stored work.",
     Kind.RULE_SUGGESTED: "I suggested a scoped rule for your review.",
     Kind.RULE_ACTIVATED: "You activated a rule. Its scope and Undo are in Memory.",
     Kind.RULE_UNDONE: "You undid a rule. Its future influence is disabled.",
@@ -407,6 +431,10 @@ def project(row):
         href = f"/memory#memory-{identity}" if entity == "memory" else "/memory"
     if entity == "rule":
         href = f"/memory#rule-{identity}"
+    if entity == 'task':
+        href = f'/work#task-{identity}'
+    if entity == 'briefing':
+        href = f'/?briefing={identity}'
     return result | {"facts": facts, "source_refs": refs, "text": text, "href": href}
 
 
