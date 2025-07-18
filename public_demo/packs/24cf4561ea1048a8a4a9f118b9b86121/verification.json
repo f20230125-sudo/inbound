@@ -1,0 +1,49 @@
+{
+  "pages": 1,
+  "overfull": 0,
+  "bullet_count": 8,
+  "traced_bullets": 8,
+  "bullet_trace": {
+    "p4-b1": true,
+    "p4-b2": true,
+    "p1-b1": true,
+    "p1-b2": true,
+    "p3-b1": true,
+    "p3-b2": true,
+    "p5-b1": true,
+    "p5-b2": true
+  },
+  "manifest_check": true,
+  "approved_skills": true,
+  "identity_line_check": true,
+  "filename_check": true,
+  "provisional": false,
+  "provisional_label_check": true,
+  "metadata_check": true,
+  "canary_check": true,
+  "links": [
+    "https://code.demo.invalid/sara-qamar/demo-p1",
+    "https://code.demo.invalid/sara-qamar/demo-p2",
+    "https://code.demo.invalid/sara-qamar/demo-p3",
+    "https://code.demo.invalid/sara-qamar/demo-p4",
+    "https://code.demo.invalid/sara-qamar/demo-p5",
+    "https://portfolio.demo.invalid/sara-qamar",
+    "https://projects.demo.invalid/sara-qamar/demo-p1",
+    "https://projects.demo.invalid/sara-qamar/demo-p3",
+    "https://projects.demo.invalid/sara-qamar/demo-p4",
+    "https://projects.demo.invalid/sara-qamar/demo-p5"
+  ],
+  "profile": {
+    "family": "demo",
+    "needs_uzair_review": false,
+    "not_tailored": false
+  },
+  "coverage": {
+    "supported": 3,
+    "total": 3,
+    "ratio": 1.0
+  },
+  "fit": "supported",
+  "fit_reason": "",
+  "passed": true
+}
