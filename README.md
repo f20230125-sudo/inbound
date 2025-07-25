@@ -4,6 +4,11 @@ I built this for me. Scout is my Inbound agent: it triages my inbox, prepares
 evidence-backed CV packs, asks for decisions and shows what it learned from them.
 I review each pack and submit it myself.
 
+**Live demo: https://inbound-scout.vercel.app** (a read-only replay of fictional data: a
+made-up applicant's mail, college tasks, memories and CV packs. Nothing in it can be
+changed, and it is not connected to any mailbox.) My own desk runs locally on my real
+inbox; that data never leaves my PC.
+
 Internship calls arrive as forwarded emails, reminders, inline job descriptions,
 and attachments. Inbound groups revisions, shows deadlines and unknowns, and
 matches role requirements to my approved project evidence. Scout shows the source
