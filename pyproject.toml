@@ -1,8 +1,18 @@
 [project]
 name = "inbound"
 version = "0.1.0"
-description = "Offline personal inbox triage"
+description = "Scout: a personal inbox agent (Gmail read-only, triage, extraction, evidence-backed CV packs)"
 requires-python = ">=3.14"
+# Runtime set for the hosted read-only demo; the full pinned development set is requirements-lock.txt.
+dependencies = [
+    "flask>=3.1,<4",
+    "httpx>=0.28,<1",
+    "pdfplumber>=0.11.7,<0.12",
+    "pydantic>=2.12,<3",
+    "python-docx>=1.2,<2",
+    "pyyaml>=6,<7",
+    "tzdata>=2025",
+]
 
 [tool.ruff]
 line-length = 100
