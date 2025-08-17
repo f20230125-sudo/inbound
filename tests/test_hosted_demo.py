@@ -62,3 +62,20 @@ def test_passed_settings_are_used_without_building_defaults(tmp_path, monkeypatc
     app = create_app({"APP_MODE": "replay",
                       "SETTINGS": Settings(data_root=tmp_path, hosted_replay=True)})
     assert app.config["SETTINGS"].data_root == tmp_path.resolve()
+
+
+def test_hosted_demo_answers_only_on_its_own_hosts(hosted):
+    client = hosted.app.test_client()
+    assert client.get("/api/settings", headers={"Host": "inbound-scout.vercel.app"}).status_code == 200
+    assert client.get("/api/settings",
+                      headers={"Host": "inbound-scout-abc123-uzair-ba1c.vercel.app"}).status_code == 200
+    assert client.get("/api/settings", headers={"Host": "evil.example"}).status_code == 403
+    assert client.post("/api/import", json={},
+                       headers={"Host": "inbound-scout.vercel.app"}).status_code == 405
+
+
+def test_hosted_hosts_never_widen_the_local_desk(tmp_path):
+    app = create_app({"APP_MODE": "local", "SETTINGS": Settings(data_root=tmp_path),
+                      "HOSTED_HOSTS": r"inbound-scout\.vercel\.app"})
+    assert app.test_client().get(
+        "/api/settings", headers={"Host": "inbound-scout.vercel.app"}).status_code == 403
