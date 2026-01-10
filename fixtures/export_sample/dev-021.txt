@@ -1,0 +1,15 @@
+id: P-D21
+thread_id: d21
+date: 2026-10-27T02:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: PS survey
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Dear students, please complete the requested response on or before 29 October 2026.
+Mira Sen, synthetic coordinator

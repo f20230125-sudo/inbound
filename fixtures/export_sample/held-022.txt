@@ -1,0 +1,23 @@
+id: P-H22
+thread_id: h22
+date: 2026-10-27T02:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Call for CV - PS II – Second Semester 2026-2027 - Brindlewave, Labs,Lumen Bay - Search Intern
+labels: 
+attachments: jd-P-H22.pdf|application/pdf|attachments/jd-P-H22.pdf
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Call for CV - PS II – Second Semester 2026-2027 - Brindlewave, Labs,Lumen Bay - Search Intern
+Brindlewave, Labs has expressed their interest to hire Students for PS II. Location: Lumen Bay
+JD location:
+· Attached
+*Mode of Internship:* Remote
+· AED2300 per month
+*https://forms.gle/SYNTHETIC-NOT-LIVE-P-H22 <https://forms.gle/SYNTHETIC-NOT-LIVE-P-H22>*
+*CV Submission Deadline*: 28 October 2026, 13:00
+Mira Sen
+Synthetic PS coordinator

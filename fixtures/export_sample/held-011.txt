@@ -1,0 +1,26 @@
+id: P-H11
+thread_id: h02
+date: 2026-10-27T17:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Re: Fwd: ﻿Call for C‍V - PS II – Second Semester 2026-2027 - Wispforge Data,Glassport - Backend Intern
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Please note the current closing arrangements below.
+Current intake: Wispforge Data; City: Glassport
+· AED2250 per month
+*Mode of Internship:* Hybrid
+*Job Title & Expected Skills*
+(1) Backend Intern
+Requirements: Python; Flask; SQL
+Deadline extended; submit by tomorrow at 10 AM
+
+
+--- Original message ---
+> ﻿Call for C‍V - PS II – Second Semester 2026-2027 - Wispforge Data,Glassport - Backend Intern
+> 28 October 2026 — 1000 hrs

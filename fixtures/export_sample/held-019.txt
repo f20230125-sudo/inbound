@@ -1,0 +1,26 @@
+id: P-H19
+thread_id: h19
+date: 2026-10-27T02:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Call for CV - PS II – Second Semester 2026-2027 - Morrowfinch Systems,Solmere
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Call for CV - PS II – Second Semester 2026-2027 - Morrowfinch Systems,Solmere
+Morrowfinch Systems has expressed their interest to hire Students for PS II. Location: Solmere
+*Job Title & Expected Skills*
+Role | Requirements
+Search Intern | Python; SQLite FTS5; BM25
+Test Engineering Intern | pytest; Vitest
+Terms for this intake
+*Mode of Internship:* Remote
+· AED2400 per month
+*CV Submission Deadline*: 28 October 2026 at 15:30
+*https://forms.gle/SYNTHETIC-NOT-LIVE-P-H19 <https://forms.gle/SYNTHETIC-NOT-LIVE-P-H19>*
+Mira Sen
+Synthetic PS coordinator
