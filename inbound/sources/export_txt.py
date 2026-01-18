@@ -58,7 +58,14 @@ def parse(path, root, source):
         if available and candidate.stat().st_size > 10 * 1024 * 1024:
             raise SourceError("Attachment exceeds 10 MB")
         attachments.append(
-            Attachment(name, mime, relative, available, "unsupported" if available else "missing")
+            Attachment(
+                name,
+                mime,
+                relative,
+                available,
+                "unsupported" if available else "missing",
+                import_root=str(Path(root).resolve()),
+            )
         )
     return Message(
         provider_id=values["id"],
