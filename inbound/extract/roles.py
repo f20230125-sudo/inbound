@@ -11,12 +11,31 @@ STOP = re.compile(
     r"(?:Please\s+)?submit\s+(?:your|the)\s+(?:CV|resume|application)\b)",
     re.IGNORECASE,
 )
+INLINE_ROLE = re.compile(
+    r"\b(\d+)\.\s+([^\n]+?)\.\s*(Expected Skills|Requirements|Responsibilities)\s*:\s*"
+    r"([^\n]*?)(?=\s+\d+\.\s+|$)",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+
+def expand_inline_role(match):
+    """Convert numbered sentence headings and skill lists to the existing bullet layout."""
+    number, title, _label, requirements = match.groups()
+    values = re.split(r"[,;]\s*", requirements.strip().removesuffix("."))
+    # A blank line ends the inline list, so following prose cannot extend its last skill.
+    bullets = "\n".join(f"- {value.strip()}" for value in values if value.strip())
+    return f"\n{number}. {title}\n{bullets}\n\n"
 
 
 def parse_roles(text, subject, identity):
     roles, quotes, active = [], [], None
     subject_only = False
-    prepared = re.sub(r"(?<!^)(?<!\n)(?=\(\d+\)\s+\w|Role\s+\d+:)", "\n", text)
+    prepared = INLINE_ROLE.sub(expand_inline_role, text)
+    prepared = re.sub(
+        r"\bPositions available:\s*(?=\d+\.)", "Positions available:\n", prepared,
+        flags=re.IGNORECASE,
+    )
+    prepared = re.sub(r"(?<!^)(?<!\n)(?=\(\d+\)\s+\w|Role\s+\d+:)", "\n", prepared)
     prepared = re.sub(r"(\bIntern)\s+(?=(?:Expected Skills|Requirements):)", r"\1\n", prepared)
     lines = []
     for line in prepared.splitlines():
