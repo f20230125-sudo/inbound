@@ -243,10 +243,16 @@ def create_app(config=None):
     @app.get("/api/opportunities")
     def get_opportunities():
         from inbound.extract.pipeline import opportunity_state
+        from inbound.presentation import opportunity_labels
+
+        def project(oid):
+            state = opportunity_state(db(), oid, clock=current_time)
+            state.update(opportunity_labels(db(), state, state["normalized_subject"]))
+            return state
 
         return output(
             [
-                opportunity_state(db(), r[0], clock=current_time)
+                project(r[0])
                 for r in db().execute("SELECT id FROM opportunities ORDER BY id")
             ]
         )
