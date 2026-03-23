@@ -164,3 +164,15 @@ Where this section conflicts with §0-§12, this section wins. M1-M4 run on **28
 3. *Company — City - Role:* subject `... – <Company> — <City> - <Role>` (em dash between company and city, hyphen before the role) and body `*<Company> — <City>, *has expressed ...`. ⇒ company, city and role all found. Dash unification must not lose which separator was which before splitting.
 4. *Company from the body:* when the subject split is ambiguous, the body sentence `<X> has expressed their interest` (asterisks/commas tolerated) confirms the company; if subject and body disagree, keep both as observations, do not guess.
 These go in as unit tests with fictional names (not added to the frozen 190; the dataset stays frozen). Real-mail results are reported separately and labelled "rules tuned on these messages".
+
+## 15. Amendment 3 (28 Oct 2026, 06:20 Dubai): daily-use features after the first real morning
+
+Agreed with Codex (planning round r6). Built in this order; each keeps Pause, CSRF, Host, replay and stale-write protections, staged-import publication, and the no-outward-action rule.
+
+1. **Outside application record (M7).** Uzair can record "I applied outside Inbound" on any opportunity (no pack, blocked JD or expired deadline allowed): explicit human declaration, applied-at time, recorded-at time, optional note and optional follow-up date (a local task only). It never marks a pack reviewed. Corrections append history; nothing is deleted. Re-imports preserve it. This narrows DESIGN's reviewed-pack prerequisite for this one action only.
+2. **Live deadline correctness (M7).** The open desk regroups Today every minute and on tab return, using elapsed wall time from a server-time anchor; the frozen synthetic clock stays frozen in demo/replay; unknown/conflicting deadlines never get countdowns.
+3. **Missing-JD recovery (M8).** On a blocked opportunity Uzair selects the missing attachment and supplies a local PDF/DOCX (upload from the desk, or a path under the configured data root). Inbound previews the parsed text; he confirms; then requirements are re-extracted, coverage rebuilt and any reviewed pack invalidated. File hash and provenance are stored; history kept; a failed parse keeps the blocker. Never auto-link by filename.
+4. **Application-update linking (M9).** An `application_update` message can be linked (manually, with a searchable selector) to an opportunity with a confirmed outcome (acknowledgement, shortlisted, not shortlisted, other); unlink/relink keep history; an update never establishes that Uzair submitted.
+5. **Deadline calendar file (M9, if time).** Download one supported timed deadline as `.ics` (stable UID, version bumps on amendment, escaped text); unknown/conflicting deadlines cannot export.
+
+Backlog (not now): preference fit, tailoring-vs-general-CV comparison with fresh labels, weekly review page, live model comparison.
