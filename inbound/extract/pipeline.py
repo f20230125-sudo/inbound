@@ -195,20 +195,40 @@ def sync_revision(db, opportunity_id, revision_id, effective):
                 (*values, opportunity_id, revision_id),
             )
     for extra in existing[len(roles) :]:
+        # Historical packs retain their selection; a removed role is no longer current.
+        db.execute("UPDATE packs SET role_id=NULL WHERE role_id=?", (extra["id"],))
         db.execute("DELETE FROM roles WHERE id=?", (extra["id"],))
 
 
 def rebuild_timeline(db, opportunity_id):
     """Recompute derived snapshots on late arrival; original local evidence never changes."""
     revisions = db.execute(
-        "SELECT r.* FROM opportunity_revisions r JOIN messages m ON m.id=r.message_id "
+        "SELECT r.*,m.subject FROM opportunity_revisions r JOIN messages m ON m.id=r.message_id "
         "WHERE r.opportunity_id=? ORDER BY julianday(m.sent_at),m.id",
         (opportunity_id,),
     ).fetchall()
-    effective, blocker = {}, None
+    effective, blocker, seen_subjects = {}, None, set()
     for revision in revisions:
         check(db)
         local = json.loads(revision["local_fields_json"])
+        # A title-only reminder cannot contradict requirements recovered from an
+        # earlier JD. Keep the reminder's local facts, inherit the richer role evidence.
+        # A reminder that repeats an earlier subject adds no new role evidence either,
+        # even when that subject's title differs from the JD's own title.
+        old_roles = effective.get("roles", {})
+        subject = normalize_subject(revision["subject"] or "")
+        if (
+            old_roles.get("status") == "found"
+            and old_roles.get("provenance", {}).get("source") == "attachment"
+            and local["roles"].get("provenance", {}).get("source") == "subject"
+            and (
+                subject in seen_subjects
+                or {r["title"] for r in local["roles"]["normalized"] or []}
+                <= {r["title"] for r in old_roles["normalized"] or []}
+            )
+        ):
+            local = {k: v for k, v in local.items() if k not in {"roles", "role_count"}}
+        seen_subjects.add(subject)
         effective = effective_fields(effective, local, bool(revision["amendment"]))
         if revision["blocked_reason"]:
             blocker = revision["blocked_reason"]
@@ -252,6 +272,52 @@ def refresh_urgency(db, now):
             "UPDATE triage SET urgency=? WHERE message_id=?",
             (urgency(value, now), row["message_id"]),
         )
+
+
+def reextract_message(db, message_id):
+    """Replace exactly one local extraction in the caller's recovery transaction.
+
+    Canonical mail identity deliberately ignores transport availability. Recovery calls
+    this explicitly, preserving revision IDs and the history saved by its caller.
+    """
+    check(db)
+    row = db.execute("SELECT * FROM messages WHERE id=?", (message_id,)).fetchone()
+    attachments = db.execute("SELECT * FROM attachments WHERE message_id=?", (message_id,)
+                             ).fetchall()
+    declarations, parsed = [], []
+    for attachment in attachments:
+        declaration = Attachment(
+            attachment["filename"], attachment["mime"], attachment["bytes_path"],
+            bool(attachment["bytes_available"]), attachment["parse_status"],
+            attachment["import_root"], attachment["content_base64"],
+        )
+        declarations.append(declaration)
+        result = parse_attachment(declaration)
+        parsed.append(result)
+        db.execute("UPDATE attachments SET text=?,parse_status=? WHERE id=?",
+                   (result["text"], result["parse_status"], attachment["id"]))
+    category = db.execute(
+        "SELECT COALESCE(corrected_category,category) FROM triage WHERE message_id=?", (message_id,)
+    ).fetchone()[0]
+    extracted = extract_call(message_from_row(row, declarations), parsed, category=category)
+    if not extracted["creates_opportunity"]:
+        raise ValueError("Attachment no longer belongs to a call")
+    check(db)
+    local = dump(extracted["fields"])
+    db.execute(
+        "UPDATE message_extractions SET fields_json=?,attack_suspected=?,attack_quotes_json=?,"
+        "created_at=? WHERE message_id=?",
+        (local, int(extracted["attack_suspected"]), dump(extracted["attack_quotes"]),
+         timestamp(), message_id),
+    )
+    db.execute(
+        "UPDATE opportunity_revisions SET local_fields_json=?,amendment=?,blocked_reason=? "
+        "WHERE message_id=?",
+        (local, int(extracted["amendment"]), extracted["blocked_reason"], message_id),
+    )
+    oid = db.execute("SELECT opportunity_id FROM opportunity_revisions WHERE message_id=?",
+                     (message_id,)).fetchone()[0]
+    rebuild_timeline(db, oid)
 
 
 def extract_messages(db, clock=None, ids=None):

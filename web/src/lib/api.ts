@@ -4,7 +4,8 @@ export class ApiError extends Error {
     constructor(message: string, status: number) { super(message); this.status = status; }
 }
 export async function request<T>(path: string, token?: string, body?: unknown): Promise<T> {
-    const response = await fetch(`/api${path}`, { credentials: 'same-origin', headers: { ...(body !== undefined ? { 'Content-Type': 'application/json', 'X-CSRF-Token': token || '' } : {}) }, ...(body !== undefined ? { method: 'POST', body: JSON.stringify(body) } : {}) });
+    const multipart = body instanceof FormData;
+    const response = await fetch(`/api${path}`, { credentials: 'same-origin', headers: { ...(body !== undefined ? { ...(!multipart ? { 'Content-Type': 'application/json' } : {}), 'X-CSRF-Token': token || '' } : {}) }, ...(body !== undefined ? { method: 'POST', body: multipart ? body : JSON.stringify(body) } : {}) });
     const data = await response.json();
     if (!response.ok)
         throw new ApiError(data.message || data.error || 'Request failed', response.status);
