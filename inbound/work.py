@@ -11,7 +11,7 @@ from inbound.extract.pipeline import extract_messages
 from inbound.ledger import timestamp
 from inbound.pause import PausedError, check
 from inbound.provenance import index_locations
-from inbound.sources import eml_dir, export_txt
+from inbound.sources import eml_dir, export_txt, gmail_api
 from inbound.triage.rules import triage_messages
 
 
@@ -53,7 +53,7 @@ def import_pipeline(
 ):
     progress = progress or (lambda name: stage(db, run_id, name))
     progress("import")
-    loader = {"export": export_txt.load, "eml": eml_dir.load}.get(source)
+    loader = {"export": export_txt.load, "eml": eml_dir.load, "gmail": gmail_api.load}.get(source)
     if loader is None:
         raise ValueError("Unknown source format")
     messages = list(loader(root, provenance))

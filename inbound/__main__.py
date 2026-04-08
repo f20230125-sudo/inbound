@@ -42,13 +42,59 @@ def main(argv=None):
     attach.add_argument('--attachment', required=True)
     attach.add_argument('--file', type=Path, required=True)
     attach.add_argument('--preview', action='store_true')
+    gmail = sub.add_parser('gmail')
+    gmail.add_argument('action', choices=['connect', 'disconnect', 'sync', 'status', 'poll'])
+    gmail.add_argument('--client-secret', type=Path)
+    gmail.add_argument('--on', action='store_true')
+    gmail.add_argument('--off', action='store_true')
+    gmail.add_argument('--minutes', type=int, default=2)
+    sub.add_parser('watch')
     args = parser.parse_args(argv)
     try:
         settings = Settings.from_env()
         if args.command == 'serve':
             from inbound.api import create_app
+            from inbound.gmail_sync import Poller
 
+            # Live Gmail checks run inside the desk once Uzair switches them on.
+            Poller(settings).start()
             create_app().run(host='127.0.0.1', port=5000, debug=False, use_reloader=False)
+            return 0
+        if args.command == 'watch':
+            from inbound.gmail_sync import Poller
+
+            def report(result):
+                print(json.dumps(result), flush=True)
+
+            print(json.dumps({"watching": True, "note": "Ctrl+C to stop"}), flush=True)
+            try:
+                Poller(settings, on_result=report).run()
+            except KeyboardInterrupt:
+                return 0
+            return 0
+        if args.command == 'gmail':
+            from inbound import gmail_sync
+            from inbound.sources import gmail_api
+
+            if args.action == 'connect':
+                if not args.client_secret:
+                    raise ValueError("--client-secret is required")
+                email = gmail_api.connect_account(settings, args.client_secret)
+                print(json.dumps({"connected": True, "email": email}))
+                return 0
+            if args.action == 'disconnect':
+                gmail_api.disconnect(settings)
+                print(json.dumps({"connected": False}))
+                return 0
+            if args.action == 'sync':
+                print(json.dumps(gmail_sync.sync(settings)))
+                return 0
+            with closing(connect(settings.db_path)) as db:
+                if args.action == 'poll':
+                    if args.on == args.off:
+                        raise ValueError("Use --on or --off")
+                    gmail_sync.set_poll(db, enabled=args.on, minutes=args.minutes)
+                print(json.dumps(gmail_sync.status(settings, db)))
             return 0
         if args.command == 'demo':
             from inbound.demo import build_demo

@@ -52,8 +52,13 @@ def decoded(part):
 
 
 def parse(path, root, source):
-    mail = BytesParser(policy=policy.default).parsebytes(read_bytes(path))
-    identity = str(mail.get("Message-ID", "")).strip().strip("<>")
+    return parse_bytes(read_bytes(path), root, source)
+
+
+def parse_bytes(data, root, source, *, identity=None, thread_id=None, labels=None):
+    """Parse one RFC 822 message. Gmail sync passes its own message/thread ids and labels."""
+    mail = BytesParser(policy=policy.default).parsebytes(data)
+    identity = identity or str(mail.get("Message-ID", "")).strip().strip("<>")
     if not identity or not mail.get("Date") or not mail.get("From"):
         raise SourceError("EML lacks identity/date/sender")
     # Synthetic alternates use the same mail identity namespace as the export.
@@ -97,7 +102,7 @@ def parse(path, root, source):
         raise SourceError("Invalid EML completeness flag")
     return Message(
         provider_id=identity,
-        thread_id=str(mail.get("X-Inbound-Thread-ID", identity)),
+        thread_id=thread_id or str(mail.get("X-Inbound-Thread-ID", identity)),
         sent_at=sent,
         received_at=iso_timestamp(str(mail["X-Inbound-Received-At"]))
         if mail.get("X-Inbound-Received-At")
@@ -108,7 +113,7 @@ def parse(path, root, source):
         bcc=str(mail.get("Bcc", "")),
         subject=str(mail.get("Subject", "")),
         body_text="\n".join(plain or html).replace("\r\n", "\n").rstrip("\n"),
-        labels=str(mail.get("X-Inbound-Labels", "")),
+        labels=labels if labels is not None else str(mail.get("X-Inbound-Labels", "")),
         body_complete=complete == "true",
         attachments=tuple(attachments),
         source=provenance(source),
