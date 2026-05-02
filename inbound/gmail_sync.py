@@ -15,6 +15,7 @@ from inbound.pause import check, is_paused
 from inbound.sources.gmail_api import (
     GmailClient,
     GmailError,
+    TooLarge,
     gmail_dir,
     read_json,
     token_path,
@@ -25,6 +26,8 @@ DEFAULT_QUERY = "newer_than:30d -in:sent -in:drafts -in:chats"
 MAX_PER_SYNC = 300
 MIN_MINUTES, DEFAULT_MINUTES = 1, 2
 SKIP_LABELS = {"SPAM", "TRASH", "DRAFT"}
+# One sync at a time per process: the poller and "Check Gmail now" share files and state.
+_SYNC_LOCK = threading.Lock()
 
 
 def mail_dir(settings):
@@ -79,27 +82,41 @@ def status(settings, db):
 
 
 def fetch_new(settings, client, *, query=DEFAULT_QUERY, limit=MAX_PER_SYNC):
-    """Save messages Gmail added since the last sync; return how many were saved."""
+    """Save messages Gmail added since the last sync; return how many were saved.
+
+    The history cursor moves only after every listed message is handled, so an error or
+    Pause part-way leaves it where it was and the next sync repeats the same range (files
+    already saved are skipped). Only the very first listing is bounded to `limit` newest.
+    """
     folder = mail_dir(settings)
     folder.mkdir(parents=True, exist_ok=True)
     state = read_json(state_path(settings)) or {}
     profile = client.profile()
+    email = profile.get("emailAddress")
+    if state.get("email") and email and state["email"] != email:
+        # Another account's cursor and saved mail must never mix with this one.
+        raise GmailError("Connected account changed; use a new data folder for it")
     ids = None
     if state.get("history_id"):
         try:
-            ids = client.history_ids(state["history_id"], limit)
+            ids = client.history_ids(state["history_id"])
         except FileNotFoundError:
-            ids = None  # history expired: fall back to a bounded full listing
+            ids = None  # history expired or too long: fall back to a bounded listing
     if ids is None:
         ids = client.list_ids(query, limit)
-    saved = 0
+    saved, skipped = 0, 0
     for message_id in ids:
-        if (folder / f"{message_id}.json").exists():
+        if (folder / f"{message_id}.json").exists() or (folder / f"{message_id}.skipped").exists():
             continue
         try:
             data, meta = client.raw(message_id)
         except FileNotFoundError:
             continue  # deleted between listing and fetching
+        except TooLarge:
+            # Over 25 MB: recorded (id only) and never retried, so one huge mail cannot stop sync.
+            (folder / f"{message_id}.skipped").write_text("larger than 25 MB", encoding="utf-8")
+            skipped += 1
+            continue
         labels = set(meta["labelIds"])
         # History also reports spam, trash, drafts and Uzair's own sent mail; none is inbox.
         if labels & SKIP_LABELS or ("SENT" in labels and "INBOX" not in labels):
@@ -107,9 +124,29 @@ def fetch_new(settings, client, *, query=DEFAULT_QUERY, limit=MAX_PER_SYNC):
         (folder / f"{meta['id']}.eml").write_bytes(data)
         write_json(folder / f"{meta['id']}.json", meta)  # written last: marks the pair complete
         saved += 1
+    state = read_json(state_path(settings)) or {}
+    state["email"] = email or state.get("email")
     state["history_id"] = profile.get("historyId", state.get("history_id"))
     write_json(state_path(settings), state)
-    return {"listed": len(ids), "fetched": saved}
+    return {"listed": len(ids), "fetched": saved, "too_large": skipped}
+
+
+def unimported(settings):
+    """Saved messages not yet in the database (e.g. a crash between download and import)."""
+    saved = {path.stem for path in mail_dir(settings).glob("*.json")}
+    if not saved:
+        return set()
+    with closing(connect(settings.db_path)) as db:
+        known = {row[0] for row in db.execute(
+            "SELECT provider_id FROM messages WHERE provider='mail'")}
+    return saved - known
+
+
+def pause_guard(settings):
+    def guard():
+        with closing(connect(settings.db_path)) as db:
+            check(db)
+    return guard
 
 
 def record_result(settings, result=None, error=None):
@@ -121,15 +158,25 @@ def record_result(settings, result=None, error=None):
 
 
 def sync(settings, *, transport=None, clock=None):
-    """One sync: fetch new Gmail messages, then a staged import of the saved folder."""
+    """One sync: fetch new Gmail messages, import any saved mail not yet imported, then
+    build draft packs for calls that became buildable."""
+    if not _SYNC_LOCK.acquire(blocking=False):
+        return {"skipped": "another Gmail check is running"}
+    try:
+        return _sync(settings, transport=transport, clock=clock)
+    finally:
+        _SYNC_LOCK.release()
+
+
+def _sync(settings, *, transport, clock):
     from inbound.work import execute, start_run
 
     token = read_json(token_path(settings))
     if not token:
         raise GmailError("Gmail is not connected")
-    with closing(connect(settings.db_path)) as db:
-        check(db)
-    client = GmailClient(token, transport=transport,
+    guard = pause_guard(settings)
+    guard()
+    client = GmailClient(token, transport=transport, before_request=guard,
                          on_refresh=lambda t: write_json(token_path(settings), t))
     try:
         fetched = fetch_new(settings, client)
@@ -139,11 +186,8 @@ def sync(settings, *, transport=None, clock=None):
     finally:
         client.close()
     result = dict(fetched)
-    state = read_json(state_path(settings)) or {}
-    # Import when new mail arrived, or when an earlier import of saved mail did not finish.
-    if fetched["fetched"] or state.get("import_pending"):
-        state["import_pending"] = True
-        write_json(state_path(settings), state)
+    # Import whenever saved mail is missing from the database, not only after new downloads.
+    if unimported(settings):
         with closing(connect(settings.db_path)) as db:
             run_id = start_run(db, "import", source_type="gmail")
         execute(settings, run_id, "import", root=mail_dir(settings), source="gmail",
@@ -152,13 +196,31 @@ def sync(settings, *, transport=None, clock=None):
             row = db.execute("SELECT status,counts_json FROM runs WHERE id=?", (run_id,)).fetchone()
         result.update(json.loads(row["counts_json"] or "{}"))
         result["status"] = row["status"]
-        state = read_json(state_path(settings)) or {}
-        state["import_pending"] = row["status"] != "success"
-        write_json(state_path(settings), state)
-        if row["status"] == "success":
-            result["auto_packs"] = auto_packs(settings)
+    if result.get("status", "success") == "success":
+        # Runs on every check, so calls left over from a busy check are drained later.
+        result["auto_packs"] = auto_packs(settings)
     record_result(settings, result=result)
     return result
+
+
+def buildable(db, opportunity_id):
+    """Eligible for an automatic draft right now: judged on the effective (sent-time)
+    revision, rechecked immediately before each build so a later Skip always wins."""
+    from inbound.extract.pipeline import latest_revision
+
+    row = db.execute("SELECT status,blocked_reason FROM opportunities WHERE id=?",
+                     (opportunity_id,)).fetchone()
+    if row is None or row["blocked_reason"] or row["status"] in {
+            "blocked", "skipped", "submitted_by_me", "reviewed"}:
+        return False
+    revision = latest_revision(db, opportunity_id)
+    if revision is None or db.execute(
+            "SELECT 1 FROM packs WHERE opportunity_id=? AND revision_id=?",
+            (opportunity_id, revision["id"])).fetchone():
+        return False
+    return bool(db.execute(
+        "SELECT 1 FROM roles WHERE revision_id=? AND requirements_json NOT IN ('null','[]')",
+        (revision["id"],)).fetchone())
 
 
 def auto_packs(settings, limit=5):
@@ -170,20 +232,14 @@ def auto_packs(settings, limit=5):
         check(db)
         if not db.execute("SELECT 1 FROM evidence_snapshots WHERE scope='public'").fetchone():
             return 0  # the CV evidence registry has not been imported on this desk yet
-        candidates = [row[0] for row in db.execute(
-            "SELECT o.id FROM opportunities o "
-            "JOIN opportunity_revisions r ON r.id=(SELECT MAX(id) FROM opportunity_revisions "
-            "WHERE opportunity_id=o.id) "
-            "WHERE o.blocked_reason IS NULL "
-            "AND o.status NOT IN ('blocked','skipped','submitted_by_me') "
-            "AND EXISTS (SELECT 1 FROM roles WHERE revision_id=r.id "
-            "AND requirements_json NOT IN ('null','[]')) "
-            "AND NOT EXISTS (SELECT 1 FROM packs WHERE opportunity_id=o.id AND revision_id=r.id) "
-            "ORDER BY o.id DESC LIMIT ?", (limit,),
-        )]
+        ids = [row[0] for row in db.execute("SELECT id FROM opportunities ORDER BY id DESC")]
+        candidates = [oid for oid in ids if buildable(db, oid)][:limit]
     built = 0
     for opportunity_id in candidates:
         with closing(connect(settings.db_path)) as db:
+            check(db)
+            if not buildable(db, opportunity_id):
+                continue  # skipped, built by hand or changed while earlier drafts built
             run_id = start_run(db, "pack", opportunity_id=opportunity_id)
         execute(settings, run_id, "pack", opportunity_id=opportunity_id)
         with closing(connect(settings.db_path)) as db:
@@ -214,9 +270,9 @@ class Poller:
         return datetime.now(UTC) >= datetime.fromisoformat(last) + timedelta(minutes=poll["minutes"])
 
     def tick(self):
-        if not self.due():
-            return None
         try:
+            if not self.due():
+                return None
             result = sync(self.settings)
         except Exception as exc:  # noqa: BLE001 - the background loop must survive any failure
             result = {"error": type(exc).__name__}

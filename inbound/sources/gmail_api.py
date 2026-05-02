@@ -32,6 +32,10 @@ class GmailError(RuntimeError):
     pass
 
 
+class TooLarge(GmailError):
+    """One message over the size cap; sync skips it instead of stopping."""
+
+
 def gmail_dir(settings):
     return Path(settings.data_root) / "gmail"
 
@@ -50,7 +54,8 @@ def read_json(path):
 def write_json(path, value):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(".tmp")
+    # A unique temporary name: two writers (poller and "Check now") never share one.
+    temporary = path.with_name(f"{path.name}.{os.getpid()}.{secrets.token_hex(4)}.tmp")
     temporary.write_text(json.dumps(value, indent=2, sort_keys=True), encoding="utf-8")
     os.replace(temporary, path)
 
@@ -66,12 +71,27 @@ def load_client_secret(path, settings):
     return {"client_id": client["client_id"], "client_secret": client["client_secret"]}
 
 
+def error_reason(response):
+    """Google's short machine reason (e.g. rateLimitExceeded); never message content."""
+    try:
+        error = response.json().get("error", {})
+        reasons = [e.get("reason", "") for e in error.get("errors", [])]
+        return ",".join(r for r in reasons if r) or str(error.get("status", ""))
+    except ValueError:
+        return ""
+
+
+def rate_limited(response):
+    return response.status_code == 403 and "ratelimitexceeded" in error_reason(response).lower()
+
+
 class GmailClient:
     """Minimal REST client. `transport` lets tests use httpx.MockTransport (no sockets)."""
 
-    def __init__(self, token, *, transport=None, on_refresh=None):
+    def __init__(self, token, *, transport=None, on_refresh=None, before_request=None):
         self.token = dict(token)
         self.on_refresh = on_refresh
+        self.before_request = before_request
         self.http = httpx.Client(transport=transport, timeout=30.0, follow_redirects=False)
 
     def close(self):
@@ -81,10 +101,13 @@ class GmailClient:
         host = urlsplit(url).hostname
         if (method, host) not in ALLOWED or urlsplit(url).scheme != "https":
             raise GmailError(f"Blocked request: {method} {host}")
-        for attempt in range(4):
+        for attempt in range(6):
+            if self.before_request:
+                self.before_request()  # Pause is rechecked before every request and retry
             response = self.http.request(method, url, **kwargs)
-            if response.status_code in {429, 500, 502, 503, 504} and attempt < 3:
-                time.sleep(min(2**attempt, 8))
+            retry = response.status_code in {429, 500, 502, 503, 504} or rate_limited(response)
+            if retry and attempt < 5:
+                time.sleep(min(2 ** (attempt + 1), 32))
                 continue
             return response
         return response
@@ -101,8 +124,8 @@ class GmailClient:
         if response.status_code != 200:
             raise GmailError(f"Token refresh failed ({response.status_code}); reconnect Gmail")
         value = response.json()
-        if SCOPE not in value.get("scope", SCOPE).split():
-            raise GmailError("Token does not carry the read-only Gmail scope")
+        if value.get("scope", SCOPE).split() != [SCOPE]:
+            raise GmailError("Token scope is not exactly gmail.readonly; reconnect Gmail")
         self.token["access_token"] = value["access_token"]
         self.token["expires_at"] = time.time() + int(value.get("expires_in", 3600))
         if self.on_refresh:
@@ -117,7 +140,7 @@ class GmailClient:
         if response.status_code == 404:
             raise FileNotFoundError(path)
         if response.status_code != 200:
-            raise GmailError(f"Gmail API {response.status_code}")
+            raise GmailError(f"Gmail API {response.status_code} {error_reason(response)}".strip())
         return response.json()
 
     def profile(self):
@@ -136,11 +159,12 @@ class GmailClient:
                 break
         return ids[:limit]
 
-    def history_ids(self, start, limit):
-        """Message ids added since `start`; FileNotFoundError when the history id expired."""
+    def history_ids(self, start, max_pages=100):
+        """Every message id added since `start` (all pages: none may be skipped, because the
+        cursor then moves past them). FileNotFoundError when the history id has expired."""
         ids, page = [], None
-        while len(ids) < limit:
-            params = {"startHistoryId": start, "historyTypes": "messageAdded", "maxResults": 100}
+        for _ in range(max_pages):
+            params = {"startHistoryId": start, "historyTypes": "messageAdded", "maxResults": 500}
             if page:
                 params["pageToken"] = page
             value = self.get("history", **params)
@@ -150,14 +174,14 @@ class GmailClient:
                         ids.append(added["message"]["id"])
             page = value.get("nextPageToken")
             if not page:
-                break
-        return ids[:limit]
+                return ids
+        raise FileNotFoundError("history too long; relist")  # fall back to a bounded listing
 
     def raw(self, message_id):
         value = self.get(f"messages/{message_id}", format="raw")
         data = base64.urlsafe_b64decode(value["raw"] + "=" * (-len(value["raw"]) % 4))
         if len(data) > MAX_RAW_BYTES:
-            raise GmailError("Message larger than the 25 MB cap")
+            raise TooLarge("Message larger than the 25 MB cap")
         return data, {
             "id": value["id"],
             "threadId": value.get("threadId", value["id"]),

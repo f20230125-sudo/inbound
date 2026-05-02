@@ -45,3 +45,21 @@ def test_tables_paragraph_numbering_and_continuation(text):
     assert roles[0]["requirements"][0]["text"] == "Python"
     if "FTS5" in text:
         assert roles[0]["requirements"][1]["text"] == "SQLite FTS5"
+
+
+def test_en_dash_bullets_from_a_company_pdf_are_requirements():
+    from inbound.extract.roles import parse_roles
+
+    text = (
+        "Kestrel Labs\nData & Automation Intern\nWhat we are looking for\n"
+        "– Good Python. You write clean code and use Git.\n"
+        "– Basic SQL. You can query, join and aggregate data in a\nrelational database.\n"
+        "— Experience with an LLM API.\n"
+    )
+    role = parse_roles(text, "Call for CV - Kestrel Labs,Port Selene", "k")["normalized"][0]
+    assert role["title"] == "Data & Automation Intern"
+    assert [q["text"] for q in role["requirements"]] == [
+        "Good Python. You write clean code and use Git.",
+        "Basic SQL. You can query, join and aggregate data in a relational database.",
+        "Experience with an LLM API.",
+    ]
