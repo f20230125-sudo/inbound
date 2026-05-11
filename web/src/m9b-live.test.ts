@@ -12,7 +12,7 @@ function entry(id: number, deadline: string | null, extra: Partial<Entry> = {}):
 }
 function today(parts: Partial<Today>): Today {
     return { now: now.toISOString(), snapshot: { imported_at: null, latest_message_at: null, stale: false, version: 1, latest_import_failure: null },
-        attention: [], deadlines_48h: [], date_only: [], uncertain_deadlines: [], new_calls: [], admin_tasks: [], ...parts };
+        decision_queue: [], past_deadlines: [], attention: [], deadlines_48h: [], date_only: [], uncertain_deadlines: [], new_calls: [], admin_tasks: [], ...parts };
 }
 
 describe('alertsFor', () => {
