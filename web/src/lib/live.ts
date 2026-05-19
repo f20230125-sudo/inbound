@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { DATA_CHANGED, request } from './api';
-import type { Entry, Today } from '../types';
+import type { AgentStep, Entry, StepsPage, Today } from '../types';
 
 export type LiveState = { status: 'connecting' | 'live' | 'reconnecting'; checkedAt?: Date };
 const INTERVAL_MS = 10000;
@@ -42,20 +42,34 @@ export function alertsFor(today: Today, now: Date, seen: string[]): { key: strin
     return out.filter(a => !seen.includes(a.key));
 }
 
-async function notify(today: Today, primeOnly: boolean) {
+async function notify(today: Today, primeOnly: boolean, allowed: () => boolean) {
     const seen = stored<string[]>(SEEN_KEY, []);
     const fresh = alertsFor(today, new Date(), seen);
     if (!fresh.length) return;
     store(SEEN_KEY, [...seen, ...fresh.map(a => a.key)].slice(-500));
-    if (primeOnly || !alertsEnabled()) return;
+    if (primeOnly || !allowed()) return;
+    const settings = await request<import('../types').Settings>('/settings');
+    if (!allowed() || settings.mode !== 'local' || settings.paused || !settings.csrf_token) return;
     for (const alert of fresh) {
-        const shown = new Notification(alert.title, { body: alert.body, tag: alert.key });
-        shown.onclick = () => { window.focus(); window.location.assign(`/opportunity/${alert.id}`); };
+        if (!allowed()) return;
+        const facts = { opportunity_id: alert.id, alert_type: alert.key.startsWith('due12:') ? 'deadline' : 'new_call' };
+        async function record(kind: string, reason: string) {
+            try { await request('/agent/alerts', settings.csrf_token, { ...facts, kind, reason }); }
+            catch { /* A guard may have changed since this check; never bypass it. */ }
+        }
+        await record('eligible', 'eligible');
+        if (!allowed()) return;
+        if (!alertsEnabled()) { await record('suppressed', 'disabled'); continue; }
+        try {
+            const shown = new Notification(alert.title, { body: alert.body, tag: alert.key });
+            shown.onclick = () => { window.focus(); window.location.assign(`/opportunity/${alert.id}`); };
+            await record('requested', 'requested');
+        } catch { await record('suppressed', 'failed'); }
     }
 }
 
 /** Watches the server's change token; when it moves, every open view refetches in place. */
-export function useLive(refresh: () => Promise<void>, enabled: boolean): LiveState {
+export function useLive(refresh: () => Promise<void>, enabled: boolean, streamEnabled = true): LiveState {
     const [state, setState] = useState<LiveState>({ status: 'connecting' });
     const last = useRef<string | undefined>(undefined);
     const primed = useRef(false);
@@ -63,6 +77,31 @@ export function useLive(refresh: () => Promise<void>, enabled: boolean): LiveSta
     useEffect(() => {
         if (!enabled) return;
         let stopped = false;
+        let stream: EventSource | undefined;
+        let resourceTimer: number | undefined;
+        let cursor = 0;
+        async function connectStream() {
+            if (!streamEnabled || typeof EventSource === 'undefined') return;
+            try {
+                const history = await request<StepsPage>('/agent/steps');
+                if (stopped) return;
+                cursor = history.after;
+                stream = new EventSource(`/api/agent/stream?after=${cursor}`);
+                stream.onmessage = event => {
+                    try {
+                        const step = JSON.parse(event.data) as AgentStep;
+                        if (stopped || step.id <= cursor) return;
+                        cursor = step.id;
+                        if (resourceTimer === undefined) resourceTimer = window.setTimeout(() => {
+                            resourceTimer = undefined;
+                            window.dispatchEvent(new Event(DATA_CHANGED));
+                            void refresh();
+                        }, 250);
+                    } catch { /* The version fallback can recover a malformed stream frame. */ }
+                };
+            } catch { /* Version polling remains available if catch-up or SSE is unavailable. */ }
+        }
+        void connectStream();
         async function check() {
             if (document.hidden) return;
             try {
@@ -75,7 +114,7 @@ export function useLive(refresh: () => Promise<void>, enabled: boolean): LiveSta
                 // Deadlines cross the 12 h line with no data change, so alerts re-check each minute.
                 if (changed || !primed.current || Date.now() - alerted.current >= 60000) {
                     // First pass only records what already exists, so opening the desk is quiet.
-                    await notify(await request<Today>('/today'), !primed.current);
+                    await notify(await request<Today>('/today'), !primed.current, () => !stopped);
                     primed.current = true;
                     alerted.current = Date.now();
                 }
@@ -85,7 +124,7 @@ export function useLive(refresh: () => Promise<void>, enabled: boolean): LiveSta
         const timer = window.setInterval(() => void check(), INTERVAL_MS);
         const visible = () => { if (!document.hidden) void check(); };
         document.addEventListener('visibilitychange', visible);
-        return () => { stopped = true; clearInterval(timer); document.removeEventListener('visibilitychange', visible); };
-    }, [refresh, enabled]);
+        return () => { stopped = true; stream?.close(); clearTimeout(resourceTimer); clearInterval(timer); document.removeEventListener('visibilitychange', visible); };
+    }, [refresh, enabled, streamEnabled]);
     return state;
 }

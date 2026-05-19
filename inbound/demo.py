@@ -21,7 +21,7 @@ def build_demo(settings=None):
         check(db)
         if db.execute("SELECT 1 FROM messages WHERE source<>'synthetic'").fetchone():
             raise ValueError("Demo requires a synthetic-only database")
-        run_id = start_run(db, "import", source_type="export")
+        run_id = start_run(db, "import", source_type="export", source_provenance="synthetic")
         try:
             counts = import_pipeline(
                 db,

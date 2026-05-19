@@ -11,6 +11,7 @@ from inbound.extract.records import conflict
 from inbound.ledger import timestamp
 from inbound.models import Attachment, Message
 from inbound.pause import check
+from inbound.steps import Empty, Kind, Reference, emit
 from inbound.triage.normalize import normalize_subject
 from inbound.triage.rules import urgency
 
@@ -443,6 +444,18 @@ def extract_messages(db, clock=None, ids=None):
                 ),
             )
             rebuild_timeline(db, opportunity_id)
+            revision_id = cursor.lastrowid
+            refs = (Reference("message", row['id']),)
+            emit(db, Kind.CREATED if len(db.execute(
+                "SELECT id FROM opportunity_revisions WHERE opportunity_id=?", (opportunity_id,)
+            ).fetchall()) == 1 else Kind.REVISED, Empty(),
+                 entity_type="opportunity", entity_id=opportunity_id,
+                 revision_id=revision_id, references=refs)
+            effective = db.execute("SELECT fields_json FROM opportunity_revisions WHERE id=?",
+                                   (revision_id,)).fetchone()[0]
+            if any(f['status'] == 'conflicting' for f in json.loads(effective).values()):
+                emit(db, Kind.CONFLICT, Empty(), entity_type="opportunity",
+                     entity_id=opportunity_id, revision_id=revision_id, references=refs)
             reason = extracted["blocked_reason"]
             if reason:
                 db.execute(

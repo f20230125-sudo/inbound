@@ -55,8 +55,13 @@ def parse(path, root, source):
     return parse_bytes(read_bytes(path), root, source)
 
 
-def parse_bytes(data, root, source, *, identity=None, thread_id=None, labels=None):
-    """Parse one RFC 822 message. Gmail sync passes its own message/thread ids and labels."""
+def parse_bytes(data, root, source, *, identity=None, thread_id=None, labels=None,
+                keep_oversized=False):
+    """Parse one RFC 822 message. Gmail sync passes its own message/thread ids and labels.
+
+    `keep_oversized`: live mail keeps the message and records an attachment over 10 MB
+    without its bytes (unsupported), instead of rejecting the whole email.
+    """
     mail = BytesParser(policy=policy.default).parsebytes(data)
     identity = identity or str(mail.get("Message-ID", "")).strip().strip("<>")
     if not identity or not mail.get("Date") or not mail.get("From"):
@@ -81,7 +86,11 @@ def parse_bytes(data, root, source, *, identity=None, thread_id=None, labels=Non
             safe_attachment_path(root, name)
             payload = part.get_payload(decode=True) or b""
             if len(payload) > 10 * 1024 * 1024:
-                raise SourceError("Attachment exceeds 10 MB")
+                if not keep_oversized:
+                    raise SourceError("Attachment exceeds 10 MB")
+                attachments.append(Attachment(name, part.get_content_type(),
+                                              parse_status="unsupported"))
+                continue
             attachments.append(
                 Attachment(
                     name,

@@ -90,7 +90,7 @@ def test_numbers_trace_to_current_rows_and_ready_drafts(database):
     assert state["counts"] == {"decisions": 1, "drafts": 1}
     assert state["mood"] == "draft_ready"
     assert state["decisions"][0]["action"] == "Review draft"
-    assert "1 decision needs your attention." in [b["text"] for b in state["briefing"]]
+    assert "1 call needs you." in [b["text"] for b in state["briefing"]]
     assert "1 draft is ready for review." in [b["text"] for b in state["briefing"]]
     assert all(b["href"] for b in state["briefing"])
     # A stale content version must never be called a ready draft.

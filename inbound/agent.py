@@ -1,4 +1,4 @@
-"""Deterministic Scout projection. Reads only; no journal or command execution in M11."""
+"""Deterministic Scout projection. Reads only; all counts describe the saved snapshot."""
 
 import json
 from datetime import datetime, timedelta
@@ -99,24 +99,17 @@ def agent_state(db, now, *, gmail=None, syncing=False):
             }
         )
     # Category corrections and due follow-ups are decisions, not fictional Scout activity.
-    reviews = db.execute(
-        "SELECT m.id,m.subject FROM messages m JOIN triage t ON t.message_id=m.id "
+    review_count = db.execute(
+        "SELECT COUNT(*) FROM messages m JOIN triage t ON t.message_id=m.id "
         "WHERE COALESCE(t.corrected_category,t.category)='needs_review' "
-        "ORDER BY julianday(m.received_at) DESC,m.id"
-    ).fetchall()
-    for row in reviews:
-        decisions.append(
-            {
-                "id": f"message-{row['id']}",
-                "title": row["subject"],
-                "reason": "This message needs a category decision.",
-                "action": "Review category",
-                "href": f"/work?category=needs_review#message-{row['id']}",
-            }
-        )
+    ).fetchone()[0]
+    call_count = sum(e['kind'] == 'call' for e in summary['decision_queue'])
+    notice_count = len(summary['decision_queue']) - call_count
+    follow_up_count = 0
     for entry in summary["outside_applications"]:
         follow_up = entry["outside_application"]["follow_up"]
         if follow_up and follow_up <= now.astimezone(DUBAI).date().isoformat():
+            follow_up_count += 1
             decisions.append(
                 {
                     "id": f"follow-up-{entry['id']}",
@@ -126,6 +119,12 @@ def agent_state(db, now, *, gmail=None, syncing=False):
                     "href": f"/opportunity/{entry['id']}",
                 }
             )
+    if review_count:
+        decisions.append({
+            "id": "sorting-backlog", "title": f"{review_count} emails need sorting",
+            "reason": "Review the grouped sorting backlog in Work.",
+            "action": "Sort emails", "href": "/work?category=needs_review",
+        })
     total = len(decisions)
     clauses = []
 
@@ -154,8 +153,16 @@ def agent_state(db, now, *, gmail=None, syncing=False):
             ),
             f"/settings?run={latest['id']}#runs",
         )
-    if total:
-        say(f"{total} decision{'s need' if total != 1 else ' needs'} your attention.", "/work")
+    if call_count:
+        say(f"{call_count} call{'s need' if call_count != 1 else ' needs'} you.", "/work")
+    if notice_count:
+        say(f"{notice_count} notice{'s need' if notice_count != 1 else ' needs'} you.", "/work")
+    if follow_up_count:
+        say(f"{follow_up_count} local follow-up{'s need' if follow_up_count != 1 else ' needs'} you.",
+            "/work")
+    if review_count:
+        say(f"{review_count} email{'s need' if review_count != 1 else ' needs'} sorting.",
+            "/work?category=needs_review")
     if drafts:
         say(
             f"{drafts} draft{'s are' if drafts != 1 else ' is'} ready for review.",
@@ -206,6 +213,8 @@ def agent_state(db, now, *, gmail=None, syncing=False):
         "gmail_connected": bool(gmail.get("connected")),
         "failed": failed,
         "counts": {"decisions": total, "drafts": drafts},
+        "decision_counts": {"calls": call_count, "notices": notice_count,
+                            "follow_ups": follow_up_count, "emails_to_sort": review_count},
         "decisions": decisions[:3],
         "briefing": clauses,
         "freshness": {

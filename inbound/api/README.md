@@ -41,6 +41,19 @@ source paths and bodies are not included in background errors.
 | POST `/api/packs/<id>/status` | Review/submission body below |
 | POST `/api/import` | `{}`; source folder/format/provenance come from trusted configuration; returns 202 with run ID |
 | GET `/api/runs` | Array ordered newest first, with run ID, result, current/last stage, counts, duration, related IDs, execution type and sanitized error class |
+| GET `/api/agent/state` | Source-linked briefing, separate call/sorting counts, three prioritized decisions and factual Scout state |
+| GET `/api/agent/steps` | Most recent 100 journal steps; `?after=<id>` instead returns ascending catch-up with `after` and `has_more` |
+| GET `/api/agent/stream` | Same-origin SSE; journal IDs, `Last-Event-ID` resume (or initial `?after=<id>`), unstored 15-second heartbeats |
+| GET `/api/agent/steps?replay=last` | Read-only recorded check, `label`, `recording_id` and `through`; subsequent pages use `?replay=<recording_id>&through=<through>&after=<id>` |
+| GET `/api/version` | Fallback change token including domain generation and visible journal cursor |
+| POST `/api/agent/alerts` | Typed local browser-alert receipt: `opportunity_id`, `kind` (`eligible`, `requested`, `suppressed`), `alert_type` (`new_call`, `deadline`), allowlisted `reason`; normal POST guards apply |
+
+M12 journal facts never contain mail text, exception messages, notes or skip reasons.
+Successful staged results publish with the snapshot; progress and failures survive a
+failed import. Content generation triggers detect concurrent authoritative changes;
+run/journal telemetry does not invalidate imports. Pause is checked separately.
+Replay mode filters private journal events even when no private message remains.
+Recorded playback performs reads only and suspends browser notifications in that view.
 
 Review body:
 

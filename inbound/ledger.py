@@ -38,7 +38,10 @@ def run(db, kind):
     counts = {}
     status, error = "success", None
     try:
-        yield counts
+        from inbound.steps import scope
+
+        with scope(run_id=run_id):
+            yield counts
     except Exception as exc:
         status, error = "failed", type(exc).__name__
         raise
