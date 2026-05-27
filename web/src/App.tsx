@@ -11,6 +11,7 @@ import TodayPage from './pages/Today';
 import OpportunityPage from './pages/Opportunity';
 import SettingsPage from './pages/Settings';
 import DeskPage from './pages/Desk';
+import MemoryPage from './pages/Memory';
 import { ScoutFace } from './components/scout';
 interface Desk {
     settings: Settings;
@@ -116,7 +117,7 @@ export default function App() {
                     <Route path="/today" element={<LegacyRoute to="/work" />}/><Route path="/inbox" element={<LegacyRoute to="/work" />}/><Route path="/applications" element={<LegacyRoute to="/work" />}/>
                     <Route path="/opportunity" element={<LegacyRoute to="/work" />}/><Route path="/opportunity/:id" element={<OpportunityPage />}/>
                     <Route path="/settings" element={<SettingsPage />}/><Route path="/runs" element={<LegacyRoute to="/settings" hash="#runs" />}/>
-                    <Route path="/memory" element={<section className="memory-placeholder"><h2>What Scout knows about you</h2><p>Memory arrives in M13. No memories have been imported or learned in this view.</p></section>}/>
+                    <Route path="/memory" element={<MemoryPage />}/>
                     <Route path="*" element={<p>Choose a call from <Link to="/work">Work</Link></p>}/>
                 </Routes></Context.Provider>}
             </main>
