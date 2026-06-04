@@ -4,6 +4,7 @@ import json
 from datetime import UTC, datetime, timedelta
 from zoneinfo import ZoneInfo
 
+from inbound import learning
 from inbound.application_activity import latest
 from inbound.extract.pipeline import latest_revision, opportunity_state
 from inbound.presentation import opportunity_labels
@@ -97,7 +98,9 @@ def today(db, now=None):
                 "city": state["fields"]["city"]["normalized"],
                 "roles": state["fields"]["roles"]["normalized"],
                 "status": state["status"],
-                "mode": state["fields"]["mode"]["normalized"],
+                "mode": state["fields"]["mode"]["normalized"]
+                if state["fields"]["mode"]["status"] in {"found", "inferred"} else None,
+                **learning.relocation_evidence(message["body_text"]),
                 "stipend": state["fields"]["stipend"]["normalized"],
                 "deadline": state["fields"]["deadline"],
                 "blocked_reason": state["blocked_reason"],
@@ -134,6 +137,7 @@ def today(db, now=None):
     for entry in entries:
         if entry["kind"] == "ps_admin":
             entry["display_title"] = normalize_subject(entry["subject"])
+        entry.update(learning.preference_fit(db, entry))
         group = deadline_group(entry["deadline"], now)
         entry["deadline_group"] = group
         entry["deadline_label"] = (
@@ -214,7 +218,7 @@ def today(db, now=None):
     result["attention"].sort(key=attention_order)
     result["decision_queue"].sort(
         key=lambda e: (
-            e["decision_priority"],
+            *learning.rank_key(e),
             due(e) if e["deadline_group"] != "uncertain" else "9999",
             *received(e),
         )

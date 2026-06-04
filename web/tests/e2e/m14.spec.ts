@@ -1,0 +1,68 @@
+import { expect } from '@playwright/test';
+import { audit, identities, keyboardActivate, test, theme } from './helpers.js';
+
+test('correction proposes a visible rule, separate preview preserves manual choices, and Undo stops influence', async ({ page }, info) => {
+    await theme(page, info.project.name.endsWith('-dark'));
+    await page.goto('/work?category=needs_review');
+    const ids = await identities(page);
+    const mid = ids[`M14-${info.project.name}-1`].id;
+    const second = ids[`M14-${info.project.name}-2`].id;
+    const group = page.locator('details').filter({ has: page.locator('summary', { hasText: `learning-${info.project.name}@fiction.demo.invalid` }) }).first();
+    await group.locator(':scope > summary').click();
+    await expect(page.getByText(/of \d+ messages still need review/)).toBeVisible();
+    await expect(group.getByLabel('Limit to this exact normalized subject')).toBeChecked();
+    await expect(group.getByLabel('Limit to this exact normalized subject')).toBeDisabled();
+    await expect(group.getByRole('button', { name: 'Propose sender rule' })).toBeVisible();
+    await page.goto(`/work?category=needs_review#message-${mid}`);
+    const mail = page.locator(`#message-${mid}`);
+    await mail.getByRole('combobox', { name: 'Correct category' }).selectOption('research');
+    await expect.poll(async () => {
+        const response = await page.request.get('/api/learning');
+        const data = await response.json();
+        return data.rules.find((r: { origin_id: string }) => r.origin_id === String(mid));
+    }).toBeTruthy();
+    const data = await (await page.request.get('/api/learning')).json();
+    const rid = data.rules.find((r: { origin_id: string }) => r.origin_id === String(mid)).id;
+    await page.goto(`/memory#rule-${rid}`);
+    const card = page.locator(`#rule-${rid}`);
+    await expect(card).toContainText('Suggested');
+    await expect(card).toContainText('2 stored messages match');
+    await expect(card).toContainText('subject equals Studio notes');
+    await keyboardActivate(page, card.getByRole('button', { name: 'Activate rule' }));
+    await expect(card).toContainText('Activated for future use');
+    let messages = await (await page.request.get('/api/messages')).json();
+    expect(messages.find((m: { id: number }) => m.id === second).category).toBe('needs_review');
+    await card.getByRole('button', { name: 'Preview stored matches' }).click();
+    await expect(card).toContainText('2 messages match; 1 can be reprocessed');
+    await audit(page);
+    await card.getByRole('button', { name: 'Confirm reprocessing' }).click();
+    await expect(card).toContainText('1 stored messages reprocessed');
+    messages = await (await page.request.get('/api/messages')).json();
+    expect(messages.find((m: { id: number }) => m.id === mid).corrected_category).toBe('research');
+    expect(messages.find((m: { id: number }) => m.id === second).category).toBe('research');
+    await card.getByText('Recent uses', { exact: true }).click();
+    await expect(card.getByRole('link', { name: 'Studio notes' })).toBeVisible();
+    await card.getByRole('button', { name: 'Undo rule' }).click();
+    await expect(card).toContainText('Undone · No future influence');
+    await card.getByText('Rule versions', { exact: true }).click();
+    await expect(card).toContainText('Version 3');
+    await page.screenshot({ path: info.outputPath('learned-rule.png'), fullPage: true });
+    await audit(page);
+});
+
+test('explicit preference has source examples and Undo; product copy has no release labels', async ({ page }, info) => {
+    await theme(page, info.project.name.endsWith('-dark'));
+    await page.goto('/memory');
+    await page.getByRole('textbox', { name: 'Always or remember instruction' }).fill('Remember that I prefer remote roles');
+    await page.getByRole('button', { name: 'Remember preference' }).click();
+    const card = page.getByRole('article').filter({ has: page.getByRole('heading', { name: 'Prefer remote roles', exact: true }) }).first();
+    await expect(card).toContainText('Active');
+    await card.getByText('Example matches', { exact: true }).click();
+    await expect(card.getByRole('link').filter({ hasText: /Call for CV/ }).first()).toBeVisible();
+    await audit(page);
+    await card.getByRole('button', { name: 'Undo rule' }).click();
+    await expect(card).toContainText('Undone');
+    expect(await page.locator('main').innerText()).not.toMatch(/\bM1[0-9]\b|milestone/i);
+    await page.goto('/');
+    expect(await page.locator('main').innerText()).not.toMatch(/\bM1[0-9]\b|milestone/i);
+});

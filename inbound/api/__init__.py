@@ -105,6 +105,10 @@ def create_app(config=None):
 
     register_memory(app, db, output, settings)
 
+    from inbound.api.learning import register as register_learning
+
+    register_learning(app, db, output)
+
     @app.teardown_appcontext
     def close_db(error=None):
         connection = g.pop("db", None)
@@ -292,8 +296,11 @@ def create_app(config=None):
         if set(value) != {"category"} or value["category"] not in CATEGORIES:
             abort(400, "Unknown category")
         connection = db()
+        connection.execute("BEGIN IMMEDIATE")
         with connection:
-            check(connection)
+            from inbound.memory import guard as memory_guard
+
+            memory_guard(connection)
             row = connection.execute("SELECT * FROM triage WHERE message_id=?", (mid,)).fetchone()
             if row is None:
                 abort(404)
@@ -309,7 +316,20 @@ def create_app(config=None):
             )
             emit(connection, Kind.CORRECTED, Classification(value['category']),
                  entity_type="message", entity_id=mid)
-        return output({"id": mid, "category": value["category"], "previous_category": previous})
+            from inbound import learning
+            from inbound.triage.normalize import normalize_subject
+
+            mail = connection.execute('SELECT * FROM messages WHERE id=?', (mid,)).fetchone()
+            learned = None
+            if (
+                learning.mailbox(mail['sender'])
+                and normalize_subject(mail['subject']).strip()
+                and len(mail['subject']) <= 500
+            ):
+                learned = learning.suggest_sender(connection, mid, value['category'],
+                                                   subject=normalize_subject(mail['subject']))
+        return output({"id": mid, "category": value["category"], "previous_category": previous,
+                       "learning_rule": learned})
 
     @app.get("/api/opportunities")
     def get_opportunities():
@@ -474,7 +494,10 @@ def create_app(config=None):
                 (status, timestamp(), oid),
             )
             event(connection, oid, revision["id"], action, details=details)
-        return output({"id": oid, "status": status})
+            from inbound.learning import skip_suggestion
+
+            learned = skip_suggestion(connection, oid, details['reason']) if action == 'skipped' else None
+        return output({"id": oid, "status": status, "learning_rule": learned})
 
     @app.get("/api/packs/<pid>")
     def get_pack(pid):
