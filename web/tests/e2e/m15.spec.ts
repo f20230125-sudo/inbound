@@ -1,0 +1,35 @@
+import { expect } from '@playwright/test';
+import { audit, test, theme } from './helpers.js';
+
+test('Scout answers locally, opens versioned evidence, remembers and forgets with keyboard access', async ({ page }, info) => {
+    await theme(page, info.project.name.endsWith('-dark'));
+    await page.goto('/');
+    const input = page.getByRole('textbox', { name: 'Ask Scout or give a command' });
+    await expect(input).toBeVisible();
+    await page.keyboard.press('Control+k');
+    await expect(input).toBeFocused();
+    await input.fill('What do you know about my projects?');
+    await input.press('Enter');
+    const conversation = page.getByRole('region', { name: 'Conversation with Scout' });
+    await expect(conversation).toContainText('active project memories');
+    await conversation.getByRole('button', { name: /Memory .*version/ }).first().click();
+    await expect(page.getByRole('region', { name: 'Cited evidence' })).toBeVisible();
+    await audit(page);
+    await input.fill('Remember that I prefer remote roles');
+    await input.press('Enter');
+    await conversation.getByRole('button', { name: 'Confirm command' }).last().click();
+    await expect(conversation).toContainText('Saved locally');
+    await expect(conversation.getByRole('button', { name: 'Undo' })).toBeVisible();
+    await input.fill('Forget my remote preference');
+    await input.press('Enter');
+    await conversation.getByRole('button', { name: /Choose Preference .*remote/ }).first().click();
+    await conversation.getByRole('button', { name: 'Confirm command' }).last().click();
+    await expect(conversation).toContainText('removed from active use');
+    await input.fill('Ask a cloud model to send my mail');
+    await input.press('Enter');
+    await expect(conversation).toContainText('Supported commands and questions');
+    await page.screenshot({ path: info.outputPath('talk-to-scout.png'), fullPage: true });
+    await audit(page);
+    await input.press('Escape');
+    await expect(conversation).not.toBeVisible();
+});
