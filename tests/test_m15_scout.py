@@ -310,3 +310,36 @@ def test_why_exposes_blocker_and_each_conflicting_source(seeded):
     captured = client.get(conflict['citations'][0]['url']).json
     assert [c['source_text'] for c in captured['content']['evidence']['candidates']] == [
         'Original: 30 October', 'Reminder: 31 October']
+
+
+def test_passed_deadlines_come_after_open_ones():
+    from datetime import date
+
+    from inbound.scout import add_deadline
+
+    groups = {'timed': [], 'date_only': [], 'uncertain': [], 'past': []}
+    now = datetime(2026, 10, 28, 6, tzinfo=UTC)  # 10:00 Dubai
+    for title, value in [('Gone', '2026-10-27T08:00:00+04:00'), ('Open', '2026-10-29T08:00:00+04:00')]:
+        add_deadline(groups, title, {'normalized': value, 'status': 'found'},
+                     date(2026, 10, 26), date(2026, 11, 2), None, now)
+    assert [i['text'].split(':')[0] for i in groups['timed']] == ['Open']
+    assert [i['text'].split(':')[0] for i in groups['past']] == ['Gone']
+
+
+def test_a_call_without_a_company_is_found_by_its_subject():
+    from inbound.scout import matches, title_of
+
+    op = {'id': 7, 'company': None,
+          'mail': {'subject': 'Call for CV - PS II – Second Semester 2026-2027 – Harbor Finch,Port Selene'}}
+    assert title_of(op) == 'Harbor Finch,Port Selene'
+    assert matches('Harbor Finch', f"{op['company'] or ''} {op['mail']['subject']}")
+
+
+def test_repeated_quiet_steps_collapse_into_one_line():
+    from inbound.scout import collapse
+
+    entries = [('I checked Gmail. No new messages.', f'2026-10-28T09:{m:02d}:00+00:00', None)
+               for m in (40, 38, 36)] + [('I prepared a draft.', '2026-10-28T09:30:00+00:00', None)]
+    lines = [i['text'] for i in collapse(entries)]
+    assert len(lines) == 2
+    assert lines[0].endswith('(3 times)') and '13:36-13:40' in lines[0]
