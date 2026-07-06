@@ -8,6 +8,9 @@ from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import mkdtemp
+from threading import Thread
+
+from werkzeug.serving import make_server
 
 ROOT = next(p for p in Path(__file__).resolve().parents if (p / "CODEX_BRIEF.md").is_file())
 sys.path.insert(0, str(ROOT))
@@ -70,6 +73,20 @@ def main():
         {"SETTINGS": settings, "DEMO": True, "TEST_CLOCK": True,
          "WEB_DIST": Path(__file__).resolve().parents[1] / "dist"}
     )
+    # Separate synthetic arrival service: the existing suite keeps its frozen counts.
+    release_root = root / "release-service"
+    mail_root = release_root / "mail"
+    mail_root.mkdir(parents=True)
+    release_app = create_app({
+        "SETTINGS": Settings(data_root=release_root), "DEMO": True,
+        "ASYNC_WORK": False, "IMPORT_ROOT": mail_root, "SOURCE_PROVENANCE": "synthetic",
+        "CLOCK": lambda: now, "WEB_DIST": Path(__file__).resolve().parents[1] / "dist",
+    })
+    with closing(connect(release_app.config["SETTINGS"].db_path)):
+        pass  # Finish initial migrations before the browser makes concurrent reads.
+    (ROOT / f".local/inbound-e2e-{port + 1}-mail.txt").write_text(str(mail_root), "utf8")
+    release_server = make_server("127.0.0.1", port + 1, release_app, threaded=True)
+    Thread(target=release_server.serve_forever, daemon=True).start()
     app.run(host="127.0.0.1", port=port, debug=False, use_reloader=False)
 
 
