@@ -20,16 +20,22 @@ export function alertsEnabled() {
 export function setAlertsEnabled(on: boolean) { store(ALERTS_KEY, on ? 'on' : 'off'); }
 
 /** Alerts on this PC only: a new PS call, or a deadline within 12 h not yet acted on. */
-export function alertsFor(today: Today, now: Date, seen: string[]): { key: string; title: string; body: string; id: number }[] {
-    const out: { key: string; title: string; body: string; id: number }[] = [];
+export function alertsFor(today: Today, now: Date, seen: string[]): { key: string; title: string; body: string; id: number; task?: boolean }[] {
+    const out: { key: string; title: string; body: string; id: number; task?: boolean }[] = [];
     // A call can leave 'new' within seconds (blocked by a missing JD, or given a draft pack),
     // so look for first sightings across every Today list, not only new_calls.
     const lists = [today.new_calls, today.attention, today.deadlines_48h, today.date_only, today.uncertain_deadlines];
     const firstSeen = new Set<number>();
     for (const entry of lists.flat()) {
-        if (entry.kind === 'ps_admin' || firstSeen.has(entry.id)) continue;
+        if (entry.kind === 'ps_admin' || entry.kind === 'task' || firstSeen.has(entry.id)) continue;
         firstSeen.add(entry.id);
         out.push({ key: `new:${entry.id}`, title: 'New PS call', body: entry.display_title, id: entry.id });
+    }
+    for (const task of today.college_tasks || []) {
+        const value = task.deadline.normalized;
+        if (!task.actionable || !['found', 'inferred'].includes(task.deadline.status) || typeof value !== 'string' || value.length <= 10) continue;
+        const hours = (new Date(value).getTime() - now.getTime()) / 3600000;
+        if (hours > 0 && hours <= 12) out.push({ key: `task12:${task.id}:${value}`, title: 'College task within 12 hours', body: `${task.course || 'Course unknown'} · ${task.title}`, id: task.id, task: true });
     }
     const applied = new Set((today.outside_applications || []).map(a => a.id));
     for (const entry of today.deadlines_48h as Entry[]) {
@@ -47,12 +53,12 @@ async function notify(today: Today, primeOnly: boolean, allowed: () => boolean) 
     const fresh = alertsFor(today, new Date(), seen);
     if (!fresh.length) return;
     store(SEEN_KEY, [...seen, ...fresh.map(a => a.key)].slice(-500));
-    if (primeOnly || !allowed()) return;
+    if (primeOnly || !allowed() || !alertsEnabled()) return;
     const settings = await request<import('../types').Settings>('/settings');
     if (!allowed() || settings.mode !== 'local' || settings.paused || !settings.csrf_token) return;
     for (const alert of fresh) {
         if (!allowed()) return;
-        const facts = { opportunity_id: alert.id, alert_type: alert.key.startsWith('due12:') ? 'deadline' : 'new_call' };
+        const facts = { ...(alert.task ? { task_id: alert.id } : { opportunity_id: alert.id }), alert_type: alert.task ? 'task_deadline' : alert.key.startsWith('due12:') ? 'deadline' : 'new_call' };
         async function record(kind: string, reason: string) {
             try { await request('/agent/alerts', settings.csrf_token, { ...facts, kind, reason }); }
             catch { /* A guard may have changed since this check; never bypass it. */ }
@@ -62,7 +68,7 @@ async function notify(today: Today, primeOnly: boolean, allowed: () => boolean) 
         if (!alertsEnabled()) { await record('suppressed', 'disabled'); continue; }
         try {
             const shown = new Notification(alert.title, { body: alert.body, tag: alert.key });
-            shown.onclick = () => { window.focus(); window.location.assign(`/opportunity/${alert.id}`); };
+            shown.onclick = () => { window.focus(); window.location.assign(alert.task ? `/work#task-${alert.id}` : `/opportunity/${alert.id}`); };
             await record('requested', 'requested');
         } catch { await record('suppressed', 'failed'); }
     }

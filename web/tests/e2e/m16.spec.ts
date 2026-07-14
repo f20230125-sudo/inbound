@@ -86,6 +86,10 @@ test('fictional arrival, narrated publication, decision, visible learning, next 
     await page.keyboard.press('Control+k');
     await expect(page.getByRole('textbox', { name: 'Ask Scout or give a command' })).toBeFocused();
     await page.keyboard.press('Escape');
+    // Opening the desk saves today's briefing in the background; let that settle first, so
+    // the comparison below measures only what the replay does.
+    await expect.poll(async () => (await (await page.request.get(`${origin}/api/briefing`)).json()).needs_refresh,
+        { timeout: 20000 }).toBe(false);
     const before = await (await page.request.get(`${origin}/api/version`)).json();
     const mutations: string[] = [];
     page.on('request', request => { if (request.method() !== 'GET') mutations.push(request.url()); });

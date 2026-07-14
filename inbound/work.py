@@ -173,6 +173,9 @@ def staged_import(db, settings, run_id, root, source, provenance, clock):
                     "attachment_recoveries",
                     "snapshots",
                     "learned_rule_uses",
+                    "tasks",
+                    "task_revisions",
+                    "task_actions",
                 ):
                     db.execute(
                         f"INSERT OR REPLACE INTO main.{table} SELECT * FROM import_stage.{table}"

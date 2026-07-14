@@ -16,8 +16,9 @@ from inbound.packs.matching import contains, skill_matches
 from inbound.steps import project
 from inbound.triage.normalize import ZERO_WIDTH
 
-COMMANDS = {'skip', 'remember', 'forget', 'check', 'pause'}
+COMMANDS = {'skip', 'remember', 'forget', 'check', 'pause', 'task_done'}
 EXAMPLES = ["What's due this week?", 'What changed since yesterday?',
+            'What assignments are due?', 'Mark <task> done',
             'What did you do today?', 'Find backend roles',
             'What do you know about my projects?', 'Check now', 'Pause']
 
@@ -38,6 +39,7 @@ def parse(text):
              'due this week': 'due', 'what did you do today': 'activity',
              'what do you know about my projects': 'projects',
              'check now': 'check', 'pause': 'pause'}
+    exact['what assignments are due'] = 'tasks'
     if normal in exact:
         return Intent(exact[normal])
     for pattern, kind in [(r'why is (.{1,120}) flagged', 'why'),
@@ -50,6 +52,9 @@ def parse(text):
     match = re.fullmatch(r'skip (.{1,120}?) because (.{1,300})', text, re.IGNORECASE)
     if match:
         return Intent('skip', match[1], match[2])
+    match = re.fullmatch(r'mark (.{1,120}) done', text, re.IGNORECASE)
+    if match:
+        return Intent('task_done', match[1])
     match = re.fullmatch(r'what changed since (yesterday|today|\d{4}-\d{2}-\d{2})', normal)
     if match:
         try:
@@ -115,6 +120,17 @@ def query(db, text, now, *, replay=False, selection=None, demo=False):
         raise ValueError('This question does not take an entity selection')
     if intent.kind == 'due':
         return due(db, now, replay)
+    if intent.kind == 'tasks':
+        from inbound.tasks import list_tasks
+
+        records = list_tasks(db, now, replay=replay, active=True)
+        return reply(f'I found {len(records)} open college tasks in stored mail. '
+                     'Supported dates are ordered first; unknown and conflicting dates need review.',
+                     items=[item(f"{t['course'] or 'Course unknown'} · {t['title']}: "
+                                 f"{t['deadline'].get('normalized') or 'Date unknown'} "
+                                 f"({t['deadline']['status']})" +
+                                 (' · time not stated' if t['deadline'].get('precision') == 'date'
+                                  else ' · Dubai'), citations.task(db, t)) for t in records])
     if intent.kind in {'changed', 'activity'}:
         return activity(db, intent, now, replay)
     if intent.kind == 'projects':
@@ -144,6 +160,11 @@ def due(db, now, replay):
     start = day - timedelta(days=day.weekday())
     end = start + timedelta(days=7)
     groups = {'timed': [], 'date_only': [], 'uncertain': [], 'past': []}
+    from inbound.tasks import list_tasks
+
+    for task in list_tasks(db, now, replay=replay, active=True):
+        add_deadline(groups, f"{task['course'] or 'Course unknown'} · {task['title']}",
+                     task['deadline'], start, end, citations.task(db, task), now)
     for op in opportunities(db, now, replay):
         if op['status'] in {'skipped', 'submitted_by_me'} or latest(db, op['id']):
             continue
@@ -327,6 +348,19 @@ def prepare(db, intent, now, *, replay, selection):
         return reply('Commands are unavailable in read-only replay. You can ask local questions.',
                      suggestions=EXAMPLES[:5])
     action = {'kind': intent.kind, 'entity': intent.entity, 'value': intent.value}
+    if intent.kind == 'task_done':
+        from inbound.tasks import list_tasks
+
+        candidates = [(f"task:{t['id']}", f"{t['course'] or 'Course unknown'} · {t['title']}", t)
+                      for t in list_tasks(db, now, active=True)
+                      if matches(intent.entity, f"{t['course'] or ''} {t['title']}")]
+        task, choices = choose(candidates, selection)
+        if task is None:
+            return reply('Choose the task you mean.' if choices else
+                         'No matching open college task found.', choices=choices)
+        action.update(id=task['id'], version=task['version'])
+        return reply(f"Mark {task['title']} done? This records your decision locally.",
+                     action=action, items=[item('Current task evidence.', citations.task(db, task))])
     if intent.kind == 'skip':
         candidates = [(f"opportunity:{o['id']}", f"{title_of(o)} · call {o['id']}", o)
                       for o in opportunities(db, now, replay)
