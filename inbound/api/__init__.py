@@ -56,7 +56,9 @@ def create_app(config=None):
     app.request_class = MemoryUploads
     app.config.update(
         APP_MODE=os.environ.get("APP_MODE", "local"),
-        SETTINGS=Settings.from_env(),
+        # Built from the environment only when the caller passes no settings (the hosted
+        # demo passes its own, which the D:-only defaults would reject).
+        SETTINGS=(config or {}).get("SETTINGS") or Settings.from_env(),
         IMPORT_ROOT=Path(os.environ.get("INBOUND_IMPORT_ROOT", REPO / "fixtures/export_sample")),
         SOURCE_PROVENANCE=os.environ.get("INBOUND_SOURCE_PROVENANCE", "synthetic"),
         SOURCE_FORMAT=os.environ.get("INBOUND_SOURCE_FORMAT", "export"),
