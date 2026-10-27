@@ -1,0 +1,1703 @@
+{
+  "scope": "public",
+  "projects": [
+    {
+      "id": "backroom",
+      "title": "Backroom",
+      "stack": [
+        "Python",
+        "Gemini API",
+        "PostgreSQL",
+        "Flask",
+        "React"
+      ],
+      "live_url": "https://backroom-ops.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/backroom",
+      "source_file": "unique-body.tex",
+      "source_hash": "6c689dee219560f35de149bd8943701a56ee0c7ed411a2a7f9f26b7b71fc22c3",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "backroom-809cdf4d8073976a",
+          "text_tex": "LLM agent reads supplier invoice PDFs, emails and payout statements into \\textbf{typed records} (JSON schema, source quotes, rule validation): \\textbf{99.8\\%} of fields on layouts it never saw vs \\textbf{12.7\\%} for a rules-only baseline; \\textbf{0 of 221} accepted documents carry a wrong amount",
+          "text_plain": "LLM agent reads supplier invoice PDFs, emails and payout statements into typed records (JSON schema, source quotes, rule validation): 99.8% of fields on layouts it never saw vs 12.7% for a rules-only baseline; 0 of 221 accepted documents carry a wrong amount",
+          "source_file": "unique-body.tex",
+          "source_line": 15,
+          "source_hash": "6c689dee219560f35de149bd8943701a56ee0c7ed411a2a7f9f26b7b71fc22c3",
+          "preferred": true
+        },
+        {
+          "id": "backroom-0b2d33d741b7d732",
+          "text_tex": "\\textbf{Agent with six typed SQL tools} answers questions about the numbers: \\textbf{29/30} correct, \\textbf{0} wrong, 5/5 out-of-scope requests refused; planted \\textbf{prompt-injection} documents flagged; REST API, HMAC webhook, \\textbf{272} tests in GitHub Actions",
+          "text_plain": "Agent with six typed SQL tools answers questions about the numbers: 29/30 correct, 0 wrong, 5/5 out-of-scope requests refused; planted prompt-injection documents flagged; REST API, HMAC webhook, 272 tests in GitHub Actions",
+          "source_file": "unique-body.tex",
+          "source_line": 16,
+          "source_hash": "6c689dee219560f35de149bd8943701a56ee0c7ed411a2a7f9f26b7b71fc22c3",
+          "preferred": true
+        },
+        {
+          "id": "backroom-fedabb6b72377968",
+          "text_tex": "Incremental, idempotent pipeline loads \\textbf{234} documents (invoice PDFs, emails, payout statements) and POS and ledger CSVs into \\textbf{PostgreSQL}; LLM extraction checked by rules reads \\textbf{99.8\\%} of fields on layouts it never saw (rules-only: 12.7\\%), with \\textbf{0 of 221} accepted documents carrying a wrong amount",
+          "text_plain": "Incremental, idempotent pipeline loads 234 documents (invoice PDFs, emails, payout statements) and POS and ledger CSVs into PostgreSQL; LLM extraction checked by rules reads 99.8% of fields on layouts it never saw (rules-only: 12.7%), with 0 of 221 accepted documents carrying a wrong amount",
+          "source_file": "mubama-body.tex",
+          "source_line": 31,
+          "source_hash": "92818b69c84a1447b6be79bbbd321fe0fb9c60566b8a1eaee458f9484bf524c1",
+          "preferred": false
+        },
+        {
+          "id": "backroom-32f5fe63632e785b",
+          "text_tex": "Reconciliation finds all \\textbf{31} planted problems (short payouts, duplicates, VAT errors) with \\textbf{0} false alarms; \\textbf{272} tests run on SQLite and PostgreSQL in GitHub Actions",
+          "text_plain": "Reconciliation finds all 31 planted problems (short payouts, duplicates, VAT errors) with 0 false alarms; 272 tests run on SQLite and PostgreSQL in GitHub Actions",
+          "source_file": "mubama-body.tex",
+          "source_line": 32,
+          "source_hash": "92818b69c84a1447b6be79bbbd321fe0fb9c60566b8a1eaee458f9484bf524c1",
+          "preferred": false
+        }
+      ]
+    },
+    {
+      "id": "agent-desk",
+      "title": "Agent Desk",
+      "stack": [
+        "Python",
+        "FastAPI",
+        "Claude",
+        "Next.js"
+      ],
+      "live_url": "https://github-bot-wine.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/github-bot",
+      "source_file": "unique-body.tex",
+      "source_hash": "6c689dee219560f35de149bd8943701a56ee0c7ed411a2a7f9f26b7b71fc22c3",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "agent-desk-87a49360babd654d",
+          "text_tex": "Two \\textbf{Claude} agents with JSON-schema output: rules first, then at most one model call; nothing is written without a human click; usage stop at 40\\% of the plan; a scheduled GitHub Actions job audits repositories every six hours",
+          "text_plain": "Two Claude agents with JSON-schema output: rules first, then at most one model call; nothing is written without a human click; usage stop at 40% of the plan; a scheduled GitHub Actions job audits repositories every six hours",
+          "source_file": "unique-body.tex",
+          "source_line": 44,
+          "source_hash": "6c689dee219560f35de149bd8943701a56ee0c7ed411a2a7f9f26b7b71fc22c3",
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "signaldesk-ai",
+      "title": "SignalDesk AI",
+      "stack": [
+        "Python",
+        "SQL",
+        "Gemini",
+        "TypeScript"
+      ],
+      "live_url": "https://signaldesk-ai-phi.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/-signaldesk-ai",
+      "source_file": "unique-body.tex",
+      "source_hash": "6c689dee219560f35de149bd8943701a56ee0c7ed411a2a7f9f26b7b71fc22c3",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "signaldesk-ai-e16ba90727b1fce8",
+          "text_tex": "Bounded \\textbf{Gemini agent} with five typed evidence tools, citation validation, Redis-backed quotas and exportable briefs; paired evaluation against a same-model \\textbf{BM25 baseline} on 40 held-out tasks (agent 17/40 vs baseline 19/40), published with failure analysis",
+          "text_plain": "Bounded Gemini agent with five typed evidence tools, citation validation, Redis-backed quotas and exportable briefs; paired evaluation against a same-model BM25 baseline on 40 held-out tasks (agent 17/40 vs baseline 19/40), published with failure analysis",
+          "source_file": "unique-body.tex",
+          "source_line": 23,
+          "source_hash": "6c689dee219560f35de149bd8943701a56ee0c7ed411a2a7f9f26b7b71fc22c3",
+          "preferred": true
+        },
+        {
+          "id": "signaldesk-ai-0697bb5d3e9411a7",
+          "text_tex": "Bounded \\textbf{Gemini agent} with five typed evidence tools over \\textbf{29} FDA announcements, 8 formulations and \\textbf{30} trial records; citation validation, Redis-backed quotas and exportable briefs",
+          "text_plain": "Bounded Gemini agent with five typed evidence tools over 29 FDA announcements, 8 formulations and 30 trial records; citation validation, Redis-backed quotas and exportable briefs",
+          "source_file": "science-body.tex",
+          "source_line": 31,
+          "source_hash": "e430d90fab0589afc396e3b24c118bbe38532f6b40b21d38c70d0bf18d221465",
+          "preferred": false
+        },
+        {
+          "id": "signaldesk-ai-f0ae01892a712ce3",
+          "text_tex": "Paired evaluation against a same-model BM25 baseline on \\textbf{40 held-out} tasks: agent 17/40 vs baseline 19/40, short of the 34/40 target; published case-level results and failure analysis",
+          "text_plain": "Paired evaluation against a same-model BM25 baseline on 40 held-out tasks: agent 17/40 vs baseline 19/40, short of the 34/40 target; published case-level results and failure analysis",
+          "source_file": "science-body.tex",
+          "source_line": 32,
+          "source_hash": "e430d90fab0589afc396e3b24c118bbe38532f6b40b21d38c70d0bf18d221465",
+          "preferred": false
+        }
+      ]
+    },
+    {
+      "id": "pharma-evidence",
+      "title": "PharmaEvidence",
+      "stack": [
+        "Python",
+        "BM25",
+        "DeBERTa NLI",
+        "ONNX"
+      ],
+      "live_url": "https://pharma-evidence.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/pharma-evidence",
+      "source_file": "unique-body.tex",
+      "source_hash": "6c689dee219560f35de149bd8943701a56ee0c7ed411a2a7f9f26b7b71fc22c3",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "pharma-evidence-4254b57d51e33c73",
+          "text_tex": "Checks claims against 2,309 label passages with BM25 retrieval, numeric rules and an INT8 \\textbf{DeBERTa NLI} model on-device; on 48 held-out claims NLI scored 47/48 and rules + NLI 48/48, catching a tenfold dose error the model accepted",
+          "text_plain": "Checks claims against 2,309 label passages with BM25 retrieval, numeric rules and an INT8 DeBERTa NLI model on-device; on 48 held-out claims NLI scored 47/48 and rules + NLI 48/48, catching a tenfold dose error the model accepted",
+          "source_file": "unique-body.tex",
+          "source_line": 37,
+          "source_hash": "6c689dee219560f35de149bd8943701a56ee0c7ed411a2a7f9f26b7b71fc22c3",
+          "preferred": true
+        },
+        {
+          "id": "pharma-evidence-99c341d6dd5462e3",
+          "text_tex": "Checks draft claims against \\textbf{2,309} passages from versioned KEYTRUDA and WINREVAIR labels with BM25 retrieval, numeric and qualifier rules and a pretrained \\textbf{INT8 DeBERTa NLI} model running on-device",
+          "text_plain": "Checks draft claims against 2,309 passages from versioned KEYTRUDA and WINREVAIR labels with BM25 retrieval, numeric and qualifier rules and a pretrained INT8 DeBERTa NLI model running on-device",
+          "source_file": "science-body.tex",
+          "source_line": 39,
+          "source_hash": "e430d90fab0589afc396e3b24c118bbe38532f6b40b21d38c70d0bf18d221465",
+          "preferred": false
+        },
+        {
+          "id": "pharma-evidence-23dd249d9ed945b9",
+          "text_tex": "Froze \\textbf{120} authored claims (72 development / 48 held out): NLI \\textbf{47/48}, rules + NLI \\textbf{48/48}; the rules caught a tenfold dose error the model accepted",
+          "text_plain": "Froze 120 authored claims (72 development / 48 held out): NLI 47/48, rules + NLI 48/48; the rules caught a tenfold dose error the model accepted",
+          "source_file": "science-body.tex",
+          "source_line": 40,
+          "source_hash": "e430d90fab0589afc396e3b24c118bbe38532f6b40b21d38c70d0bf18d221465",
+          "preferred": false
+        }
+      ]
+    },
+    {
+      "id": "quant-copilot",
+      "title": "Quant Copilot",
+      "stack": [
+        "Python",
+        "NumPy",
+        "pandas",
+        "FastAPI",
+        "Next.js"
+      ],
+      "live_url": "",
+      "code_url": "https://github.com/f20230125-sudo/Quant-Trading-copilot",
+      "source_file": "mubama-body.tex",
+      "source_hash": "92818b69c84a1447b6be79bbbd321fe0fb9c60566b8a1eaee458f9484bf524c1",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "quant-copilot-a5d77a371c1e06d8",
+          "text_tex": "Built a \\textbf{backtester} on \\textbf{12} seeded tick-level markets (random walk, jump-diffusion, regime switching; \\textbf{50,000} ticks backfilled per index) with stop-loss/take-profit, fees, an in-sample/out-of-sample split and \\textbf{walk-forward} optimisation",
+          "text_plain": "Built a backtester on 12 seeded tick-level markets (random walk, jump-diffusion, regime switching; 50,000 ticks backfilled per index) with stop-loss/take-profit, fees, an in-sample/out-of-sample split and walk-forward optimisation",
+          "source_file": "mubama-body.tex",
+          "source_line": 15,
+          "source_hash": "92818b69c84a1447b6be79bbbd321fe0fb9c60566b8a1eaee458f9484bf524c1",
+          "preferred": true
+        },
+        {
+          "id": "quant-copilot-8ccf8cee1ee8c000",
+          "text_tex": "Validated every result against \\textbf{500 circular-shift null runs}: a planted-edge control gives \\textbf{p = 0.002}, a pure random walk \\textbf{p = 0.61}, and the edge is reported as not surviving 1 bp fees; a test proves \\textbf{no look-ahead} at every bar; \\textbf{112} pytest tests incl. hand-computed trades; realized volatility recovered within 3\\%, plus GARCH(1,1) forecasts and jump detection",
+          "text_plain": "Validated every result against 500 circular-shift null runs: a planted-edge control gives p = 0.002, a pure random walk p = 0.61, and the edge is reported as not surviving 1 bp fees; a test proves no look-ahead at every bar; 112 pytest tests incl. hand-computed trades; realized volatility recovered within 3%, plus GARCH(1,1) forecasts and jump detection",
+          "source_file": "mubama-body.tex",
+          "source_line": 16,
+          "source_hash": "92818b69c84a1447b6be79bbbd321fe0fb9c60566b8a1eaee458f9484bf524c1",
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "rx-market-pulse",
+      "title": "Rx Market Pulse",
+      "stack": [
+        "Python",
+        "SQL (DuckDB)",
+        "Power BI"
+      ],
+      "live_url": "https://rx-market-pulse.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/rx-market-pulse",
+      "source_file": "mubama-body.tex",
+      "source_hash": "92818b69c84a1447b6be79bbbd321fe0fb9c60566b8a1eaee458f9484bf524c1",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "rx-market-pulse-f8ccf0dad4e0e3bb",
+          "text_tex": "\\textbf{ETL} over \\textbf{36.1M} public Medicaid rows in 15 SQL steps (joins, CTEs, subqueries, window functions such as ROW\\_NUMBER and LAG); \\textbf{1,488} name variants harmonized, \\textbf{19} data-quality checks, unkeyable rows quarantined; star schema behind a \\textbf{Power BI} report (28 DAX measures)",
+          "text_plain": "ETL over 36.1M public Medicaid rows in 15 SQL steps (joins, CTEs, subqueries, window functions such as ROW_NUMBER and LAG); 1,488 name variants harmonized, 19 data-quality checks, unkeyable rows quarantined; star schema behind a Power BI report (28 DAX measures)",
+          "source_file": "mubama-body.tex",
+          "source_line": 23,
+          "source_hash": "92818b69c84a1447b6be79bbbd321fe0fb9c60566b8a1eaee458f9484bf524c1",
+          "preferred": true
+        },
+        {
+          "id": "rx-market-pulse-8b4251b0e4432742",
+          "text_tex": "\\textbf{EDA}: spend rose \\textbf{60\\% to \\$116.9B} on flat prescriptions; brands are 14\\% of prescriptions and 89\\% of spend; backtested forecasts over \\textbf{28 quarters} and reported that the chosen method's 9.01\\% WAPE \\textbf{lost} to the seasonal baseline's 5.54\\%",
+          "text_plain": "EDA: spend rose 60% to $116.9B on flat prescriptions; brands are 14% of prescriptions and 89% of spend; backtested forecasts over 28 quarters and reported that the chosen method's 9.01% WAPE lost to the seasonal baseline's 5.54%",
+          "source_file": "mubama-body.tex",
+          "source_line": 24,
+          "source_hash": "92818b69c84a1447b6be79bbbd321fe0fb9c60566b8a1eaee458f9484bf524c1",
+          "preferred": true
+        },
+        {
+          "id": "rx-market-pulse-97043119c4e128ee",
+          "text_tex": "Built a tested pipeline over \\textbf{36.1M} public Medicaid rows; \\textbf{harmonized 1,488} manufacturer name variants with \\textbf{19} data-quality checks; a \\textbf{Power BI} report (star schema, 28 DAX measures, 6 pages) and a web dashboard share one set of numbers",
+          "text_plain": "Built a tested pipeline over 36.1M public Medicaid rows; harmonized 1,488 manufacturer name variants with 19 data-quality checks; a Power BI report (star schema, 28 DAX measures, 6 pages) and a web dashboard share one set of numbers",
+          "source_file": "analyst-body.tex",
+          "source_line": 23,
+          "source_hash": "e7e66ac8efbd39691cc18d4d62b75763fb08591cf8b1a9fe9db8cd559d2206f5",
+          "preferred": false
+        },
+        {
+          "id": "rx-market-pulse-fc54f46780063d05",
+          "text_tex": "Insight: spend rose \\textbf{60\\% to \\$116.9B} on flat prescriptions; brands are \\textbf{14\\%} of prescriptions and \\textbf{89\\%} of spend; live-formula \\textbf{Excel} territory model ranks 51 states, checked in Excel through 6 scenarios against Python",
+          "text_plain": "Insight: spend rose 60% to $116.9B on flat prescriptions; brands are 14% of prescriptions and 89% of spend; live-formula Excel territory model ranks 51 states, checked in Excel through 6 scenarios against Python",
+          "source_file": "analyst-body.tex",
+          "source_line": 24,
+          "source_hash": "e7e66ac8efbd39691cc18d4d62b75763fb08591cf8b1a9fe9db8cd559d2206f5",
+          "preferred": false
+        },
+        {
+          "id": "rx-market-pulse-5e7758306164f48b",
+          "text_tex": "Built an \\textbf{AI agent} answering commercial questions over \\textbf{36.1M} Medicaid rows through \\textbf{five typed tools} (spend, growth drivers, territories, forecasts, trials), with validated inputs, provenance and refusals; passed 20/20 curated real-model checks",
+          "text_plain": "Built an AI agent answering commercial questions over 36.1M Medicaid rows through five typed tools (spend, growth drivers, territories, forecasts, trials), with validated inputs, provenance and refusals; passed 20/20 curated real-model checks",
+          "source_file": "science-body.tex",
+          "source_line": 23,
+          "source_hash": "e430d90fab0589afc396e3b24c118bbe38532f6b40b21d38c70d0bf18d221465",
+          "preferred": false
+        },
+        {
+          "id": "rx-market-pulse-8590da830522bdc6",
+          "text_tex": "Backtested quarterly spend forecasts over \\textbf{28 quarters} (chosen on 2022--23, tested on 2024--25); reported that the chosen method's 9.01\\% WAPE lost to the seasonal baseline's \\textbf{5.54\\%}",
+          "text_plain": "Backtested quarterly spend forecasts over 28 quarters (chosen on 2022--23, tested on 2024--25); reported that the chosen method's 9.01% WAPE lost to the seasonal baseline's 5.54%",
+          "source_file": "science-body.tex",
+          "source_line": 24,
+          "source_hash": "e430d90fab0589afc396e3b24c118bbe38532f6b40b21d38c70d0bf18d221465",
+          "preferred": false
+        },
+        {
+          "id": "rx-market-pulse-2b101e47a0c6e42e",
+          "text_tex": "Tested pipeline over \\textbf{36.1M} Medicaid rows feeding a \\textbf{Power BI} report (28 DAX measures) and a web dashboard; an \\textbf{AI agent} answers questions through five typed tools with refusals",
+          "text_plain": "Tested pipeline over 36.1M Medicaid rows feeding a Power BI report (28 DAX measures) and a web dashboard; an AI agent answers questions through five typed tools with refusals",
+          "source_file": "digital-body.tex",
+          "source_line": 39,
+          "source_hash": "b01b6a7c272e8b3a04b1b78689ffb40e4dd20676384a939d5f2b307e072cd7cb",
+          "preferred": false
+        }
+      ]
+    },
+    {
+      "id": "property-data-warehouse",
+      "title": "Property Data Warehouse",
+      "stack": [
+        "SQL",
+        "DuckDB",
+        "Python"
+      ],
+      "live_url": "",
+      "code_url": "https://github.com/f20230125-sudo/property-data-warehouse",
+      "source_file": "mubama-body.tex",
+      "source_hash": "92818b69c84a1447b6be79bbbd321fe0fb9c60566b8a1eaee458f9484bf524c1",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "property-data-warehouse-ab71dd8b35196c14",
+          "text_tex": "\\textbf{Data model} for 5,997 synthetic listings with \\textbf{SCD Type 2} agents (validity intervals via LEAD) and a point-in-time join: a Type 1 model would credit one agency with 495 listings instead of \\textbf{368}; \\textbf{11} assertions fail the build on bad data; 8 analytical queries with LAG and RANK OVER (PARTITION BY)",
+          "text_plain": "Data model for 5,997 synthetic listings with SCD Type 2 agents (validity intervals via LEAD) and a point-in-time join: a Type 1 model would credit one agency with 495 listings instead of 368; 11 assertions fail the build on bad data; 8 analytical queries with LAG and RANK OVER (PARTITION BY)",
+          "source_file": "mubama-body.tex",
+          "source_line": 39,
+          "source_hash": "92818b69c84a1447b6be79bbbd321fe0fb9c60566b8a1eaee458f9484bf524c1",
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "brand-forecast-studio",
+      "title": "Brand Forecast Studio",
+      "stack": [
+        "Python",
+        "LightGBM",
+        "Pydantic",
+        "TypeScript"
+      ],
+      "live_url": "https://brand-forecast-studio.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/brand-forecast-studio",
+      "source_file": "science-body.tex",
+      "source_hash": "e430d90fab0589afc396e3b24c118bbe38532f6b40b21d38c70d0bf18d221465",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "brand-forecast-studio-89c1bd1a978d71b3",
+          "text_tex": "Trained one global \\textbf{LightGBM} model on \\textbf{13,336} brand-quarters (535 brands) to forecast \\textbf{19 MSD brands in 6 business units}; rolling-origin backtest: WAPE \\textbf{17.9\\%} vs 19.4\\% for the best baseline, best method on 7 of 19 brands",
+          "text_plain": "Trained one global LightGBM model on 13,336 brand-quarters (535 brands) to forecast 19 MSD brands in 6 business units; rolling-origin backtest: WAPE 17.9% vs 19.4% for the best baseline, best method on 7 of 19 brands",
+          "source_file": "science-body.tex",
+          "source_line": 15,
+          "source_hash": "e430d90fab0589afc396e3b24c118bbe38532f6b40b21d38c70d0bf18d221465",
+          "preferred": true
+        },
+        {
+          "id": "brand-forecast-studio-c6c4726e086ef339",
+          "text_tex": "\\textbf{Conformal calibration} raised P10--P90 coverage from 70\\% to \\textbf{79.6\\%} on unseen quarters; one-command monitored pipeline with \\textbf{14 health checks} (drift PSI, reconciliation) and a run log; Pydantic what-if and a \\textbf{typed-tool assistant} (24/24 held-out questions)",
+          "text_plain": "Conformal calibration raised P10--P90 coverage from 70% to 79.6% on unseen quarters; one-command monitored pipeline with 14 health checks (drift PSI, reconciliation) and a run log; Pydantic what-if and a typed-tool assistant (24/24 held-out questions)",
+          "source_file": "science-body.tex",
+          "source_line": 16,
+          "source_hash": "e430d90fab0589afc396e3b24c118bbe38532f6b40b21d38c70d0bf18d221465",
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "gcc-market-report",
+      "title": "GCC Market Report",
+      "stack": [
+        "Python",
+        "SQL (DuckDB)",
+        "Excel",
+        "Power BI"
+      ],
+      "live_url": "https://gcc-market-report.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/gcc-market-report",
+      "source_file": "analyst-body.tex",
+      "source_hash": "e7e66ac8efbd39691cc18d4d62b75763fb08591cf8b1a9fe9db8cd559d2206f5",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "gcc-market-report-6aab4b2392359cad",
+          "text_tex": "Validated two regulators' price lists (\\textbf{8,207} Saudi SFDA and \\textbf{5,560} Bahrain NHRA products, \\textbf{22} checks, quarantine) into one DuckDB database and \\textbf{harmonized} them onto one ATC classification: spelling fixes, pack sizes parsed for 98.2\\%, one-to-one pack matching",
+          "text_plain": "Validated two regulators' price lists (8,207 Saudi SFDA and 5,560 Bahrain NHRA products, 22 checks, quarantine) into one DuckDB database and harmonized them onto one ATC classification: spelling fixes, pack sizes parsed for 98.2%, one-to-one pack matching",
+          "source_file": "analyst-body.tex",
+          "source_line": 15,
+          "source_hash": "e7e66ac8efbd39691cc18d4d62b75763fb08591cf8b1a9fe9db8cd559d2206f5",
+          "preferred": true
+        },
+        {
+          "id": "gcc-market-report-25467870c3d784b4",
+          "text_tex": "Insight: sitagliptin faces \\textbf{80} generics in Saudi Arabia, the cheapest \\textbf{52\\%} below Januvia; MSD packs cost a median 5\\% less there than in Bahrain; \\textbf{Excel} pack with a quarterly forecast entry sheet (\\textbf{1,857} values checked in Excel) and \\textbf{Power BI} (194 values checked)",
+          "text_plain": "Insight: sitagliptin faces 80 generics in Saudi Arabia, the cheapest 52% below Januvia; MSD packs cost a median 5% less there than in Bahrain; Excel pack with a quarterly forecast entry sheet (1,857 values checked in Excel) and Power BI (194 values checked)",
+          "source_file": "analyst-body.tex",
+          "source_line": 16,
+          "source_hash": "e7e66ac8efbd39691cc18d4d62b75763fb08591cf8b1a9fe9db8cd559d2206f5",
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "payer-access-intelligence",
+      "title": "Payer Access Intelligence",
+      "stack": [
+        "Python",
+        "SQL",
+        "Excel",
+        "Power BI"
+      ],
+      "live_url": "",
+      "code_url": "https://github.com/f20230125-sudo/payer-access-intelligence",
+      "source_file": "analyst-body.tex",
+      "source_hash": "e7e66ac8efbd39691cc18d4d62b75763fb08591cf8b1a9fe9db8cd559d2206f5",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "payer-access-intelligence-8d8749ad3778bcc4",
+          "text_tex": "Harmonized \\textbf{2.24M} CMS formulary records across \\textbf{367} Medicare drug plans and eight strengths; joined two 2026 snapshots to enrollment without double counting; \\textbf{20} audit checks; Excel and Power BI (29 DAX measures)",
+          "text_plain": "Harmonized 2.24M CMS formulary records across 367 Medicare drug plans and eight strengths; joined two 2026 snapshots to enrollment without double counting; 20 audit checks; Excel and Power BI (29 DAX measures)",
+          "source_file": "analyst-body.tex",
+          "source_line": 31,
+          "source_hash": "e7e66ac8efbd39691cc18d4d62b75763fb08591cf8b1a9fe9db8cd559d2206f5",
+          "preferred": true
+        },
+        {
+          "id": "payer-access-intelligence-f01f3d34951de289",
+          "text_tex": "BELSOMRA is listed in plans holding \\textbf{80.5\\%} of members (DAYVIGO 17.7\\%, QUVIVIQ 9.3\\%); its rise from 79.5\\% was enrollment mix, not new listings; \\textbf{70 plans (3.2M members)} queued for payer review",
+          "text_plain": "BELSOMRA is listed in plans holding 80.5% of members (DAYVIGO 17.7%, QUVIVIQ 9.3%); its rise from 79.5% was enrollment mix, not new listings; 70 plans (3.2M members) queued for payer review",
+          "source_file": "analyst-body.tex",
+          "source_line": 32,
+          "source_hash": "e7e66ac8efbd39691cc18d4d62b75763fb08591cf8b1a9fe9db8cd559d2206f5",
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "field-force-planner",
+      "title": "Field Force Planner",
+      "stack": [
+        "Python",
+        "SQL (DuckDB)",
+        "Excel"
+      ],
+      "live_url": "https://field-force-planner.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/field-force-planner",
+      "source_file": "analyst-body.tex",
+      "source_hash": "e7e66ac8efbd39691cc18d4d62b75763fb08591cf8b1a9fe9db8cd559d2206f5",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "field-force-planner-c8bea936b62112e3",
+          "text_tex": "Transformed the \\textbf{9.9M}-record NPI registry, placed \\textbf{98.9\\%} of providers in a county and sized a launch at \\textbf{1,310 diabetes} and \\textbf{474 oncology} reps; Excel sizing model checked in Excel on \\textbf{2,730 cells}",
+          "text_plain": "Transformed the 9.9M-record NPI registry, placed 98.9% of providers in a county and sized a launch at 1,310 diabetes and 474 oncology reps; Excel sizing model checked in Excel on 2,730 cells",
+          "source_file": "analyst-body.tex",
+          "source_line": 39,
+          "source_hash": "e7e66ac8efbd39691cc18d4d62b75763fb08591cf8b1a9fe9db8cd559d2206f5",
+          "preferred": true
+        },
+        {
+          "id": "field-force-planner-037e3e1a9a810f17",
+          "text_tex": "Aligned 3,143 counties into connected territories: workload spread \\textbf{7.5\\%} vs 274\\% by county count; \\textbf{99.6\\%} of territories within 25\\% of target",
+          "text_plain": "Aligned 3,143 counties into connected territories: workload spread 7.5% vs 274% by county count; 99.6% of territories within 25% of target",
+          "source_file": "analyst-body.tex",
+          "source_line": 40,
+          "source_hash": "e7e66ac8efbd39691cc18d4d62b75763fb08591cf8b1a9fe9db8cd559d2206f5",
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "order-desk",
+      "title": "Order Desk",
+      "stack": [
+        "Python (Flask)",
+        "PostgreSQL",
+        "React",
+        "TypeScript"
+      ],
+      "live_url": "https://order-desk-ops.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/order-desk",
+      "source_file": "madenat-body.tex",
+      "source_hash": "59a552fbb981960e985f0731a16423d98a33474fc3bba32b8ac3d89cbf5986f1",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "order-desk-68294ec10ead5fa0",
+          "text_tex": "Built an \\textbf{internal dashboard} showing which team (\\textbf{Sales, Ops, Finance}) acts next, on \\textbf{PostgreSQL} with a \\textbf{trigger-based audit log}; automated \\textbf{data entry} from PDFs and emails, \\textbf{14 reconciliation checks} caught all \\textbf{34} seeded discrepancies",
+          "text_plain": "Built an internal dashboard showing which team (Sales, Ops, Finance) acts next, on PostgreSQL with a trigger-based audit log; automated data entry from PDFs and emails, 14 reconciliation checks caught all 34 seeded discrepancies",
+          "source_file": "madenat-body.tex",
+          "source_line": 47,
+          "source_hash": "59a552fbb981960e985f0731a16423d98a33474fc3bba32b8ac3d89cbf5986f1",
+          "preferred": true
+        },
+        {
+          "id": "order-desk-5c111415a4285904",
+          "text_tex": "Built an \\textbf{internal dashboard} of \\textbf{incoming and outgoing orders} showing which team (\\textbf{Sales, Ops, Finance}) acts next",
+          "text_plain": "Built an internal dashboard of incoming and outgoing orders showing which team (Sales, Ops, Finance) acts next",
+          "source_file": "condo-body.tex",
+          "source_line": 21,
+          "source_hash": "448b8416a3e3d11d904475ff5c87fb982d53ea6d7a2ba19f82fc2517a61d9a25",
+          "preferred": false
+        },
+        {
+          "id": "order-desk-0a2ada31d1f3915d",
+          "text_tex": "Designed the \\textbf{PostgreSQL} schema: migrations, a \\textbf{trigger-based audit log}, constraints on duplicate serials and malformed TRNs",
+          "text_plain": "Designed the PostgreSQL schema: migrations, a trigger-based audit log, constraints on duplicate serials and malformed TRNs",
+          "source_file": "condo-body.tex",
+          "source_line": 22,
+          "source_hash": "448b8416a3e3d11d904475ff5c87fb982d53ea6d7a2ba19f82fc2517a61d9a25",
+          "preferred": false
+        },
+        {
+          "id": "order-desk-0b4b3938db85b74e",
+          "text_tex": "Automated \\textbf{data entry} from PDF POs and .eml emails with source-linked extraction and \\textbf{14 reconciliation checks}: caught all \\textbf{34} seeded discrepancies, zero false positives; on an unseen PO layout v1 read \\textbf{100\\%} of line items, \\textbf{14.3\\%} of header fields",
+          "text_plain": "Automated data entry from PDF POs and .eml emails with source-linked extraction and 14 reconciliation checks: caught all 34 seeded discrepancies, zero false positives; on an unseen PO layout v1 read 100% of line items, 14.3% of header fields",
+          "source_file": "condo-body.tex",
+          "source_line": 23,
+          "source_hash": "448b8416a3e3d11d904475ff5c87fb982d53ea6d7a2ba19f82fc2517a61d9a25",
+          "preferred": false
+        }
+      ]
+    },
+    {
+      "id": "loopdesk",
+      "title": "LoopDesk",
+      "stack": [
+        "Python (Flask)",
+        "PostgreSQL",
+        "Jinja"
+      ],
+      "live_url": "https://loopdesk-sigma.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/loopdesk",
+      "source_file": "madenat-body.tex",
+      "source_hash": "59a552fbb981960e985f0731a16423d98a33474fc3bba32b8ac3d89cbf5986f1",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "loopdesk-b796ed2261f14917",
+          "text_tex": "Built a \\textbf{CRM} for \\textbf{contact management} and \\textbf{pipeline tracking}: organisations, contacts and opportunities by service (battery recycling, e-waste, ITAD), owners, stage history from New to Won/Lost, dated \\textbf{follow-up tasks}, board and list views",
+          "text_plain": "Built a CRM for contact management and pipeline tracking: organisations, contacts and opportunities by service (battery recycling, e-waste, ITAD), owners, stage history from New to Won/Lost, dated follow-up tasks, board and list views",
+          "source_file": "madenat-body.tex",
+          "source_line": 22,
+          "source_hash": "59a552fbb981960e985f0731a16423d98a33474fc3bba32b8ac3d89cbf5986f1",
+          "preferred": true
+        },
+        {
+          "id": "loopdesk-da93dd39f9d0e947",
+          "text_tex": "Added a \\textbf{reporting dashboard} (open, overdue, due today, by service, AED estimates) and filtered, formula-safe \\textbf{CSV export}",
+          "text_plain": "Added a reporting dashboard (open, overdue, due today, by service, AED estimates) and filtered, formula-safe CSV export",
+          "source_file": "madenat-body.tex",
+          "source_line": 23,
+          "source_hash": "59a552fbb981960e985f0731a16423d98a33474fc3bba32b8ac3d89cbf5986f1",
+          "preferred": true
+        },
+        {
+          "id": "loopdesk-ca428ce8b93aef54",
+          "text_tex": "Designed the \\textbf{SQL schema}: forward-only migrations, composite foreign keys isolating workspaces, \\textbf{optimistic locking}, transactional \\textbf{audit history}; \\textbf{121 tests} pass on \\textbf{SQLite and PostgreSQL} in \\textbf{GitHub Actions}, plus 20 Playwright checks",
+          "text_plain": "Designed the SQL schema: forward-only migrations, composite foreign keys isolating workspaces, optimistic locking, transactional audit history; 121 tests pass on SQLite and PostgreSQL in GitHub Actions, plus 20 Playwright checks",
+          "source_file": "madenat-body.tex",
+          "source_line": 24,
+          "source_hash": "59a552fbb981960e985f0731a16423d98a33474fc3bba32b8ac3d89cbf5986f1",
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "scopedesk",
+      "title": "ScopeDesk",
+      "stack": [
+        "Python (Flask)",
+        "SQL",
+        "JavaScript"
+      ],
+      "live_url": "https://scopedesk-chi.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/scopedesk",
+      "source_file": "madenat-body.tex",
+      "source_hash": "59a552fbb981960e985f0731a16423d98a33474fc3bba32b8ac3d89cbf5986f1",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "scopedesk-d5c14036e7ac6376",
+          "text_tex": "Turns a customer enquiry and \\textbf{CSV inventory} into a reviewed scope: reconciles equipment, media and site quantities, flags \\textbf{conflicts} (80/40 requested vs 70/50 listed by site) and drafts editable \\textbf{customer clarifications}, each fact linked to its source",
+          "text_plain": "Turns a customer enquiry and CSV inventory into a reviewed scope: reconciles equipment, media and site quantities, flags conflicts (80/40 requested vs 70/50 listed by site) and drafts editable customer clarifications, each fact linked to its source",
+          "source_file": "madenat-body.tex",
+          "source_line": 31,
+          "source_hash": "59a552fbb981960e985f0731a16423d98a33474fc3bba32b8ac3d89cbf5986f1",
+          "preferred": true
+        },
+        {
+          "id": "scopedesk-78dd111e7c6d3f4a",
+          "text_tex": "Freezes \\textbf{immutable reviewed revisions} and exports them to LoopDesk as a \\textbf{SHA-256-checked JSON} handoff that creates one opportunity (repeats add no duplicates); \\textbf{100 tests}, incl. \\textbf{24 domain fixtures}, pass on both databases",
+          "text_plain": "Freezes immutable reviewed revisions and exports them to LoopDesk as a SHA-256-checked JSON handoff that creates one opportunity (repeats add no duplicates); 100 tests, incl. 24 domain fixtures, pass on both databases",
+          "source_file": "madenat-body.tex",
+          "source_line": 32,
+          "source_hash": "59a552fbb981960e985f0731a16423d98a33474fc3bba32b8ac3d89cbf5986f1",
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "followdesk",
+      "title": "FollowDesk",
+      "stack": [
+        "Python (Flask)",
+        "PostgreSQL",
+        "REST API"
+      ],
+      "live_url": "https://followdesk-phi.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/followdesk",
+      "source_file": "madenat-body.tex",
+      "source_hash": "59a552fbb981960e985f0731a16423d98a33474fc3bba32b8ac3d89cbf5986f1",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "followdesk-23facd73e4b0bf47",
+          "text_tex": "Built \\textbf{outreach plans} of up to five steps with exact-message review before delivery, pause/resume, automatic stop on reply or opt-out and outcome reports (simulated inbox: no real email is sent)",
+          "text_plain": "Built outreach plans of up to five steps with exact-message review before delivery, pause/resume, automatic stop on reply or opt-out and outcome reports (simulated inbox: no real email is sent)",
+          "source_file": "madenat-body.tex",
+          "source_line": 39,
+          "source_hash": "59a552fbb981960e985f0731a16423d98a33474fc3bba32b8ac3d89cbf5986f1",
+          "preferred": true
+        },
+        {
+          "id": "followdesk-6e19e21690ff2ead",
+          "text_tex": "Integrates with LoopDesk's workspace-scoped \\textbf{REST API} (one-use pairing code, expiring grants), records outcomes as retry-safe \\textbf{CRM history} via an \\textbf{outbox}, \\textbf{encrypted token storage}; \\textbf{89 tests} pass on both databases, \\textbf{44} live-app browser checks",
+          "text_plain": "Integrates with LoopDesk's workspace-scoped REST API (one-use pairing code, expiring grants), records outcomes as retry-safe CRM history via an outbox, encrypted token storage; 89 tests pass on both databases, 44 live-app browser checks",
+          "source_file": "madenat-body.tex",
+          "source_line": 40,
+          "source_hash": "59a552fbb981960e985f0731a16423d98a33474fc3bba32b8ac3d89cbf5986f1",
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "content-desk",
+      "title": "Content Desk",
+      "stack": [
+        "Python (Flask)",
+        "PostgreSQL",
+        "React",
+        "Jinja"
+      ],
+      "live_url": "https://content-desk-ae.vercel.app",
+      "code_url": "",
+      "source_file": "condo-body.tex",
+      "source_hash": "448b8416a3e3d11d904475ff5c87fb982d53ea6d7a2ba19f82fc2517a61d9a25",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "content-desk-0b8763644e1cc4b9",
+          "text_tex": "Built a \\textbf{content management system} with a role-based \\textbf{Writer, Reviewer, Publisher workflow}, revisions with diffs, scheduled publishing and an audit trail, plus a \\textbf{digital asset library} tracking owner, usage rights, expiry and where each file is used",
+          "text_plain": "Built a content management system with a role-based Writer, Reviewer, Publisher workflow, revisions with diffs, scheduled publishing and an audit trail, plus a digital asset library tracking owner, usage rights, expiry and where each file is used",
+          "source_file": "condo-body.tex",
+          "source_line": 30,
+          "source_hash": "448b8416a3e3d11d904475ff5c87fb982d53ea6d7a2ba19f82fc2517a61d9a25",
+          "preferred": true
+        },
+        {
+          "id": "content-desk-8b266e646a35d58e",
+          "text_tex": "\\textbf{Server-side rendered} the site (canonical URLs, \\textbf{JSON-LD}, generated sitemap): crawlers without JavaScript read \\textbf{30 of 30} pages vs \\textbf{0 of 30} as a JavaScript-only site; a health dashboard flags expired certificates, missing alt text, broken links",
+          "text_plain": "Server-side rendered the site (canonical URLs, JSON-LD, generated sitemap): crawlers without JavaScript read 30 of 30 pages vs 0 of 30 as a JavaScript-only site; a health dashboard flags expired certificates, missing alt text, broken links",
+          "source_file": "condo-body.tex",
+          "source_line": 31,
+          "source_hash": "448b8416a3e3d11d904475ff5c87fb982d53ea6d7a2ba19f82fc2517a61d9a25",
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "invoice-ready",
+      "title": "Invoice Ready",
+      "stack": [
+        "TypeScript",
+        "React",
+        "UBL 2.1 XML"
+      ],
+      "live_url": "https://invoice-ready-ae.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/invoice-ready",
+      "source_file": "condo-body.tex",
+      "source_hash": "448b8416a3e3d11d904475ff5c87fb982d53ea6d7a2ba19f82fc2517a61d9a25",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "invoice-ready-9d47d44e669d576c",
+          "text_tex": "Validates draft invoices against the Ministry of Finance's \\textbf{51 mandatory fields} and key \\textbf{Peppol PINT AE} rules before the \\textbf{2027} mandate; generates \\textbf{UBL XML} and parses it back (51 of 51 fields, 5 totals rules); shows which customer record blocks each invoice",
+          "text_plain": "Validates draft invoices against the Ministry of Finance's 51 mandatory fields and key Peppol PINT AE rules before the 2027 mandate; generates UBL XML and parses it back (51 of 51 fields, 5 totals rules); shows which customer record blocks each invoice",
+          "source_file": "condo-body.tex",
+          "source_line": 38,
+          "source_hash": "448b8416a3e3d11d904475ff5c87fb982d53ea6d7a2ba19f82fc2517a61d9a25",
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "quote-desk",
+      "title": "Quote Desk",
+      "stack": [
+        "Python (Flask)",
+        "ReportLab",
+        "python-docx",
+        "React"
+      ],
+      "live_url": "https://quote-desk-ae.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/quote-desk",
+      "source_file": "condo-body.tex",
+      "source_hash": "448b8416a3e3d11d904475ff5c87fb982d53ea6d7a2ba19f82fc2517a61d9a25",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "quote-desk-2cd13fc8f795e517",
+          "text_tex": "Generates \\textbf{PDF and Word} quotations from one approved template; checks margins, discount approvals, minimum quantities and validity, watermarking blocked drafts; versions quotes with change diffs and keeps a versioned \\textbf{clause library}",
+          "text_plain": "Generates PDF and Word quotations from one approved template; checks margins, discount approvals, minimum quantities and validity, watermarking blocked drafts; versions quotes with change diffs and keeps a versioned clause library",
+          "source_file": "condo-body.tex",
+          "source_line": 45,
+          "source_hash": "448b8416a3e3d11d904475ff5c87fb982d53ea6d7a2ba19f82fc2517a61d9a25",
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "site-health-monitor",
+      "title": "Site Health Monitor",
+      "stack": [
+        "Lighthouse",
+        "Node.js",
+        "Python",
+        "GitHub Actions"
+      ],
+      "live_url": "https://pharma-site-health.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/site-health-monitor",
+      "source_file": "condo-body.tex",
+      "source_hash": "448b8416a3e3d11d904475ff5c87fb982d53ea6d7a2ba19f82fc2517a61d9a25",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "site-health-monitor-2388c126e5f14ef0",
+          "text_tex": "Ran weekly \\textbf{Lighthouse} audits of a \\textbf{WordPress} site and 9 peers; ranked \\textbf{24} failures into a \\textbf{process-improvement} backlog",
+          "text_plain": "Ran weekly Lighthouse audits of a WordPress site and 9 peers; ranked 24 failures into a process-improvement backlog",
+          "source_file": "condo-body.tex",
+          "source_line": 52,
+          "source_hash": "448b8416a3e3d11d904475ff5c87fb982d53ea6d7a2ba19f82fc2517a61d9a25",
+          "preferred": true
+        },
+        {
+          "id": "site-health-monitor-0d56130030b36032",
+          "text_tex": "Automated weekly mobile \\textbf{Lighthouse} audits of \\textbf{msd.com (WordPress)} and \\textbf{9 pharma peers}; detected each site's platform (WordPress, Drupal, Adobe AEM) from public markup",
+          "text_plain": "Automated weekly mobile Lighthouse audits of msd.com (WordPress) and 9 pharma peers; detected each site's platform (WordPress, Drupal, Adobe AEM) from public markup",
+          "source_file": "digital-body.tex",
+          "source_line": 23,
+          "source_hash": "b01b6a7c272e8b3a04b1b78689ffb40e4dd20676384a939d5f2b307e072cd7cb",
+          "preferred": false
+        },
+        {
+          "id": "site-health-monitor-0e8f7ba5a105dd13",
+          "text_tex": "MSD leads on performance (median \\textbf{41} vs 29) but trails on \\textbf{accessibility} (90 vs 97); turned \\textbf{24} failing audits into a ranked \\textbf{process-improvement backlog} with WordPress fixes",
+          "text_plain": "MSD leads on performance (median 41 vs 29) but trails on accessibility (90 vs 97); turned 24 failing audits into a ranked process-improvement backlog with WordPress fixes",
+          "source_file": "digital-body.tex",
+          "source_line": 24,
+          "source_hash": "b01b6a7c272e8b3a04b1b78689ffb40e4dd20676384a939d5f2b307e072cd7cb",
+          "preferred": false
+        }
+      ]
+    },
+    {
+      "id": "digital-demand-pulse",
+      "title": "Digital Demand Pulse",
+      "stack": [
+        "Python",
+        "REST API",
+        "Excel",
+        "GitHub Actions"
+      ],
+      "live_url": "https://digital-demand-pulse.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/digital-demand-pulse",
+      "source_file": "digital-body.tex",
+      "source_hash": "b01b6a7c272e8b3a04b1b78689ffb40e4dd20676384a939d5f2b307e072cd7cb",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "digital-demand-pulse-f5b9d8d24172f0dc",
+          "text_tex": "Analysed \\textbf{146K} daily Wikipedia readership rows for 22 MSD, competitor and disease articles in \\textbf{English and Arabic} (2016--2026): Keytruda holds \\textbf{57\\%} of PD-1/PD-L1 attention (51\\% a year before), Januvia 3\\% in a semaglutide-led group",
+          "text_plain": "Analysed 146K daily Wikipedia readership rows for 22 MSD, competitor and disease articles in English and Arabic (2016--2026): Keytruda holds 57% of PD-1/PD-L1 attention (51% a year before), Januvia 3% in a semaglutide-led group",
+          "source_file": "digital-body.tex",
+          "source_line": 15,
+          "source_hash": "b01b6a7c272e8b3a04b1b78689ffb40e4dd20676384a939d5f2b307e072cd7cb",
+          "preferred": true
+        },
+        {
+          "id": "digital-demand-pulse-44c941b1f394f44a",
+          "text_tex": "\\textbf{Automated weekly reporting}: a scheduled job refreshes data, runs checks, flags spikes (3 matched to FDA approvals) and writes a dashboard, Excel workbook and note; found Winrevair has \\textbf{no Arabic article}",
+          "text_plain": "Automated weekly reporting: a scheduled job refreshes data, runs checks, flags spikes (3 matched to FDA approvals) and writes a dashboard, Excel workbook and note; found Winrevair has no Arabic article",
+          "source_file": "digital-body.tex",
+          "source_line": 16,
+          "source_hash": "b01b6a7c272e8b3a04b1b78689ffb40e4dd20676384a939d5f2b307e072cd7cb",
+          "preferred": true
+        }
+      ]
+    },
+    {
+      "id": "campaignops",
+      "title": "CampaignOps",
+      "stack": [
+        "Python",
+        "SQL",
+        "PHP",
+        "WordPress"
+      ],
+      "live_url": "https://campaignops-digital-solutions.vercel.app",
+      "code_url": "https://github.com/f20230125-sudo/campaignops-digital-solutions",
+      "source_file": "digital-body.tex",
+      "source_hash": "b01b6a7c272e8b3a04b1b78689ffb40e4dd20676384a939d5f2b307e072cd7cb",
+      "as_of": "2026-10-28",
+      "tagline": "",
+      "pitch": "",
+      "decisions": [],
+      "bullets": [
+        {
+          "id": "campaignops-188ba3d234412597",
+          "text_tex": "Campaign workbench over \\textbf{8,930 simulated email, web and webinar events} with DuckDB SQL metrics and quarantined data defects; a \\textbf{PHP WordPress plugin} publishing 12 assets with revisions and role checks",
+          "text_plain": "Campaign workbench over 8,930 simulated email, web and webinar events with DuckDB SQL metrics and quarantined data defects; a PHP WordPress plugin publishing 12 assets with revisions and role checks",
+          "source_file": "digital-body.tex",
+          "source_line": 31,
+          "source_hash": "b01b6a7c272e8b3a04b1b78689ffb40e4dd20676384a939d5f2b307e072cd7cb",
+          "preferred": true
+        },
+        {
+          "id": "campaignops-007da4f5af321e55",
+          "text_tex": "Automated weekly \\textbf{PDF, Excel and CSV reporting} and saved \\textbf{Gemini} briefs with validated metric references, reconciled against the dashboard",
+          "text_plain": "Automated weekly PDF, Excel and CSV reporting and saved Gemini briefs with validated metric references, reconciled against the dashboard",
+          "source_file": "digital-body.tex",
+          "source_line": 32,
+          "source_hash": "b01b6a7c272e8b3a04b1b78689ffb40e4dd20676384a939d5f2b307e072cd7cb",
+          "preferred": true
+        }
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "name": "Python",
+      "category": "languages",
+      "aliases": [
+        "python3"
+      ],
+      "projects": [
+        "backroom",
+        "brand-forecast-studio",
+        "rx-market-pulse",
+        "footnote",
+        "order-desk",
+        "loopdesk"
+      ],
+      "evidence": "local",
+      "note": "Pipelines and backends (SignalDesk's agent is TypeScript)",
+      "approved": true,
+      "id": "skill-18885f27b5af9012"
+    },
+    {
+      "name": "SQL",
+      "category": "languages",
+      "aliases": [
+        "sql queries"
+      ],
+      "projects": [
+        "rx-market-pulse",
+        "backroom",
+        "loopdesk",
+        "order-desk"
+      ],
+      "evidence": "local",
+      "note": "Warehouse SQL, migrations, typed SQL tools",
+      "approved": true,
+      "id": "skill-a7056a455639d1c7"
+    },
+    {
+      "name": "TypeScript",
+      "category": "languages",
+      "aliases": [
+        "ts"
+      ],
+      "projects": [
+        "backroom",
+        "signaldesk-ai",
+        "rx-market-pulse",
+        "brand-forecast-studio",
+        "quote-desk"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-ed0504f70a48ffe9"
+    },
+    {
+      "name": "JavaScript",
+      "category": "languages",
+      "aliases": [
+        "js"
+      ],
+      "projects": [
+        "scopedesk"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-b27ad06d123c6145"
+    },
+    {
+      "name": "PHP",
+      "category": "languages",
+      "aliases": [
+        "wordpress"
+      ],
+      "projects": [
+        "campaignops"
+      ],
+      "evidence": "local",
+      "note": "WordPress plugin: custom post types, metadata, permissions",
+      "approved": true,
+      "id": "skill-0a6a15345ad0c7e3"
+    },
+    {
+      "name": "SQL joins, CTEs and subqueries",
+      "category": "data",
+      "aliases": [
+        "joins",
+        "cte",
+        "subqueries"
+      ],
+      "projects": [
+        "rx-market-pulse"
+      ],
+      "evidence": "local",
+      "note": "rx-analytics/sql 04, 04b, 08-10",
+      "approved": true,
+      "id": "skill-abdc9120552ed799"
+    },
+    {
+      "name": "SQL window functions",
+      "category": "data",
+      "aliases": [
+        "window functions",
+        "row_number",
+        "lag"
+      ],
+      "projects": [
+        "rx-market-pulse"
+      ],
+      "evidence": "local",
+      "note": "ROW_NUMBER sql/04_dims_reference.sql:19, LAG sql/08_marts_state.sql:53; warehouse LEAD/RANK: github",
+      "approved": true,
+      "id": "skill-ac123679807d40d8"
+    },
+    {
+      "name": "SQL indexes, constraints, triggers, views, migrations",
+      "category": "data",
+      "aliases": [
+        "indexes",
+        "triggers",
+        "views",
+        "migrations",
+        "constraints"
+      ],
+      "projects": [
+        "order-desk",
+        "loopdesk",
+        "followdesk"
+      ],
+      "evidence": "local",
+      "note": "order-desk migrations 003-005; followdesk 001",
+      "approved": true,
+      "id": "skill-cac402c882a9f961"
+    },
+    {
+      "name": "Transactions and optimistic concurrency",
+      "category": "data",
+      "aliases": [
+        "transactions",
+        "optimistic locking"
+      ],
+      "projects": [
+        "loopdesk"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-38c121833a520fff"
+    },
+    {
+      "name": "PostgreSQL",
+      "category": "data",
+      "aliases": [
+        "postgres"
+      ],
+      "projects": [
+        "backroom",
+        "order-desk",
+        "loopdesk",
+        "followdesk"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-cc52d03280b7034c"
+    },
+    {
+      "name": "DuckDB",
+      "category": "data",
+      "aliases": [],
+      "projects": [
+        "rx-market-pulse",
+        "gcc-market-report"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-9eb6aa68509ef776"
+    },
+    {
+      "name": "SQLite",
+      "category": "data",
+      "aliases": [],
+      "projects": [
+        "backroom",
+        "loopdesk"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-2d2eef3e092af52b"
+    },
+    {
+      "name": "Dimensional modelling (star schema)",
+      "category": "data",
+      "aliases": [
+        "star schema",
+        "data modeling",
+        "data modelling"
+      ],
+      "projects": [
+        "rx-market-pulse",
+        "property-data-warehouse"
+      ],
+      "evidence": "local (rx powerbi.py) + github (warehouse SCD2 README)",
+      "approved": true,
+      "id": "skill-8bd4b1bf32442e1b"
+    },
+    {
+      "name": "ETL pipelines",
+      "category": "data",
+      "aliases": [
+        "etl",
+        "data pipelines",
+        "incremental loads"
+      ],
+      "projects": [
+        "rx-market-pulse",
+        "backroom"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-41c5d45762bbfb81"
+    },
+    {
+      "name": "Data cleaning and harmonization",
+      "category": "data",
+      "aliases": [
+        "data quality",
+        "data cleaning",
+        "deduplication",
+        "entity resolution"
+      ],
+      "projects": [
+        "rx-market-pulse",
+        "gcc-market-report",
+        "backroom"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-b6a2a57590d37899"
+    },
+    {
+      "name": "pandas, NumPy",
+      "category": "data",
+      "aliases": [
+        "pandas",
+        "numpy"
+      ],
+      "projects": [
+        "brand-forecast-studio",
+        "rx-market-pulse"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-f9a508cb8189153f"
+    },
+    {
+      "name": "Power BI (DAX)",
+      "category": "reporting",
+      "aliases": [
+        "power bi",
+        "dax"
+      ],
+      "projects": [
+        "rx-market-pulse",
+        "gcc-market-report"
+      ],
+      "evidence": "local",
+      "note": "Payer Access measures exist but Desktop rendering is pending: do not cite it as validated",
+      "approved": true,
+      "id": "skill-16011161335427c8"
+    },
+    {
+      "name": "Excel",
+      "category": "reporting",
+      "aliases": [
+        "spreadsheets",
+        "sumifs",
+        "index match"
+      ],
+      "projects": [
+        "rx-market-pulse",
+        "gcc-market-report",
+        "field-force-planner"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-48d53635551c8fd4"
+    },
+    {
+      "name": "Exploratory data analysis",
+      "category": "data",
+      "aliases": [
+        "eda"
+      ],
+      "projects": [
+        "rx-market-pulse",
+        "gcc-market-report"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-e354985cf655a0c9"
+    },
+    {
+      "name": "CSV import and PDF/.eml parsing",
+      "category": "data",
+      "aliases": [
+        "pdf parsing",
+        "email parsing",
+        "csv import",
+        "document extraction"
+      ],
+      "projects": [
+        "order-desk",
+        "loopdesk",
+        "backroom"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-fe83dcc5cc4e7b52"
+    },
+    {
+      "name": "PDF and Word generation (ReportLab, python-docx)",
+      "category": "data",
+      "aliases": [
+        "reportlab",
+        "python-docx",
+        "document generation"
+      ],
+      "projects": [
+        "quote-desk"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-556ea513a36506a1"
+    },
+    {
+      "name": "Gemini API; Claude via Claude Code CLI",
+      "category": "ai",
+      "aliases": [
+        "gemini",
+        "claude",
+        "llm",
+        "large language models",
+        "llm apis"
+      ],
+      "projects": [
+        "backroom",
+        "signaldesk-ai",
+        "agent-desk",
+        "footnote"
+      ],
+      "evidence": "local",
+      "note": "No Anthropic API key project; no OpenAI API project",
+      "approved": true,
+      "id": "skill-b58ecc32fba4b499"
+    },
+    {
+      "name": "Structured outputs (JSON schema)",
+      "category": "ai",
+      "aliases": [
+        "structured output",
+        "json schema",
+        "pydantic"
+      ],
+      "projects": [
+        "backroom",
+        "signaldesk-ai",
+        "agent-desk"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-af0d181267d2fcf9"
+    },
+    {
+      "name": "Tool calling / AI agents",
+      "category": "ai",
+      "aliases": [
+        "ai agents",
+        "agents",
+        "tool use",
+        "function calling",
+        "chatbot"
+      ],
+      "projects": [
+        "backroom",
+        "signaldesk-ai",
+        "rx-market-pulse"
+      ],
+      "evidence": "local",
+      "note": "Agent Desk disables CLI tools: not cited for tool calling",
+      "approved": true,
+      "id": "skill-8ab8a91a8eb46b5b"
+    },
+    {
+      "name": "RAG and retrieval (BM25)",
+      "category": "ai",
+      "aliases": [
+        "rag",
+        "retrieval",
+        "bm25",
+        "retrieval-augmented generation"
+      ],
+      "projects": [
+        "footnote",
+        "signaldesk-ai",
+        "pharma-evidence"
+      ],
+      "evidence": "local",
+      "note": "Footnote: retrieval on 150 questions; live answers a 16-pair pilot",
+      "approved": true,
+      "id": "skill-533330d4a3a4e504"
+    },
+    {
+      "name": "MCP server",
+      "category": "ai",
+      "aliases": [
+        "mcp",
+        "model context protocol"
+      ],
+      "projects": [
+        "footnote"
+      ],
+      "evidence": "local",
+      "note": "4 tools over stdio",
+      "approved": true,
+      "id": "skill-d938c8168e3acbba"
+    },
+    {
+      "name": "LLM evaluation on held-out data",
+      "category": "ai",
+      "aliases": [
+        "evaluation",
+        "held-out evaluation",
+        "prompt engineering",
+        "prompt design"
+      ],
+      "projects": [
+        "backroom",
+        "signaldesk-ai",
+        "footnote"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-1f9792bfe21b9254"
+    },
+    {
+      "name": "Prompt-injection guards",
+      "category": "ai",
+      "aliases": [
+        "prompt injection",
+        "llm security"
+      ],
+      "projects": [
+        "backroom"
+      ],
+      "evidence": "local",
+      "note": "Tested on 2 planted documents: small scope",
+      "approved": true,
+      "id": "skill-65352d80b555d31d"
+    },
+    {
+      "name": "NLP: pretrained transformer NLI (integration and evaluation)",
+      "category": "ai",
+      "aliases": [
+        "nlp",
+        "natural language processing",
+        "nli",
+        "deberta"
+      ],
+      "projects": [
+        "pharma-evidence"
+      ],
+      "evidence": "local",
+      "note": "No training or fine-tuning claim",
+      "approved": true,
+      "id": "skill-3bf219b58f6796cf"
+    },
+    {
+      "name": "ONNX Runtime (pretrained INT8 models)",
+      "category": "ai",
+      "aliases": [
+        "onnx"
+      ],
+      "projects": [
+        "pharma-evidence"
+      ],
+      "evidence": "local",
+      "note": "Uzair did not perform the quantization here",
+      "approved": true,
+      "id": "skill-816ed9ca83ac7644"
+    },
+    {
+      "name": "LightGBM (scikit-learn API)",
+      "category": "ai",
+      "aliases": [
+        "lightgbm",
+        "machine learning",
+        "gradient boosting"
+      ],
+      "projects": [
+        "brand-forecast-studio"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-986dfe18b4ee42e9"
+    },
+    {
+      "name": "Conformal prediction intervals; PSI drift monitoring",
+      "category": "ai",
+      "aliases": [
+        "conformal",
+        "calibration",
+        "psi",
+        "drift"
+      ],
+      "projects": [
+        "brand-forecast-studio"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-91a91b931630a9bf"
+    },
+    {
+      "name": "Forecasting and backtesting",
+      "category": "ai",
+      "aliases": [
+        "forecasting",
+        "backtesting",
+        "time series"
+      ],
+      "projects": [
+        "brand-forecast-studio",
+        "rx-market-pulse",
+        "quant-copilot"
+      ],
+      "evidence": "local + github (Quant Copilot)",
+      "approved": true,
+      "id": "skill-d91a9837a5e9720a"
+    },
+    {
+      "name": "Bootstrap confidence intervals, paired evaluation",
+      "category": "ai",
+      "aliases": [
+        "bootstrap",
+        "statistics"
+      ],
+      "projects": [
+        "footnote"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-52efc5b23e8df8f6"
+    },
+    {
+      "name": "Computer vision (MobileNetV2), TensorFlow Lite, edge deployment",
+      "category": "ai",
+      "aliases": [
+        "computer vision",
+        "tensorflow",
+        "tflite",
+        "raspberry pi",
+        "edge ml"
+      ],
+      "projects": [],
+      "evidence": "attested",
+      "note": "Uzair's first-author paper (tail.tex); no local artefact; keep wording exactly as in tail.tex",
+      "approved": true,
+      "id": "skill-8d550a343fb48452"
+    },
+    {
+      "name": "Null/permutation tests and p-values for backtests",
+      "category": "quant",
+      "aliases": [
+        "hypothesis testing",
+        "p-value",
+        "null test"
+      ],
+      "projects": [
+        "quant-copilot"
+      ],
+      "evidence": "github",
+      "approved": true,
+      "id": "skill-3a03bc6dbe796e3c"
+    },
+    {
+      "name": "GARCH(1,1), realized volatility, walk-forward optimisation",
+      "category": "quant",
+      "aliases": [
+        "garch",
+        "volatility",
+        "walk-forward"
+      ],
+      "projects": [
+        "quant-copilot"
+      ],
+      "evidence": "github",
+      "approved": true,
+      "id": "skill-fbc8764553cb6cf4"
+    },
+    {
+      "name": "Flask",
+      "category": "backend",
+      "aliases": [],
+      "projects": [
+        "backroom",
+        "order-desk",
+        "loopdesk",
+        "followdesk"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-c0862201e27e10f5"
+    },
+    {
+      "name": "FastAPI",
+      "category": "backend",
+      "aliases": [],
+      "projects": [
+        "agent-desk"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-2dd9eb7d9f0c1186"
+    },
+    {
+      "name": "REST APIs",
+      "category": "backend",
+      "aliases": [
+        "rest",
+        "api",
+        "backend development"
+      ],
+      "projects": [
+        "backroom",
+        "loopdesk",
+        "followdesk"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-324f92a9b7c1751f"
+    },
+    {
+      "name": "Webhooks (HMAC)",
+      "category": "backend",
+      "aliases": [
+        "webhook",
+        "hmac"
+      ],
+      "projects": [
+        "backroom"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-be749956a2582308"
+    },
+    {
+      "name": "Retry-safe outbox integration",
+      "category": "backend",
+      "aliases": [
+        "outbox",
+        "integration"
+      ],
+      "projects": [
+        "followdesk"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-964378a2b87fd9df"
+    },
+    {
+      "name": "CSRF protection, encrypted token storage",
+      "category": "backend",
+      "aliases": [
+        "csrf",
+        "security",
+        "encryption"
+      ],
+      "projects": [
+        "loopdesk",
+        "followdesk"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-bd700c5c7f382a95"
+    },
+    {
+      "name": "Redis-backed rate limiting",
+      "category": "backend",
+      "aliases": [
+        "redis",
+        "rate limiting"
+      ],
+      "projects": [
+        "signaldesk-ai"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-03cd610fb55751e7"
+    },
+    {
+      "name": "React, Next.js",
+      "category": "frontend",
+      "aliases": [
+        "react",
+        "nextjs",
+        "next.js"
+      ],
+      "projects": [
+        "backroom",
+        "rx-market-pulse",
+        "brand-forecast-studio"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-d63c049fa58228d4"
+    },
+    {
+      "name": "Accessibility testing (axe, keyboard, mobile)",
+      "category": "frontend",
+      "aliases": [
+        "accessibility",
+        "wcag",
+        "a11y"
+      ],
+      "projects": [
+        "backroom",
+        "content-desk"
+      ],
+      "evidence": "local",
+      "note": "Automated checks, not a full WCAG audit",
+      "approved": true,
+      "id": "skill-d33193900b4527a9"
+    },
+    {
+      "name": "Server-rendered pages and SEO metadata",
+      "category": "frontend",
+      "aliases": [
+        "seo",
+        "ssr"
+      ],
+      "projects": [
+        "content-desk"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-57b56af6c69b3c83"
+    },
+    {
+      "name": "Git",
+      "category": "engineering",
+      "aliases": [
+        "github",
+        "version control"
+      ],
+      "projects": [
+        "backroom",
+        "rx-market-pulse"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-b949c922b6ef9ffb"
+    },
+    {
+      "name": "GitHub Actions (CI, scheduled jobs)",
+      "category": "engineering",
+      "aliases": [
+        "ci",
+        "ci/cd",
+        "github actions",
+        "scheduled jobs"
+      ],
+      "projects": [
+        "backroom",
+        "agent-desk"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-c0a7151abd9536af"
+    },
+    {
+      "name": "pytest, Playwright",
+      "category": "engineering",
+      "aliases": [
+        "testing",
+        "pytest",
+        "playwright"
+      ],
+      "projects": [
+        "backroom",
+        "loopdesk"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-b1a5be1b370655b2"
+    },
+    {
+      "name": "Vercel, Neon (hosting)",
+      "category": "engineering",
+      "aliases": [
+        "deployment",
+        "vercel",
+        "neon"
+      ],
+      "projects": [
+        "backroom",
+        "loopdesk"
+      ],
+      "evidence": "local",
+      "note": "Not AWS/Azure",
+      "approved": true,
+      "id": "skill-73c24e3d7b87887e"
+    },
+    {
+      "name": "AI-assisted development (Claude Code, Codex)",
+      "category": "engineering",
+      "aliases": [
+        "claude code",
+        "codex"
+      ],
+      "projects": [
+        "backroom"
+      ],
+      "evidence": "local",
+      "approved": true,
+      "id": "skill-18113f7c0d7a203f"
+    }
+  ]
+}

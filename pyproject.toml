@@ -12,5 +12,5 @@ extend-exclude = ["private", ".local", ".venv"]
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
-addopts = "--basetemp=.local/pytest-m2"
+addopts = "--basetemp=.local/pytest-m3"
 cache_dir = ".local/pytest-cache"

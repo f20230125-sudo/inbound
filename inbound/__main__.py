@@ -21,10 +21,22 @@ def main(argv=None):
     ingest.add_argument("--provenance", choices=("synthetic", "private"), required=True)
     for name in ("triage", "extract", "pause", "resume", "baseline"):
         sub.add_parser(name)
+    evidence = sub.add_parser('evidence')
+    evidence.add_argument('action', choices=['import'])
+    pack = sub.add_parser('pack')
+    pack.add_argument('opportunity_id', type=int)
+    pack.add_argument('--demo', action='store_true')
     args = parser.parse_args(argv)
     try:
         settings = Settings.from_env()
         with closing(connect(settings.db_path)) as db:
+            if args.command == 'pack':
+                from inbound.packs.build import create_pack
+
+                result = create_pack(db, args.opportunity_id, demo=args.demo)
+                print(json.dumps({'id': result['id'], 'status': result['status'],
+                                  'checks': result['checks']}))
+                return 0
             if args.command in {"pause", "resume"}:
                 set_paused(db, args.command == "pause")
                 print(json.dumps({"paused": args.command == "pause"}))
@@ -44,6 +56,12 @@ def main(argv=None):
                     from inbound.extract.pipeline import extract_messages
 
                     counts.update(extract_messages(db))
+                    print(json.dumps(counts, sort_keys=True))
+                elif args.command == 'evidence':
+                    from inbound.evidence.registry import import_evidence
+
+                    registry = import_evidence(db)
+                    counts.update(projects=len(registry['projects']), skills=len(registry['skills']))
                     print(json.dumps(counts, sort_keys=True))
                 else:
                     from eval.triage_baseline import baseline

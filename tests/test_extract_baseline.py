@@ -56,5 +56,7 @@ def test_dev_only(database, tmp_path):
     triage_messages(database)
     report = baseline(database, tmp_path)
     assert report["denominator"] == 64 and report["held_out"] == "not scored"
+    assert report["applicable"] == {"correct": 266, "denominator": 266, "accuracy": 1.0}
+    assert report["full_record"]["correct"] == report["full_record"]["denominator"] == 24
     assert report["silently_wrong_deadlines"] == 0
     assert (tmp_path / "m2.json").is_file() and (tmp_path / "m2.md").is_file()

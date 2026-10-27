@@ -36,8 +36,8 @@ def test_matching_and_amendment(database, anchor, reminder):
 def test_conflicting_quotes_and_review_invalidation(database):
     original = message("P-D01")
     run(database, [original])
-    database.execute("CREATE TABLE packs (id INTEGER, opportunity_id INTEGER, status TEXT)")
-    database.execute("INSERT INTO packs VALUES(1,1,'reviewed')")
+    database.execute("INSERT INTO packs(id,opportunity_id,status,created_at) "
+                     "VALUES('1',1,'reviewed','2026-10-28')")
     database.commit()
     newer = replace(
         original,

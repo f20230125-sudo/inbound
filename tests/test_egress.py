@@ -26,9 +26,20 @@ def test_package_has_no_transports():
         tree = ast.parse(path.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
-                assert all(alias.name.split(".")[0] not in forbidden for alias in node.names)
+                for alias in node.names:
+                    if alias.name == "subprocess" and path == Path("inbound/packs/build.py"):
+                        continue
+                    assert alias.name.split(".")[0] not in forbidden
             if isinstance(node, ast.ImportFrom):
                 assert (node.module or "").split(".")[0] not in forbidden
+            if (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and isinstance(node.func.value, ast.Name)
+                and node.func.value.id == "subprocess"
+            ):
+                assert path == Path("inbound/packs/build.py")
+                assert node.func.attr == "run"
 
 
 def test_import_triage_offline(tmp_path, monkeypatch):

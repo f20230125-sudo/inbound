@@ -1,0 +1,461 @@
+{
+  "scope": "demo",
+  "projects": [
+    {
+      "id": "demo-p1",
+      "title": "Shelfmark Inventory",
+      "bullets": [
+        {
+          "id": "p1-b1",
+          "text_tex": "Built a Flask inventory service with SQLite tables for products, stock movements and purchase records.",
+          "text_plain": "Built a Flask inventory service with SQLite tables for products, stock movements and purchase records.",
+          "source_file": "synth-cases-r4.md",
+          "source_line": 358,
+          "source_hash": "1a8873f02ef058dc12b4df88077902657bed8149637ef8a94fea7c4415a39247",
+          "preferred": true
+        },
+        {
+          "id": "p1-b2",
+          "text_tex": "Added pytest checks for stock adjustments and transaction rollback when an update fails.",
+          "text_plain": "Added pytest checks for stock adjustments and transaction rollback when an update fails.",
+          "source_file": "synth-cases-r4.md",
+          "source_line": 358,
+          "source_hash": "1a8873f02ef058dc12b4df88077902657bed8149637ef8a94fea7c4415a39247",
+          "preferred": true
+        }
+      ],
+      "stack": [
+        "Python",
+        "Flask",
+        "SQLite",
+        "SQL",
+        "pytest"
+      ],
+      "tagline": "track a fictional shared pantry.",
+      "pitch": "",
+      "decisions": [
+        "partial stock updates; wrapped related writes in one transaction."
+      ],
+      "source_file": "synth-cases-r4.md",
+      "source_hash": "1a8873f02ef058dc12b4df88077902657bed8149637ef8a94fea7c4415a39247",
+      "as_of": "2026-10-28",
+      "code_url": "https://code.demo.invalid/sara-qamar/demo-p1",
+      "live_url": "https://projects.demo.invalid/sara-qamar/demo-p1"
+    },
+    {
+      "id": "demo-p2",
+      "title": "Lantern Tasks",
+      "bullets": [
+        {
+          "id": "p2-b1",
+          "text_tex": "Built a React and TypeScript task board with labelled controls, keyboard navigation and responsive CSS layouts.",
+          "text_plain": "Built a React and TypeScript task board with labelled controls, keyboard navigation and responsive CSS layouts.",
+          "source_file": "synth-cases-r4.md",
+          "source_line": 359,
+          "source_hash": "1a8873f02ef058dc12b4df88077902657bed8149637ef8a94fea7c4415a39247",
+          "preferred": true
+        },
+        {
+          "id": "p2-b2",
+          "text_tex": "Added Vitest tests for filtering tasks and preserving form validation messages.",
+          "text_plain": "Added Vitest tests for filtering tasks and preserving form validation messages.",
+          "source_file": "synth-cases-r4.md",
+          "source_line": 359,
+          "source_hash": "1a8873f02ef058dc12b4df88077902657bed8149637ef8a94fea7c4415a39247",
+          "preferred": true
+        }
+      ],
+      "stack": [
+        "React",
+        "TypeScript",
+        "HTML",
+        "CSS",
+        "accessibility",
+        "Vitest"
+      ],
+      "tagline": "organize fictional study-group tasks.",
+      "pitch": "",
+      "decisions": [
+        "focus disappeared after removing a task; moved focus to the next available control."
+      ],
+      "source_file": "synth-cases-r4.md",
+      "source_hash": "1a8873f02ef058dc12b4df88077902657bed8149637ef8a94fea7c4415a39247",
+      "as_of": "2026-10-28",
+      "code_url": "https://code.demo.invalid/sara-qamar/demo-p2",
+      "live_url": "https://projects.demo.invalid/sara-qamar/demo-p2"
+    },
+    {
+      "id": "demo-p3",
+      "title": "QuayPulse Reports",
+      "bullets": [
+        {
+          "id": "p3-b1",
+          "text_tex": "Built a Python pipeline that validates synthetic CSV records before loading them into DuckDB.",
+          "text_plain": "Built a Python pipeline that validates synthetic CSV records before loading them into DuckDB.",
+          "source_file": "synth-cases-r4.md",
+          "source_line": 360,
+          "source_hash": "1a8873f02ef058dc12b4df88077902657bed8149637ef8a94fea7c4415a39247",
+          "preferred": true
+        },
+        {
+          "id": "p3-b2",
+          "text_tex": "Used SQL window functions to calculate rolling totals and identify duplicate event sequences, with pytest checks for invalid rows.",
+          "text_plain": "Used SQL window functions to calculate rolling totals and identify duplicate event sequences, with pytest checks for invalid rows.",
+          "source_file": "synth-cases-r4.md",
+          "source_line": 360,
+          "source_hash": "1a8873f02ef058dc12b4df88077902657bed8149637ef8a94fea7c4415a39247",
+          "preferred": true
+        }
+      ],
+      "stack": [
+        "Python",
+        "SQL",
+        "SQL window functions",
+        "CSV validation",
+        "DuckDB",
+        "pytest"
+      ],
+      "tagline": "summarize invented harbor-event data.",
+      "pitch": "",
+      "decisions": [
+        "duplicate input records; introduced a stable event key and duplicate checks."
+      ],
+      "source_file": "synth-cases-r4.md",
+      "source_hash": "1a8873f02ef058dc12b4df88077902657bed8149637ef8a94fea7c4415a39247",
+      "as_of": "2026-10-28",
+      "code_url": "https://code.demo.invalid/sara-qamar/demo-p3",
+      "live_url": "https://projects.demo.invalid/sara-qamar/demo-p3"
+    },
+    {
+      "id": "demo-p4",
+      "title": "FernFind Search",
+      "bullets": [
+        {
+          "id": "p4-b1",
+          "text_tex": "Built a Python document search tool using SQLite FTS5 and BM25 ranking over fictional notes.",
+          "text_plain": "Built a Python document search tool using SQLite FTS5 and BM25 ranking over fictional notes.",
+          "source_file": "synth-cases-r4.md",
+          "source_line": 361,
+          "source_hash": "1a8873f02ef058dc12b4df88077902657bed8149637ef8a94fea7c4415a39247",
+          "preferred": true
+        },
+        {
+          "id": "p4-b2",
+          "text_tex": "Added pytest cases for empty queries, punctuation and deterministic result ordering.",
+          "text_plain": "Added pytest cases for empty queries, punctuation and deterministic result ordering.",
+          "source_file": "synth-cases-r4.md",
+          "source_line": 361,
+          "source_hash": "1a8873f02ef058dc12b4df88077902657bed8149637ef8a94fea7c4415a39247",
+          "preferred": true
+        }
+      ],
+      "stack": [
+        "Python",
+        "SQLite",
+        "SQLite FTS5",
+        "BM25",
+        "pytest"
+      ],
+      "tagline": "search invented course notes.",
+      "pitch": "",
+      "decisions": [
+        "unstable ties; added a stable document-ID tie-break."
+      ],
+      "source_file": "synth-cases-r4.md",
+      "source_hash": "1a8873f02ef058dc12b4df88077902657bed8149637ef8a94fea7c4415a39247",
+      "as_of": "2026-10-28",
+      "code_url": "https://code.demo.invalid/sara-qamar/demo-p4",
+      "live_url": "https://projects.demo.invalid/sara-qamar/demo-p4"
+    },
+    {
+      "id": "demo-p5",
+      "title": "Glassline Delivery Lab",
+      "bullets": [
+        {
+          "id": "p5-b1",
+          "text_tex": "Containerized a demonstration Flask service with Docker and documented its Linux startup procedure.",
+          "text_plain": "Containerized a demonstration Flask service with Docker and documented its Linux startup procedure.",
+          "source_file": "synth-cases-r4.md",
+          "source_line": 362,
+          "source_hash": "1a8873f02ef058dc12b4df88077902657bed8149637ef8a94fea7c4415a39247",
+          "preferred": true
+        },
+        {
+          "id": "p5-b2",
+          "text_tex": "Created a GitHub Actions workflow that runs tests and builds the container image.",
+          "text_plain": "Created a GitHub Actions workflow that runs tests and builds the container image.",
+          "source_file": "synth-cases-r4.md",
+          "source_line": 362,
+          "source_hash": "1a8873f02ef058dc12b4df88077902657bed8149637ef8a94fea7c4415a39247",
+          "preferred": true
+        }
+      ],
+      "stack": [
+        "Python",
+        "Flask",
+        "Docker",
+        "Linux",
+        "GitHub Actions",
+        "CI/CD"
+      ],
+      "tagline": "demonstrate a repeatable build for a fictional service.",
+      "pitch": "",
+      "decisions": [
+        "inconsistent dependency versions; pinned the demonstration dependencies."
+      ],
+      "source_file": "synth-cases-r4.md",
+      "source_hash": "1a8873f02ef058dc12b4df88077902657bed8149637ef8a94fea7c4415a39247",
+      "as_of": "2026-10-28",
+      "code_url": "https://code.demo.invalid/sara-qamar/demo-p5",
+      "live_url": "https://projects.demo.invalid/sara-qamar/demo-p5"
+    }
+  ],
+  "skills": [
+    {
+      "id": "demo-skill-python",
+      "name": "Python",
+      "aliases": [],
+      "projects": [
+        "demo-p1",
+        "demo-p3",
+        "demo-p4",
+        "demo-p5"
+      ],
+      "approved": true,
+      "category": "languages",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-flask",
+      "name": "Flask",
+      "aliases": [],
+      "projects": [
+        "demo-p1",
+        "demo-p5"
+      ],
+      "approved": true,
+      "category": "backend",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-sqlite",
+      "name": "SQLite",
+      "aliases": [],
+      "projects": [
+        "demo-p1",
+        "demo-p4"
+      ],
+      "approved": true,
+      "category": "engineering",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-sql",
+      "name": "SQL",
+      "aliases": [],
+      "projects": [
+        "demo-p1",
+        "demo-p3"
+      ],
+      "approved": true,
+      "category": "data",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-pytest",
+      "name": "pytest",
+      "aliases": [],
+      "projects": [
+        "demo-p1",
+        "demo-p3",
+        "demo-p4"
+      ],
+      "approved": true,
+      "category": "engineering",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-react",
+      "name": "React",
+      "aliases": [],
+      "projects": [
+        "demo-p2"
+      ],
+      "approved": true,
+      "category": "frontend",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-typescript",
+      "name": "TypeScript",
+      "aliases": [],
+      "projects": [
+        "demo-p2"
+      ],
+      "approved": true,
+      "category": "languages",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-html",
+      "name": "HTML",
+      "aliases": [],
+      "projects": [
+        "demo-p2"
+      ],
+      "approved": true,
+      "category": "frontend",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-css",
+      "name": "CSS",
+      "aliases": [],
+      "projects": [
+        "demo-p2"
+      ],
+      "approved": true,
+      "category": "frontend",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-accessibility",
+      "name": "accessibility",
+      "aliases": [
+        "accessible HTML/CSS",
+        "a11y",
+        "accessible"
+      ],
+      "projects": [
+        "demo-p2"
+      ],
+      "approved": true,
+      "category": "frontend",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-vitest",
+      "name": "Vitest",
+      "aliases": [],
+      "projects": [
+        "demo-p2"
+      ],
+      "approved": true,
+      "category": "engineering",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-sql-window-functions",
+      "name": "SQL window functions",
+      "aliases": [],
+      "projects": [
+        "demo-p3"
+      ],
+      "approved": true,
+      "category": "engineering",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-csv-validation",
+      "name": "CSV validation",
+      "aliases": [],
+      "projects": [
+        "demo-p3"
+      ],
+      "approved": true,
+      "category": "engineering",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-duckdb",
+      "name": "DuckDB",
+      "aliases": [],
+      "projects": [
+        "demo-p3"
+      ],
+      "approved": true,
+      "category": "engineering",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-sqlite-fts5",
+      "name": "SQLite FTS5",
+      "aliases": [],
+      "projects": [
+        "demo-p4"
+      ],
+      "approved": true,
+      "category": "engineering",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-bm25",
+      "name": "BM25",
+      "aliases": [],
+      "projects": [
+        "demo-p4"
+      ],
+      "approved": true,
+      "category": "engineering",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-docker",
+      "name": "Docker",
+      "aliases": [],
+      "projects": [
+        "demo-p5"
+      ],
+      "approved": true,
+      "category": "engineering",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-linux",
+      "name": "Linux",
+      "aliases": [],
+      "projects": [
+        "demo-p5"
+      ],
+      "approved": true,
+      "category": "engineering",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-github-actions",
+      "name": "GitHub Actions",
+      "aliases": [],
+      "projects": [
+        "demo-p5"
+      ],
+      "approved": true,
+      "category": "engineering",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    },
+    {
+      "id": "demo-skill-ci-cd",
+      "name": "CI/CD",
+      "aliases": [],
+      "projects": [
+        "demo-p5"
+      ],
+      "approved": true,
+      "category": "engineering",
+      "note": "Fictional approval: synth-cases-r4.md §4"
+    }
+  ],
+  "applicant": {
+    "name": "Sara Qamar",
+    "student_id": "DEMO-2023-CS-0042",
+    "email": "sara.qamar@applicant.demo.invalid",
+    "location": "Lumen Bay",
+    "education": "BSc Computer Science, Lumen Bay Institute of Computing, September 2023–July 2027",
+    "education_status": "Expected graduation July 2027",
+    "profile": "Computer science student building web applications, data tools and search systems with Python, TypeScript and SQL.",
+    "portfolio": "https://portfolio.demo.invalid/sara-qamar",
+    "default_filename": "DEMO-2023-CS-0042-Sara-Qamar-<Company>.pdf",
+    "experience": null,
+    "research": null,
+    "certifications": null
+  }
+}

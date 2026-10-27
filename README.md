@@ -2,7 +2,8 @@
 
 Inbound is a personal inbox desk. M1 imports local mail exports and classifies messages.
 M2 extracts evidence-bearing fields, bounded PDF/DOCX JDs and opportunity revisions.
-It runs offline and makes no outward actions. Application packs and the desk UI are later work.
+M3 imports approved public evidence and builds verified, offline application previews.
+It makes no outward actions. The desk UI remains later work.
 
 Use the supplied Python 3.14 venv from this repository in PowerShell:
 
@@ -17,10 +18,13 @@ python -m inbound triage
 python -m inbound extract
 python -m inbound baseline
 python -m eval.extract_baseline
+python -m inbound evidence import
+python -m inbound pack 1 --demo
+python -m eval.pack_eval
 python -m inbound pause
 python -m inbound resume
 ruff check .
-pytest --basetemp=.local/pytest-m2
+pytest --basetemp=.local/pytest-m3
 ```
 
 The first export import adds 190 messages; repeats and the five EML alternates add zero.
@@ -40,7 +44,7 @@ deadline amendments supersede prior values; competing statements retain quoted c
 Quoted relative dates retain their original sent-time anchor. Missing/unreadable JDs block
 review. `inbound.extract.pipeline.opportunity_state(db, id, clock=...)` computes expiry;
 an unknown/conflicting deadline yields `expired=None`. New revisions invalidate reviewed
-packs through a table-presence hook; pack building is not implemented in M2.
+packs through the M2 invalidation hook. M3 binds each pack to its source revision.
 
 `synth/cases.json` is the gold authority transcribed from the frozen manifest and audit
 (`r4-20261028-01`, including the P-H25 unknown stipend). It contains source definitions,
@@ -55,7 +59,8 @@ without a stored root remain blocked until the source is reimported.
 Provenance is required import configuration, never a message header. The model payload
 boundary denies private, unknown and mixed sources. The offline model stub raises on a
 cache miss. Inherited API keys and notifier flags cannot enable networking. Tests deny
-sockets, DNS and subprocesses. Pause persists in SQLite and blocks work at stage boundaries;
+sockets, DNS and subprocesses except the exact cached, untrusted Tectonic build.
+Pause persists in SQLite and blocks work at stage boundaries;
 pause/resume remain available. Run records contain counts and error types, never bodies or
 exception messages.
 
@@ -63,3 +68,30 @@ exception messages.
 Environment files are not loaded automatically. A configured writable root must be on D:.
 Forward-only migrations live in `inbound/migrations/`; applied migration hashes are checked.
 No real mail is included. Claude alone runs imports against real data and makes commits.
+
+M3 keeps public evidence and fictional demo evidence in separate registry scopes. `evidence import`
+reads only manifest-approved CV project files and the public portfolio data; it never edits those
+sources. It imports 21 approved CV projects (51 bullet variants) and 52 curated skills. A missing
+portfolio project keeps its CV evidence. Tests use committed snapshots; the sole source-file test
+hashes every public CV TeX file before and after a demo build. `python -m inbound.evidence.snapshot`
+regenerates snapshots from the reviewed sources and fictional manifest.
+
+`pack <opportunity_id> --demo` uses Sara Qamar's five fictional projects and replaces every identity,
+education, experience, research, link and PDF metadata record. Omit `--demo` for a local public-CV
+pack after importing evidence; Claude runs that real-CV check. Fixed real parts must match
+`evidence/approved_fixed.yaml` hashes. Approved profiles may require Uzair's review; verification
+reports that flag and whether a tailored family was available. Requirement text never supplies
+CV claims. Model ranking has an interface only and is reported as **not run**.
+
+Pack files live under `.local/packs/<id>/`: `body.tex`, generated/copy-checked parts, the named PDF,
+`build.log`, `selection.json`, `verification.json` and capped `answers.txt`. Tectonic runs with
+`--only-cached --untrusted`, the pre-filled `.local/tectonic-cache/cache` cache and a 120-second
+timeout. A failed compilation or verification leaves a blocked pack and a failed ledger row.
+Blocked JDs produce visibly labelled provisional previews, which require blocker acknowledgement
+before review. A newer opportunity revision makes the prior reviewed pack stale and requires a
+rebuild. `inbound.packs.build.set_status` enforces those rules; it never submits anything.
+
+`python -m eval.pack_eval` writes `.local/reports/m3.json` and `m3.md` for the eight frozen cases,
+retaining failures in the denominator. Ranking coverage uses the manifest's human support labels
+and the fixed p1–p4/two-bullet/all-approved-skills baseline. These are fictional pack results, not
+real-mail evaluation. `.local/reports/m3-cv-hashes.json` contains all before/after source hashes.

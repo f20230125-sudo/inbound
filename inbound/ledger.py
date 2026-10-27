@@ -15,6 +15,9 @@ COUNTS = {
     "revisions",
     "blocked",
     "attacks",
+    "built",
+    "projects",
+    "skills",
 }
 
 
@@ -24,7 +27,8 @@ def timestamp():
 
 @contextmanager
 def run(db, kind):
-    if kind not in {"import", "triage", "extract", "baseline", "extract_baseline"}:
+    if kind not in {"import", "triage", "extract", "baseline", "extract_baseline",
+                    "evidence", "pack", "pack_eval"}:
         raise ValueError("Unknown run kind")
     cursor = db.execute(
         "INSERT INTO runs(kind,started_at,status) VALUES (?,?,'running')", (kind, timestamp())
