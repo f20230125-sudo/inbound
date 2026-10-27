@@ -4,7 +4,18 @@ import json
 from contextlib import contextmanager
 from datetime import UTC, datetime
 
-COUNTS = {"imported", "unchanged", "changed", "triaged", "evaluated"}
+COUNTS = {
+    "imported",
+    "unchanged",
+    "changed",
+    "triaged",
+    "evaluated",
+    "messages",
+    "opportunities",
+    "revisions",
+    "blocked",
+    "attacks",
+}
 
 
 def timestamp():
@@ -13,7 +24,7 @@ def timestamp():
 
 @contextmanager
 def run(db, kind):
-    if kind not in {"import", "triage", "baseline"}:
+    if kind not in {"import", "triage", "extract", "baseline", "extract_baseline"}:
         raise ValueError("Unknown run kind")
     cursor = db.execute(
         "INSERT INTO runs(kind,started_at,status) VALUES (?,?,'running')", (kind, timestamp())

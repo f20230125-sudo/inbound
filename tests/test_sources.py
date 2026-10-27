@@ -13,7 +13,8 @@ def test_export_grammar_and_timestamps():
     by_id = {m.provider_id: m for m in messages}
     assert by_id["P-H10"].sent_at != by_id["P-H10"].received_at
     assert not by_id["P-H08"].body_complete
-    assert by_id["P-D15"].attachments[0].parse_status == "missing"
+    assert by_id["P-D15"].attachments[0].bytes_available
+    assert by_id["P-D15"].attachments[0].parse_status == "unsupported"  # Not parsed at import.
     assert by_id["P-D01"].sent_at == by_id["P-D01"].received_at
 
 

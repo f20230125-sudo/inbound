@@ -9,6 +9,7 @@ from email.policy import SMTP
 from email.utils import format_datetime
 from pathlib import Path
 
+from synth.documents import attachment_bytes
 from synth.families import render
 
 CASES = Path(__file__).with_name("cases.json")
@@ -69,9 +70,13 @@ def eml(case, filename):
             subtype="html",
         )
     for attachment in source["attachments"]:
-        # M1 includes declarations only, deliberately no fabricated PDF/DOCX bytes.
         major, minor = attachment["mime"].split("/", 1)
-        message.add_attachment(b"", maintype=major, subtype=minor, filename=attachment["name"])
+        message.add_attachment(
+            attachment_bytes(case, attachment) or b"",
+            maintype=major,
+            subtype=minor,
+            filename=attachment["name"],
+        )
     if message.is_multipart():
         message.set_boundary("INBOUND-SYNTHETIC-" + case["id"])
     data = message.as_bytes()
@@ -91,10 +96,15 @@ def generate(root=Path("fixtures")):
         (root / folder).mkdir(parents=True, exist_ok=True)
 
     def write(name, data):
+        (root / name).parent.mkdir(parents=True, exist_ok=True)
         (root / name).write_bytes(data)
         hashes[name] = hashlib.sha256(data).hexdigest()
 
     for case in cases:
+        for attachment in case["message"]["attachments"]:
+            data = attachment_bytes(case, attachment)
+            if data is not None:
+                write("export_sample/" + attachment["bytes_path"], data)
         split = case["split"]
         membership[split].append(case["id"])
         prefix = {"dev": "dev", "held-out": "held", "attack": "attack"}[split]
@@ -121,7 +131,7 @@ def generate(root=Path("fixtures")):
         "eml_alternates": EML_MAP,
         "sha256": hashes,
         "cases_sha256": hashlib.sha256(CASES.read_bytes()).hexdigest(),
-        "attachments": "metadata only in M1; binary documents deferred to M2",
+        "attachments": "M2 deterministic PDF/DOCX bytes; missing documents stay missing",
     }
     (root / "manifest.json").write_bytes(
         (json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8")

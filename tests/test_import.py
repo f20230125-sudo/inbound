@@ -63,7 +63,7 @@ def test_migrations_are_applied_once(tmp_path):
     db = connect(path)
     db.close()
     db = connect(path)
-    assert db.execute("SELECT count(*) FROM schema_migrations").fetchone()[0] == 1
+    assert db.execute("SELECT count(*) FROM schema_migrations").fetchone()[0] == 2
     db.execute("UPDATE schema_migrations SET sha256='altered'")
     db.commit()
     db.close()
@@ -78,3 +78,19 @@ def test_import_rejects_mixed_provenance(database):
             database, [message, replace(message, provider_id="private-like", source="private")]
         )
     assert database.execute("SELECT count(*) FROM messages").fetchone()[0] == 0
+
+
+def test_unchanged_import_hydrates_m1_attachment_location(database):
+    message = next(
+        m for m in load(Path("fixtures/export_sample"), "synthetic") if m.provider_id == "P-D15"
+    )
+    old = replace(
+        message,
+        attachments=tuple(
+            replace(a, import_root=None, bytes_available=False) for a in message.attachments
+        ),
+    )
+    import_messages(database, [old])
+    assert import_messages(database, [message])["unchanged"] == 1
+    row = database.execute("SELECT import_root,bytes_available FROM attachments").fetchone()
+    assert row["import_root"] == message.attachments[0].import_root and row["bytes_available"]

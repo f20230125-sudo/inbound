@@ -19,7 +19,7 @@ def main(argv=None):
     ingest.add_argument("--source", choices=("export", "eml"), required=True)
     ingest.add_argument("--path", type=Path, required=True)
     ingest.add_argument("--provenance", choices=("synthetic", "private"), required=True)
-    for name in ("triage", "pause", "resume", "baseline"):
+    for name in ("triage", "extract", "pause", "resume", "baseline"):
         sub.add_parser(name)
     args = parser.parse_args(argv)
     try:
@@ -39,6 +39,11 @@ def main(argv=None):
                     counts["triaged"] = triage_messages(
                         db, personal_contacts=settings.personal_contacts
                     )
+                    print(json.dumps(counts, sort_keys=True))
+                elif args.command == "extract":
+                    from inbound.extract.pipeline import extract_messages
+
+                    counts.update(extract_messages(db))
                     print(json.dumps(counts, sort_keys=True))
                 else:
                     from eval.triage_baseline import baseline
