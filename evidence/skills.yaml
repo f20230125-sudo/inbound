@@ -1,0 +1,72 @@
+# Skill -> evidence map for Uzair's REAL packs. A skill may appear on a generated CV only if
+# approved: true. Written by Claude (28 Oct 2026, 00:10), corrected after Codex's read-only audit
+# (D:\claude-workspace\neovara\personal-agent\codex-round5a-evidence.md, 00:35).
+# evidence: local = source code inspected on this PC; github = README read on GitHub on 27 Oct 2026
+#           (not cloned locally); attested = Uzair's own research claim, no local artefact.
+# Deliberately absent (no evidence): Matplotlib, Seaborn, Kubernetes, PyTorch, AWS, Azure, Docker,
+# OpenAI API, vector databases, model training of transformers, performing quantization yourself.
+
+skills:
+  # Languages
+  - {name: Python, category: languages, aliases: [python3], projects: [backroom, brand-forecast-studio, rx-market-pulse, footnote, order-desk, loopdesk], evidence: local, note: "Pipelines and backends (SignalDesk's agent is TypeScript)", approved: true}
+  - {name: SQL, category: languages, aliases: [sql queries], projects: [rx-market-pulse, backroom, loopdesk, order-desk], evidence: local, note: "Warehouse SQL, migrations, typed SQL tools", approved: true}
+  - {name: TypeScript, category: languages, aliases: [ts], projects: [backroom, signaldesk-ai, rx-market-pulse, brand-forecast-studio, quote-desk], evidence: local, approved: true}
+  - {name: JavaScript, category: languages, aliases: [js], projects: [scopedesk], evidence: local, approved: true}
+  - {name: PHP, category: languages, aliases: [wordpress], projects: [campaignops], evidence: local, note: "WordPress plugin: custom post types, metadata, permissions", approved: true}
+
+  # Data and SQL
+  - {name: "SQL joins, CTEs and subqueries", category: data, aliases: [joins, cte, subqueries], projects: [rx-market-pulse], evidence: local, note: "rx-analytics/sql 04, 04b, 08-10", approved: true}
+  - {name: "SQL window functions", category: data, aliases: [window functions, row_number, lag], projects: [rx-market-pulse], evidence: local, note: "ROW_NUMBER sql/04_dims_reference.sql:19, LAG sql/08_marts_state.sql:53; warehouse LEAD/RANK: github", approved: true}
+  - {name: "SQL indexes, constraints, triggers, views, migrations", category: data, aliases: [indexes, triggers, views, migrations, constraints], projects: [order-desk, loopdesk, followdesk], evidence: local, note: "order-desk migrations 003-005; followdesk 001", approved: true}
+  - {name: "Transactions and optimistic concurrency", category: data, aliases: [transactions, optimistic locking], projects: [loopdesk], evidence: local, approved: true}
+  - {name: PostgreSQL, category: data, aliases: [postgres], projects: [backroom, order-desk, loopdesk, followdesk], evidence: local, approved: true}
+  - {name: DuckDB, category: data, aliases: [], projects: [rx-market-pulse, gcc-market-report], evidence: local, approved: true}
+  - {name: SQLite, category: data, aliases: [], projects: [backroom, loopdesk], evidence: local, approved: true}
+  - {name: "Dimensional modelling (star schema)", category: data, aliases: [star schema, data modeling, data modelling], projects: [rx-market-pulse, property-data-warehouse], evidence: "local (rx powerbi.py) + github (warehouse SCD2 README)", approved: true}
+  - {name: ETL pipelines, category: data, aliases: [etl, data pipelines, incremental loads], projects: [rx-market-pulse, backroom], evidence: local, approved: true}
+  - {name: "Data cleaning and harmonization", category: data, aliases: [data quality, data cleaning, deduplication, entity resolution], projects: [rx-market-pulse, gcc-market-report, backroom], evidence: local, approved: true}
+  - {name: "pandas, NumPy", category: data, aliases: [pandas, numpy], projects: [brand-forecast-studio, rx-market-pulse], evidence: local, approved: true}
+  - {name: "Power BI (DAX)", category: reporting, aliases: [power bi, dax], projects: [rx-market-pulse, gcc-market-report], evidence: local, note: "Payer Access measures exist but Desktop rendering is pending: do not cite it as validated", approved: true}
+  - {name: Excel, category: reporting, aliases: [spreadsheets, sumifs, index match], projects: [rx-market-pulse, gcc-market-report, field-force-planner], evidence: local, approved: true}
+  - {name: "Exploratory data analysis", category: data, aliases: [eda], projects: [rx-market-pulse, gcc-market-report], evidence: local, approved: true}
+  - {name: "CSV import and PDF/.eml parsing", category: data, aliases: [pdf parsing, email parsing, csv import, document extraction], projects: [order-desk, loopdesk, backroom], evidence: local, approved: true}
+  - {name: "PDF and Word generation (ReportLab, python-docx)", category: data, aliases: [reportlab, python-docx, document generation], projects: [quote-desk], evidence: local, approved: true}
+
+  # AI and ML
+  - {name: "Gemini API; Claude via Claude Code CLI", category: ai, aliases: [gemini, claude, llm, large language models, llm apis], projects: [backroom, signaldesk-ai, agent-desk, footnote], evidence: local, note: "No Anthropic API key project; no OpenAI API project", approved: true}
+  - {name: "Structured outputs (JSON schema)", category: ai, aliases: [structured output, json schema, pydantic], projects: [backroom, signaldesk-ai, agent-desk], evidence: local, approved: true}
+  - {name: "Tool calling / AI agents", category: ai, aliases: [ai agents, agents, tool use, function calling, chatbot], projects: [backroom, signaldesk-ai, rx-market-pulse], evidence: local, note: "Agent Desk disables CLI tools: not cited for tool calling", approved: true}
+  - {name: "RAG and retrieval (BM25)", category: ai, aliases: [rag, retrieval, bm25, retrieval-augmented generation], projects: [footnote, signaldesk-ai, pharma-evidence], evidence: local, note: "Footnote: retrieval on 150 questions; live answers a 16-pair pilot", approved: true}
+  - {name: "MCP server", category: ai, aliases: [mcp, model context protocol], projects: [footnote], evidence: local, note: "4 tools over stdio", approved: true}
+  - {name: "LLM evaluation on held-out data", category: ai, aliases: [evaluation, held-out evaluation, prompt engineering, prompt design], projects: [backroom, signaldesk-ai, footnote], evidence: local, approved: true}
+  - {name: "Prompt-injection guards", category: ai, aliases: [prompt injection, llm security], projects: [backroom], evidence: local, note: "Tested on 2 planted documents: small scope", approved: true}
+  - {name: "NLP: pretrained transformer NLI (integration and evaluation)", category: ai, aliases: [nlp, natural language processing, nli, deberta], projects: [pharma-evidence], evidence: local, note: "No training or fine-tuning claim", approved: true}
+  - {name: "ONNX Runtime (pretrained INT8 models)", category: ai, aliases: [onnx], projects: [pharma-evidence], evidence: local, note: "Uzair did not perform the quantization here", approved: true}
+  - {name: "LightGBM (scikit-learn API)", category: ai, aliases: [lightgbm, machine learning, gradient boosting], projects: [brand-forecast-studio], evidence: local, approved: true}
+  - {name: "Conformal prediction intervals; PSI drift monitoring", category: ai, aliases: [conformal, calibration, psi, drift], projects: [brand-forecast-studio], evidence: local, approved: true}
+  - {name: "Forecasting and backtesting", category: ai, aliases: [forecasting, backtesting, time series], projects: [brand-forecast-studio, rx-market-pulse, quant-copilot], evidence: "local + github (Quant Copilot)", approved: true}
+  - {name: "Bootstrap confidence intervals, paired evaluation", category: ai, aliases: [bootstrap, statistics], projects: [footnote], evidence: local, approved: true}
+  - {name: "Computer vision (MobileNetV2), TensorFlow Lite, edge deployment", category: ai, aliases: [computer vision, tensorflow, tflite, raspberry pi, edge ml], projects: [], evidence: attested, note: "Uzair's first-author paper (tail.tex); no local artefact; keep wording exactly as in tail.tex", approved: true}
+
+  # Quant (Quant Copilot lives on GitHub only; README read 27 Oct 2026)
+  - {name: "Null/permutation tests and p-values for backtests", category: quant, aliases: [hypothesis testing, p-value, null test], projects: [quant-copilot], evidence: github, approved: true}
+  - {name: "GARCH(1,1), realized volatility, walk-forward optimisation", category: quant, aliases: [garch, volatility, walk-forward], projects: [quant-copilot], evidence: github, approved: true}
+
+  # Backend and web
+  - {name: Flask, category: backend, aliases: [], projects: [backroom, order-desk, loopdesk, followdesk], evidence: local, approved: true}
+  - {name: FastAPI, category: backend, aliases: [], projects: [agent-desk], evidence: local, approved: true}
+  - {name: "REST APIs", category: backend, aliases: [rest, api, backend development], projects: [backroom, loopdesk, followdesk], evidence: local, approved: true}
+  - {name: "Webhooks (HMAC)", category: backend, aliases: [webhook, hmac], projects: [backroom], evidence: local, approved: true}
+  - {name: "Retry-safe outbox integration", category: backend, aliases: [outbox, integration], projects: [followdesk], evidence: local, approved: true}
+  - {name: "CSRF protection, encrypted token storage", category: backend, aliases: [csrf, security, encryption], projects: [loopdesk, followdesk], evidence: local, approved: true}
+  - {name: "Redis-backed rate limiting", category: backend, aliases: [redis, rate limiting], projects: [signaldesk-ai], evidence: local, approved: true}
+  - {name: "React, Next.js", category: frontend, aliases: [react, nextjs, next.js], projects: [backroom, rx-market-pulse, brand-forecast-studio], evidence: local, approved: true}
+  - {name: "Accessibility testing (axe, keyboard, mobile)", category: frontend, aliases: [accessibility, wcag, a11y], projects: [backroom, content-desk], evidence: local, note: "Automated checks, not a full WCAG audit", approved: true}
+  - {name: "Server-rendered pages and SEO metadata", category: frontend, aliases: [seo, ssr], projects: [content-desk], evidence: local, approved: true}
+
+  # Engineering
+  - {name: Git, category: engineering, aliases: [github, version control], projects: [backroom, rx-market-pulse], evidence: local, approved: true}
+  - {name: "GitHub Actions (CI, scheduled jobs)", category: engineering, aliases: [ci, ci/cd, github actions, scheduled jobs], projects: [backroom, agent-desk], evidence: local, approved: true}
+  - {name: "pytest, Playwright", category: engineering, aliases: [testing, pytest, playwright], projects: [backroom, loopdesk], evidence: local, approved: true}
+  - {name: "Vercel, Neon (hosting)", category: engineering, aliases: [deployment, vercel, neon], projects: [backroom, loopdesk], evidence: local, note: "Not AWS/Azure", approved: true}
+  - {name: "AI-assisted development (Claude Code, Codex)", category: engineering, aliases: [claude code, codex], projects: [backroom], evidence: local, approved: true}

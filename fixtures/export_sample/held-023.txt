@@ -1,0 +1,23 @@
+id: P-H23
+thread_id: h23
+date: 2026-10-27T02:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Call for CV - PS II – Second Semester 2026-2027 - Morrowfinch Systems,Valehaven
+labels: 
+attachments: jd-P-H23.pdf|application/pdf|attachments/jd-P-H23.pdf; brochure-P-H23.pdf|application/pdf|attachments/brochure-P-H23.pdf
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Call for CV - PS II – Second Semester 2026-2027 - Morrowfinch Systems,Valehaven
+Morrowfinch Systems has expressed their interest to hire Students for PS II. Location: Valehaven
+JD location:
+· Attached
+*Mode of Internship:* Hybrid
+· AED2600 per month
+*https://forms.gle/SYNTHETIC-NOT-LIVE-P-H23 <https://forms.gle/SYNTHETIC-NOT-LIVE-P-H23>*
+*CV Submission Deadline*: 29 October 2026, 09:30 AM
+Mira Sen
+Synthetic PS coordinator

@@ -1,0 +1,29 @@
+id: P-H07
+thread_id: h07
+date: 2026-10-27T02:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Call for CV - PS II – Second Semester 2026-2027 - Brindlewave, Labs,Lumen Bay - Frontend Intern
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Call for CV - PS II – Second Semester 2026-2027 - Brindlewave, Labs,Lumen Bay - Frontend Intern
+Brindlewave, Labs has expressed their interest to hire Students for PS II. Location: Lumen Bay
+Intake details
+*Mode of Internship:* In person
+*https://forms.gle/SYNTHETIC-NOT-LIVE-P-H07 <https://forms.gle/SYNTHETIC-NOT-LIVE-P-H07>*
+Allowance details:
+· AED1900 per month
+*Job Title & Expected Skills*
+(1) Frontend Intern
+Requirements: React; TypeScript; accessible HTML/CSS
+
+
+*CV Submission Deadline*: 26 October 2026, 19:00 UTC
+Mira Sen
+Synthetic PS coordinator
+

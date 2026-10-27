@@ -1,0 +1,25 @@
+id: P-D18
+thread_id: d18
+date: 2026-10-27T02:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Call for CV - PS II – Second Semester 2026-2027 - Coppercloud Metrics,Lumen Bay - Search Intern
+labels: 
+attachments: données-P-D18.docx|application/vnd.openxmlformats-officedocument.wordprocessingml.document|attachments/données-P-D18.docx
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Call for CV - PS II – Second Semester 2026-2027 - Coppercloud Metrics,Lumen Bay - Search Intern
+Coppercloud Metrics has expressed their interest to hire Students for PS II. Location: Lumen Bay
+The role description is supplied in a Word document.
+*https://forms.gle/SYNTHETIC-NOT-LIVE-P-D18 <https://forms.gle/SYNTHETIC-NOT-LIVE-P-D18>*
+· AED2100 per month
+*Mode of Internship:* Remote
+*JD*
+· Attached
+
+*CV Submission Deadline*: 08:00AM, 28 October 2026
+Mira Sen
+Synthetic PS coordinator

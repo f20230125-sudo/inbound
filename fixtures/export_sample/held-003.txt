@@ -1,0 +1,29 @@
+id: P-H03
+thread_id: h03
+date: 2026-10-27T02:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Call for CV - PS II – Second Semester 2026-2027 - Brindlewave, Labs,Cedar Quay - Data Intern
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Brindlewave, Labs invites CVs.
+City: Cedar Quay
+Intake details
+*Mode of Internship:* Remote
+*https://forms.gle/SYNTHETIC-NOT-LIVE-P-H03 <https://forms.gle/SYNTHETIC-NOT-LIVE-P-H03>*
+Allowance details:
+· between INR 11,000 to 16,000 per month.
+*Job Title & Expected Skills*
+(1) Data Intern
+Requirements: Python; SQL window functions; CSV validation
+
+
+*CV Submission Deadline*: 11 AM on 28 October 2026
+Mira Sen
+Synthetic PS coordinator
+

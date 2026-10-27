@@ -1,0 +1,14 @@
+id: O-D031
+thread_id: o-d031
+date: 2026-10-27T02:00:00+00:00
+from: invoices@billing.demo.invalid
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Invoice for demonstration service
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+A fictional notification about invoice for demonstration service.

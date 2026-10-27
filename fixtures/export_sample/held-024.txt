@@ -1,0 +1,23 @@
+id: P-H24
+thread_id: h24
+date: 2026-10-27T02:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Call for CV - PS II – Second Semester 2026-2027 - Juniper Orbit,Solmere - Test Engineering Intern
+labels: 
+attachments: jd-P-H24.pdf|application/pdf|attachments/jd-P-H24.pdf
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Call for CV - PS II – Second Semester 2026-2027 - Juniper Orbit,Solmere - Test Engineering Intern
+Juniper Orbit has expressed their interest to hire Students for PS II. Location: Solmere
+JD location:
+· Attached
+*Mode of Internship:* In person
+
+*https://forms.gle/SYNTHETIC-NOT-LIVE-P-H24 <https://forms.gle/SYNTHETIC-NOT-LIVE-P-H24>*
+*CV Submission Deadline*: 28 October 2026, 8 AM
+Mira Sen
+Synthetic PS coordinator

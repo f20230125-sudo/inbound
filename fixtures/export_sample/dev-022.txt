@@ -1,0 +1,15 @@
+id: P-D22
+thread_id: d22
+date: 2026-10-27T02:00:00+00:00
+from: psd@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Student information form
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Dear students, please complete the requested response by 12:00 PM on 28 October 2026.
+Mira Sen, synthetic coordinator

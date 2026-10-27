@@ -1,0 +1,14 @@
+id: O-D033
+thread_id: o-d033
+date: 2026-10-27T02:00:00+00:00
+from: noor@contacts.demo.invalid
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Lunch planning
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+A fictional notification about lunch planning.

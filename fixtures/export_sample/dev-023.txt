@@ -1,0 +1,15 @@
+id: P-D23
+thread_id: d23
+date: 2026-10-27T02:00:00+00:00
+from: careers@recruiting.demo.invalid
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Update on Your Application — Synthetic intake
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Your application is under review. This is an employer update.
+Application reference: d12

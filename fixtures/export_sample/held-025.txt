@@ -1,0 +1,23 @@
+id: P-H25
+thread_id: h25
+date: 2026-10-27T02:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Call for CV - PS II – Second Semester 2026-2027 - Wispforge Data,Cedar Quay - Backend Intern
+labels: 
+attachments: jd-P-H25.pdf|application/pdf|
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Call for CV - PS II – Second Semester 2026-2027 - Wispforge Data,Cedar Quay - Backend Intern
+Wispforge Data has expressed their interest to hire Students for PS II. Location: Cedar Quay
+JD location:
+· Attached
+
+· As per company norms
+*https://forms.gle/SYNTHETIC-NOT-LIVE-P-H25 <https://forms.gle/SYNTHETIC-NOT-LIVE-P-H25>*
+
+Mira Sen
+Synthetic PS coordinator

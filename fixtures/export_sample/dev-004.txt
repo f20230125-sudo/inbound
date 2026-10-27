@@ -1,0 +1,31 @@
+id: P-D04
+thread_id: d04
+date: 2026-10-27T02:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Call for CV - PS II – Second Semester 2026-2027 - Cinderfinch Labs,DSO - Data Intern
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Call for CV - PS II – Second Semester 2026-2027 - Cinderfinch Labs,DSO - Data Intern
+Cinderfinch Labs has expressed their interest to hire Students for PS II. Location: Dubai
+*https://forms.gle/SYNTHETIC-NOT-LIVE-P-D04 <https://forms.gle/SYNTHETIC-NOT-LIVE-P-D04>*
+
+*Stipend*
+· AED2000/- per month
+*Mode of Internship:* In person
+*Job Title & Expected Skills*
+*1. Data Intern*
+Expected Skills:
+· Python
+· SQL window functions
+· CSV validation
+
+*CV Submission Deadline*: 0800 hrs, 29 October 2026
+
+Mira Sen
+Synthetic PS coordinator

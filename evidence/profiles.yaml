@@ -1,0 +1,34 @@
+# Approved profile sentences for Uzair's REAL packs (verbatim from CVs already checked, 19-28 Oct 2026).
+# The pack picks one family by the role's requirements; no slot filling beyond what is listed.
+# LaTeX markup (\textbf) is kept as written in the source parts.
+
+profiles:
+  ai:
+    source: "unique-body.tex, reworded by Claude 28 Oct after Codex's audit (needs Uzair's review)"
+    needs_uzair_review: true
+    keywords: [llm, ai, agent, rag, nlp, machine learning, gemini, claude, chatbot, prompt]
+    text: >-
+      Computer Science undergraduate building \textbf{AI agents and LLM applications} in \textbf{Python}:
+      the Gemini API with structured outputs and typed tool calling, Claude through Claude Code,
+      \textbf{RAG} with measured retrieval, and REST backends on SQL databases. Projects are measured
+      against baselines where one exists, and the results are reported even when they disappoint.
+  data:
+    source: mubama-body.tex
+    keywords: [sql, data, analyst, etl, dashboard, power bi, quant, backtest, eda, pandas]
+    text: >-
+      Computer Science undergraduate who builds and tests data systems in \textbf{Python} and \textbf{SQL}:
+      a \textbf{tick-level backtesting engine} validated with null tests and a no-look-ahead proof,
+      \textbf{ETL pipelines} from raw files into SQL databases with automated data-quality checks, and
+      dashboards in Power BI and React. Every result is checked against a baseline or a control, and
+      reported even when it disappoints.
+  analytics:
+    source: analyst-body.tex
+    keywords: [commercial, insights, excel, reporting, kpi, pharmaceutical, market]
+    text: >-
+      Computer Science undergraduate doing \textbf{pharmaceutical commercial analytics}: \textbf{data
+      transformation and harmonization} of multi-million-row public US healthcare data, \textbf{data
+      analysis} in Python and SQL, and \textbf{Excel} and \textbf{Power BI} reports that turn it into
+      \textbf{actionable insights}.
+default: ai
+# Software-platform roles: no approved profile yet (madenat-body.tex has none); fall back to `ai` and
+# show a "profile not tailored" note in the verification report.

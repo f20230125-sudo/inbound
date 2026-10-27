@@ -1,0 +1,16 @@
+id: O-H051
+thread_id: o-h051
+date: 2026-10-27T02:00:00+00:00
+from: notifications@github.com
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Issue notification — digest item 3
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Digest item
+Topic | Detail
+Issue notification | Synthetic correspondence for review.

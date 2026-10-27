@@ -1,0 +1,1 @@
+"""Deterministic first-match triage."""

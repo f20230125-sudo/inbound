@@ -1,0 +1,27 @@
+# Fixed CV parts Inbound may copy verbatim into Uzair's REAL packs (SPEC §13 "CV assembly facts").
+# Written by Claude on 28 Oct 2026 (02:35). Each file is read-only and copied whole; Inbound never edits it.
+# If a file's sha256 differs from the value below, the pack is blocked until Uzair re-approves it.
+
+source_root: D:\claude-workspace\cv-msd\fresh
+order: [preamble, head, profile, projects, tail, skills]   # head opens the document; skills closes it
+
+files:
+  preamble:
+    file: preamble.tex
+    sha256: d974d43e162505d7107f9ed47e5d3f58146b3e18416e9b4727060ec18dd78365
+    holds: "document class, fonts, list macros, link macros (\\rxlive etc.)"
+  head:
+    file: head.tex
+    sha256: 8a56924c46a962aa5d52efd7b4d4713ab9feb6574d54a1a532e236b7c777d141
+    holds: "\\begin{document}, name, contact line, Education (BITS Pilani Dubai, CGPA 8.0/10, Expected 2027; Class XII 81%)"
+    approved_by: "Uzair, on every CV sent 15-27 Oct 2026"
+  tail:
+    file: tail.tex
+    sha256: c054039b2189534ae0318e110e04b5a1a8ad5df9d6f4635ea60534ef91b2fa46
+    holds: "Experience (Amaani PS-1 backend intern) and Research (IEEE MSN 2026, under review)"
+    approved_by: "Uzair, 28 Oct 2026: the paper stays 'submitted to IEEE MSN 2026 (under review)'"
+    note: "Never change this line from email content; only Uzair edits it."
+
+certification: "The Ultimate Job Ready Data Science Course, CodeWithHarry (2026)"
+identity_line_check: "Mohammad Uzair Khan"   # verify: this string must appear in the built PDF text
+default_filename: "2023A7PS0125U-Mohammad Uzair Khan-{company}.pdf"   # a call-specific naming rule overrides

@@ -1,0 +1,14 @@
+id: O-D016
+thread_id: o-d016
+date: 2026-10-27T02:00:00+00:00
+from: no-reply@teams.mail.microsoft
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Case study meeting
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+A fictional notification about case study meeting.

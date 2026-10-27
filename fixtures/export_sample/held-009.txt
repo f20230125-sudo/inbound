@@ -1,0 +1,26 @@
+id: P-H09
+thread_id: h01-forward-P-H09
+date: 2026-10-27T16:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Re: Fwd: Call for CV – Juniper Orbit,Lumen Bay – Search Intern
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Please note the current closing arrangements below.
+Current intake: Juniper Orbit; City: Lumen Bay
+· AED2750 per month
+*Mode of Internship:* In person
+*Job Title & Expected Skills*
+(1) Search Intern
+Requirements: Python; SQLite FTS5; BM25
+Closing time revised: on or before 9:15 AM tomorrow
+*https://forms.gle/SYNTHETIC-NOT-LIVE-P-H01 <https://forms.gle/SYNTHETIC-NOT-LIVE-P-H01>*
+
+--- Original message ---
+> Call for CV – Juniper Orbit,Lumen Bay – Search Intern
+> 28 October 2026 at 9:00 AM

@@ -1,0 +1,22 @@
+id: J09
+thread_id: j09
+date: 2026-10-27T02:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Call for CV - Cinderfinch Labs,Lumen Bay - Backend Intern
+labels: 
+attachments: jd-J09.pdf|application/pdf|attachments/jd-J09.pdf
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Cinderfinch Labs invites students for PS II. City: Lumen Bay
+https://forms.gle/SYNTHETIC-NOT-LIVE-J09
+*Stipend*
+· AED2500 per month
+*Mode of Internship:* In person
+*JD*
+· Attached
+CV Submission Deadline: 28 October 2026, 08:00AM
+Mira Sen, synthetic coordinator

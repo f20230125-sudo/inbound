@@ -1,0 +1,30 @@
+id: P-H04
+thread_id: h04
+date: 2026-10-27T02:00:00+00:00
+from: ps@dubai.bits-pilani.ac.in
+to: sara.qamar@applicant.demo.invalid
+cc: 
+bcc: 
+subject: Call‌   for   CV - PS II – Second Semester 2026-2027 - Morrowfinch Systems,DSO - Data Intern
+labels: 
+attachments: 
+body_exported: Synthetic inbound-export-v1; complete text except where flagged
+body_complete: true
+---
+Call‌   for   CV - PS II – Second Semester 2026-2027 - Morrowfinch Systems,DSO - Data Intern
+Morrowfinch Systems has expressed their interest to hire Students for PS II. Location: Dubai
+Subject locality observation: DSO
+Intake details
+*Mode of Internship:* In person
+*https://forms.gle/SYNTHETIC-NOT-LIVE-P-H04 <https://forms.gle/SYNTHETIC-NOT-LIVE-P-H04>*
+Allowance details:
+· AED2000 per month
+*Job Title & Expected Skills*
+(1) Data Intern
+Requirements: Python; SQL window functions; CSV validation
+
+
+*CV Submission Deadline*: CVs due on or before 29 October 2026
+Mira Sen
+Synthetic PS coordinator
+
