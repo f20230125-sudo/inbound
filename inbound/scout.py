@@ -163,7 +163,10 @@ def due(db, now, replay):
                                  {'subject': row['subject'], 'deadline': deadline},
                                  f"/work#message-{row['id']}", row['sent_at'], row['source'])
             add_deadline(groups, row['subject'], deadline, start, end, ref, now)
-    groups['timed'].sort(key=lambda i: i['text'].split(': ', 1)[-1])
+    for name in ('timed', 'date_only', 'past'):
+        groups[name].sort(key=lambda entry: entry['_due_order'])
+        for entry in groups[name]:
+            del entry['_due_order']
     counts = ', '.join(f'{len(v)} {k.replace("_", " ")}' for k, v in groups.items())
     return reply(f'Dubai week: {start} through {end - timedelta(days=1)} (inclusive). '
                  f'{counts}. Uncertain dates cannot be placed in this range. Showing up to 20 per group.',
@@ -190,9 +193,15 @@ def add_deadline(groups, title, deadline, start, end, ref, now=None):
         if now is not None and (day < now.astimezone(DUBAI).date() if group == 'date_only'
                                 else datetime.fromisoformat(value) <= now):
             # Already passed: kept visible, but after everything still open.
-            groups.setdefault('past', []).append(item(f'{title}: {when(value)} · passed', ref))
+            groups.setdefault('past', []).append(
+                item(f'{title}: {when(value)} · passed', ref) | {'_due_order': deadline_order(value)})
             return
-        groups[group].append(item(f'{title}: {when(value)} · {status}', ref))
+        groups[group].append(item(f'{title}: {when(value)} · {status}', ref)
+                             | {'_due_order': deadline_order(value)})
+
+
+def deadline_order(value):
+    return value if len(value) == 10 else datetime.fromisoformat(value).astimezone(DUBAI).isoformat()
 
 
 def when(value):

@@ -150,7 +150,6 @@ export interface Message {
     rule_id: string;
     reason: string;
     source_quote: string;
-    body_text: string;
     attachment_count: number;
     opportunity_id: number | null;
     fields: Record<string, Field>;

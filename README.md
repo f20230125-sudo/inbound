@@ -1,13 +1,13 @@
 # Inbound
 
-I built this for me. Inbound is a personal agent that triages my inbox and turns
-each internship call into an evidence-backed CV pack. I review the pack and submit
-it myself.
+I built this for me. Scout is my Inbound agent: it triages my inbox, prepares
+evidence-backed CV packs, asks for decisions and shows what it learned from them.
+I review each pack and submit it myself.
 
 Internship calls arrive as forwarded emails, reminders, inline job descriptions,
 and attachments. Inbound groups revisions, shows deadlines and unknowns, and
-matches role requirements to my approved project evidence. The local desk shows
-what needs attention, the source for each fact, and what evidence is missing.
+matches role requirements to my approved project evidence. Scout shows the source
+for each fact, what evidence is missing, and which decisions need me.
 
 It never sends mail, fills forms, or submits applications. "Submitted by me" only
 records an action I took. Private mail never leaves the PC. No cloud model runs on
@@ -29,10 +29,65 @@ on myself; nothing else in Inbound uses the network, and no model runs on my mai
   that need acknowledgement before review.
 - Flask serves a loopback API and the React/TypeScript desk. A persistent Pause
   control stops imports, extraction, and pack work. A ledger records local runs.
-- Everything is live: the open desk watches a change token every 10 seconds and
-  refreshes in place, new calls with a readable JD get a draft pack automatically
+- The append-only journal streams Scout's work to the desk, with a change-token
+  fallback every 10 seconds. Views refresh in place. New calls with a readable JD
+  get a draft pack automatically
   (marked for review, never reviewed or sent), and optional browser notifications on
   this PC flag a new PS call or a deadline within 12 hours I have not acted on.
+
+## Using the desk
+
+| Page | What I use it for |
+|---|---|
+| **Desk** | Scout's current state, a source-linked briefing, next decisions, the command bar and live activity. |
+| **Work** | Search and filter mail, correct categories, inspect call revisions, review packs and record my own application actions. Past deadlines stay accessible in a collapsed group. |
+| **Memory** | Inspect remembered context and its origin, manage local memories, and review each learned rule's scope, examples, recent uses and Undo. |
+| **Settings** | Pause, Gmail checks, notifications, theme, privacy and technical runs. |
+
+Scout's expression reflects actual work, connection health or a needed decision.
+It does not simulate thinking. Opening the desk reads the saved snapshot; it does
+not check Gmail. **Check now** uses the existing guarded read-only check.
+
+The journal distinguishes in-progress work from committed results. A failed import
+keeps its progress and failure record without claiming staged results were published.
+Quiet Gmail checks fold together so substantive work remains visible. **Replay last
+check** shows a labelled recording of stored events; it does not sync, build, learn
+or request notifications. Returning to live activity catches up with the journal.
+
+## Ask Scout
+
+Use **Ask Scout or give a command**, or focus it with **Ctrl/Cmd+K**. **Escape**
+closes the conversation and returns focus to work. Supported requests include:
+
+- “What's due this week?” — a stated Dubai date range, open deadlines first,
+  passed deadlines last, with date-only and uncertain dates kept explicit.
+- “Why is Northstar flagged?” — stored blockers, conflicting facts and rule matches.
+- “What changed since yesterday?” or “What did you do today?” — committed recorded
+  work, with repeated quiet checks folded and times shown in Dubai.
+- “Find backend roles” or “What do you know about my projects?” — local results
+  with approved evidence or versioned memory citations.
+- “Skip Northstar because it requires relocation”, “Remember that I prefer remote
+  roles”, “Forget my remote preference”, “Check now” and “Pause” — previewed
+  commands requiring confirmation, with Undo where supported.
+
+Ambiguous matches show choices. Citations open the original version and identify
+newer information. Unsupported requests show supported examples. This is a bounded
+local parser, with no cloud fallback or Claude adapter. Questions remain available
+while paused; commands retain Pause, CSRF, import and stale-version protections.
+Conversation history stays in this browser tab's session storage and can be cleared.
+
+## What stays local
+
+Mail, attachments, SQLite snapshots, the journal, memory and packs live under the
+configured data root on this PC. The browser talks to the loopback Flask service;
+source bodies load when **View source** opens. Theme and notification choices stay
+in browser storage. Recorded replay uses saved synthetic or local events, while the
+separate read-only replay mode refuses databases containing private messages.
+
+Gmail is an explicit opt-in network exception for reading mail. No model processes
+private mail, and memory cannot enable cloud access, send mail or grant a capability.
+The fictional demo and test artifacts use `.local/`; runtime private data is ignored
+by Git and is never part of the web build.
 
 ```mermaid
 flowchart LR
@@ -65,8 +120,9 @@ python -m inbound serve
 
 Open <http://127.0.0.1:5000>. The demo uses fictional mail and Sara Qamar's fictional
 CV evidence. Its clock is frozen to the evaluation snapshot so deadlines remain
-reproducible. Start at Today / Inbox, open a call, inspect its source text and role
-coverage, then review the PDF and checks. Settings / Runs shows Pause and the ledger.
+reproducible. Start at Desk, follow a decision into Work, inspect its source text and
+role coverage, then review the PDF and checks. Memory shows saved context and rules;
+Settings shows Pause and the run ledger.
 
 The demo stores its database and pack files under `.local/`. It does not need mail
 credentials. For a separate local export, configure `INBOUND_DATA_ROOT` and import
@@ -148,9 +204,22 @@ A previously published directory disappearing is incomplete; an existing empty
 directory deliberately removes its entries. Markdown supports headings, lists, links,
 code and bold text; HTML and image syntax remain inert text.
 
-M13 memories are remembered context only. They cannot activate behavior, override
-message evidence, approve skills or become CV evidence. Active learning rules arrive
-in M14. The committed `fixtures/memory/` snapshot contains fictional test data only.
+Prose memories are remembered context. They cannot override message evidence, approve
+skills or become CV evidence. The committed `fixtures/memory/` snapshot contains
+fictional test data only.
+
+Category corrections preserve the original classification and human history, then
+offer an exact-mailbox rule with a subject condition where needed. Activation affects
+future matching mail; reprocessing stored messages is a separate previewed action.
+Manual corrections win. A learned category never expands the trusted PS-office sender
+list or authorizes opportunity creation.
+
+Explicit supported preferences can affect explained ranking: remote, hybrid, in-person
+work and avoiding required relocation. Suggestions have no influence until activated.
+Skip reasons remain on the original opportunity; a clear reason can offer a broader
+preference for review. Preferences do not hide opportunities or override deadline
+priority. Rule versions, example matches and recent uses are visible in Memory.
+Undo stops future influence without erasing the original action or rewriting past packs.
 
 ## Evaluation
 
@@ -158,8 +227,8 @@ These are synthetic results, not a measurement of accuracy on my inbox. The firs
 blind run is preserved in [eval/results.json](eval/results.json). The separate
 [eval/results-after-fixes.json](eval/results-after-fixes.json) records fixes for
 wrapped deadline times and inline numbered roles. After those fixes, held-out data
-is no longer blind for those classes. M6 changes presentation and import plumbing;
-it does not rerun or replace either evaluation record.
+is no longer blind for those classes. Later interface and import changes do not
+rerun or replace either evaluation record.
 
 All counts below come from those committed JSON files. Applicable-field scores
 include correctly unknown values. Populated-field scores exclude gold unknowns.

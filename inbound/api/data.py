@@ -41,7 +41,7 @@ def clean_replay(value):
 def messages(db, category=None):
     result = []
     for row in db.execute(
-        "SELECT m.id,m.provider_id,m.subject,m.sender,m.sent_at,m.received_at,m.body_text,"
+        "SELECT m.id,m.provider_id,m.subject,m.sender,m.sent_at,m.received_at,"
         "m.body_complete,m.source,t.category AS original_category,t.corrected_category,"
         "t.reason,t.rule_id,t.source_quote,t.urgency,t.corrected_at,e.fields_json,"
         "r.opportunity_id FROM messages m LEFT JOIN triage t ON t.message_id=m.id "
@@ -65,6 +65,16 @@ def messages(db, category=None):
         ).fetchone()[0]
         result.append(item)
     return result
+
+
+def message_source(db, mid):
+    row = db.execute(
+        "SELECT id,provider_id,subject,sender,sent_at,body_text,body_complete,source "
+        "FROM messages WHERE id=?", (mid,),
+    ).fetchone()
+    if row is None:
+        abort(404)
+    return dict(row)
 
 
 def enrich(value, sources, current_id):
