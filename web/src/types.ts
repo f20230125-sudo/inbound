@@ -97,6 +97,7 @@ export interface PackRef {
     provisional: number;
 }
 export interface Opportunity {
+    outside_application?: ApplicationActivity | null;
     display_title?: string;
     city_display?: string;
     role_label?: string;
@@ -180,6 +181,7 @@ export interface Snapshot {
     } | null;
 }
 export interface Today {
+    outside_applications?: { id: number; display_title: string; outside_application: ApplicationActivity }[];
     now: string;
     snapshot: Snapshot;
     attention: Entry[];
@@ -188,6 +190,14 @@ export interface Today {
     uncertain_deadlines: Entry[];
     new_calls: Entry[];
     admin_tasks: Entry[];
+}
+export interface ApplicationActivity {
+    id: number;
+    recorded_at: string;
+    applied_at: string;
+    note: string;
+    follow_up: string | null;
+    previous_activity_id: number | null;
 }
 export interface Settings {
     mode: 'local' | 'replay';

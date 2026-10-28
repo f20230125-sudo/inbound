@@ -1,10 +1,59 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import type { Opportunity, Pack } from '../types';
 import { useDesk } from '../App';
 import { request } from '../lib/api';
-import { statuses } from '../lib/format';
+import { date, statuses } from '../lib/format';
 import { Button } from './ui/button';
+import { Textarea } from './ui/textarea';
 import { mutationReason } from './shared';
+export function OutsideApplicationStatus({ activity }: { activity?: Opportunity['outside_application'] }) {
+    if (!activity) return null;
+    return <div><p>Applied (outside Inbound) on {date(activity.applied_at)}</p>{activity.follow_up && <p>Follow-up: {date(activity.follow_up)} · Local task only</p>}</div>;
+}
+function dubaiInput(value: string) { return new Date(new Date(value).getTime() + 4 * 3600000).toISOString().slice(0, 16); }
+export function OutsideApplicationActions({ opportunity, reload }: { opportunity: Opportunity; reload: () => void }) {
+    const { settings } = useDesk();
+    const noteId = useId();
+    const [open, setOpen] = useState(false);
+    const [declared, setDeclared] = useState(false);
+    const [at, setAt] = useState('');
+    const [note, setNote] = useState('');
+    const [followUp, setFollowUp] = useState('');
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState('');
+    const [saved, setSaved] = useState(false);
+    const activity = opportunity.outside_application;
+    const blocked = mutationReason(settings);
+    function expand() {
+        setAt(dubaiInput(activity?.applied_at || settings.clock));
+        setNote(activity?.note || ''); setFollowUp(activity?.follow_up || '');
+        setDeclared(false); setSaved(false); setError(''); setOpen(v => !v);
+    }
+    async function save() {
+        setBusy(true); setError('');
+        try {
+            await request(`/opportunities/${opportunity.id}/applied`, settings.csrf_token, {
+                applied_at: `${at}:00+04:00`, human_submission: declared, note, follow_up: followUp || null,
+                expected_revision_id: opportunity.revision_id, expected_activity_id: activity?.id ?? null,
+            });
+            setOpen(false); setDeclared(false); setSaved(true); reload();
+        } catch (e) { setError(e instanceof Error ? e.message : 'Application could not be saved. Retry.'); }
+        finally { setBusy(false); }
+    }
+    return <div className="outside-application"><OutsideApplicationStatus activity={activity}/>
+        <Button variant="outline" disabled={!!blocked || busy} aria-expanded={open} onClick={expand}>{activity ? 'Correct outside application' : 'I applied outside Inbound'}</Button>
+        {blocked && <p>{blocked}</p>}
+        {open && <form className="notice" onSubmit={e => { e.preventDefault(); if (declared) void save(); }}>
+            <p>Record an application you submitted yourself. Corrections keep the previous record in history.</p>
+            <label>Applied at (Dubai time)<input type="datetime-local" required value={at} disabled={!!blocked || busy} onChange={e => setAt(e.target.value)}/></label>
+            <label htmlFor={noteId}>Application note</label><Textarea id={noteId} maxLength={1000} value={note} disabled={!!blocked || busy} onChange={e => setNote(e.target.value)}/>
+            <label>Follow-up date (local task only)<input type="date" value={followUp} disabled={!!blocked || busy} onChange={e => setFollowUp(e.target.value)}/></label>
+            <label className="check-label"><input type="checkbox" checked={declared} disabled={!!blocked || busy} onChange={e => setDeclared(e.target.checked)}/>I applied myself outside Inbound</label>
+            <Button type="submit" disabled={!!blocked || busy || !declared || !at}>Record outside application</Button>
+        </form>}
+        {saved && <p role="status">Outside application saved.</p>}{error && <p role="alert">{error}</p>}
+    </div>;
+}
 export function ReviewActions({ opportunity, pack, active, runId, failed, reload, build }: {
     opportunity: Opportunity;
     pack?: Pack;

@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react';
+import { useId, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 import { Badge } from './ui/badge';
@@ -52,16 +52,13 @@ export function SnapshotBanner({ snapshot }: {
 }) {
     return <div className="snapshot"><p>Last successful import: {date(snapshot.imported_at)}</p><p>Latest message in that import: {date(snapshot.latest_message_at)}</p>{snapshot.stale && <div className="notice review"><strong>Snapshot may be out of date</strong><p>Last successful import: {date(snapshot.imported_at)}. New mail may be missing.</p><Link to="/settings#import">Import messages</Link></div>}{snapshot.latest_import_failure && <div className="notice"><strong>Latest import failed. Showing the last successful snapshot.</strong><p><Link to={`/settings?run=${snapshot.latest_import_failure.id}#runs`}>View run</Link></p></div>}</div>;
 }
-export function DeadlineDisplay({ record, now, frozen = true, admin = false }: {
+export function DeadlineDisplay({ record, now, admin = false }: {
     record: Field | null | undefined;
     now: string;
-    frozen?: boolean;
     admin?: boolean;
 }) {
-    const [tick, setTick] = useState(0);
-    useEffect(() => { if (frozen)
-        return; const timer = window.setInterval(() => setTick(v => v + 1), 60000); return () => clearInterval(timer); }, [frozen]);
-    const result = deadlineText(record, frozen ? now : new Date(new Date(now).getTime() + tick * 60000).toISOString());
+    // All desk deadlines share the elapsed server clock supplied by the app.
+    const result = deadlineText(record, now);
     return <div className={`deadline ${result.tone}`}><strong>{admin && result.tone === 'past' ? `Deadline passed · ${result.label.replace(/^Expired · /, '')}` : result.label}</strong>{result.absolute && <p>{result.absolute}</p>}</div>;
 }
 export function CopyAnswer({ label: title, answer, provenance, needed = false }: {

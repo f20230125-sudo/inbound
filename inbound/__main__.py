@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import sqlite3
 import sys
 from contextlib import closing
@@ -30,6 +31,12 @@ def main(argv=None):
     pack = sub.add_parser('pack')
     pack.add_argument('opportunity_id', type=int)
     pack.add_argument('--demo', action='store_true')
+    applied = sub.add_parser('applied')
+    applied.add_argument('opportunity_id', type=int)
+    applied.add_argument('--at', required=True)
+    applied.add_argument('--note', default='')
+    applied.add_argument('--follow-up')
+    applied.add_argument('--i-applied-myself', action='store_true')
     args = parser.parse_args(argv)
     try:
         settings = Settings.from_env()
@@ -48,6 +55,23 @@ def main(argv=None):
 
             return evaluate()
         with closing(connect(settings.db_path)) as db:
+            if args.command == 'applied':
+                from inbound.application_activity import latest, record
+                from inbound.extract.pipeline import latest_revision
+
+                previous = latest(db, args.opportunity_id)
+                revision = latest_revision(db, args.opportunity_id)
+                if revision is None:
+                    raise ValueError("Opportunity not found")
+                result = record(
+                    db, args.opportunity_id, applied_at=args.at,
+                    human_submission=args.i_applied_myself, note=args.note,
+                    follow_up=args.follow_up, expected_revision_id=revision['id'],
+                    expected_activity_id=previous['id'] if previous else None,
+                    mode=os.environ.get('APP_MODE', 'local'),
+                )
+                print(json.dumps(result))
+                return 0
             if args.command == 'digest':
                 from inbound.digest import plain_text, today
 

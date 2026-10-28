@@ -29,7 +29,8 @@ def main():
     port = int(os.environ.get("INBOUND_E2E_PORT", "5081"))
     (ROOT / f".local/inbound-e2e-{port}.pid").write_text(str(os.getpid()), "ascii")
     app = create_app(
-        {"SETTINGS": settings, "DEMO": True, "WEB_DIST": Path(__file__).resolve().parents[1] / "dist"}
+        {"SETTINGS": settings, "DEMO": True, "TEST_CLOCK": True,
+         "WEB_DIST": Path(__file__).resolve().parents[1] / "dist"}
     )
     app.run(host="127.0.0.1", port=port, debug=False, use_reloader=False)
 

@@ -210,6 +210,9 @@ mark { background: #ffe1a6; color: #382600; }
 iframe { width: 100%; height: 570px; border: 1px solid var(--border); background: var(--muted); margin: 12px 0; }
 .review-actions { padding: 6px 0; }
 .review-actions > label { max-width: 350px; }
+.outside-application { margin: 16px 0; }
+.outside-application form { max-width: 520px; }
+.outside-application form > label { margin: 12px 0; }
 .check-label { display: flex; align-items: flex-start; gap: 12px; margin: 16px 0; max-width: none !important; }
 .skip-area { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; margin: 14px 0; }
 .skip-area > p { flex-basis: 100%; }

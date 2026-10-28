@@ -67,6 +67,6 @@ export function deadlineGroup(record: Field | null | undefined, now: string) {
     if (!record || !['found', 'inferred'].includes(record.status) || typeof record.normalized !== 'string')
         return 3;
     if (record.normalized.length === 10)
-        return record.normalized < now.slice(0, 10) ? 2 : 1;
+        return record.normalized < new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Dubai' }).format(new Date(now)) ? 2 : 1;
     return new Date(record.normalized) > new Date(now) ? 0 : 2;
 }

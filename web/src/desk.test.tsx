@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { expect, it, vi } from 'vitest';
-import { badgeVariant, deadlineText, callTitle, cityText, opportunityTitle } from './lib/format';
+import { badgeVariant, deadlineGroup, deadlineText, callTitle, cityText, opportunityTitle } from './lib/format';
 import { FieldProvenance } from './components/facts';
 import type { Opportunity } from './types';
 import { CopyAnswer, Highlight, PauseControl } from './components/shared';
@@ -15,6 +15,18 @@ it('counts timed values in Dubai and distinguishes expiry', () => {
 it('never counts down uncertain deadlines', () => {
     expect(deadlineText({ status: 'unknown' }, now).label).toBe('Deadline unknown · Expiry unknown');
     expect(deadlineText({ status: 'conflicting' }, now).label).toBe('Deadline conflicting · No countdown');
+});
+it('keeps unknown and conflicting normalized candidates out of timed groups', () => {
+    for (const status of ['unknown', 'conflicting']) {
+        const record = { status, normalized: '2026-10-28T08:00:00+04:00' };
+        for (const at of ['2026-10-28T07:59:00+04:00', '2026-10-28T08:01:00+04:00']) {
+            expect(deadlineGroup(record, at)).toBe(3);
+            expect(deadlineText(record, at).label).not.toMatch(/left|overdue/);
+        }
+    }
+});
+it('uses the Dubai date for date-only grouping after local midnight', () => {
+    expect(deadlineGroup({ status: 'found', normalized: '2026-10-28' }, '2026-10-28T20:01:00Z')).toBe(2);
 });
 it('uses semantic badge colours only', () => {
     for (const value of ['New', 'Reviewed', 'Submitted by me', 'Completed', 'Found', 'Paused'])

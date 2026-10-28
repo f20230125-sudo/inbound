@@ -16,6 +16,7 @@ from flask import Flask, abort, g, jsonify, request, send_file, send_from_direct
 from werkzeug.exceptions import HTTPException
 
 from inbound.api import data
+from inbound.application_activity import ActivityConflict, applied_time, latest, record
 from inbound.db import connect
 from inbound.digest import today
 from inbound.extract.pipeline import latest_revision
@@ -44,6 +45,7 @@ def create_app(config=None):
         SESSION_COOKIE_SAMESITE="Strict",
         WEB_DIST=REPO / "web/dist",
         CLOCK=None,
+        TEST_CLOCK=False,
     )
     app.config.update(config or {})
     if app.config["APP_MODE"] not in {"local", "replay"}:
@@ -210,6 +212,18 @@ def create_app(config=None):
     def get_today():
         return output(today(db(), current_time()))
 
+    @app.post("/api/test/clock")
+    def set_test_clock():
+        if not app.config["DEMO"] or not app.config["TEST_CLOCK"]:
+            abort(404)
+        value = body()
+        if set(value) != {"now"}:
+            abort(400)
+        applied_time(value["now"])
+        frozen = datetime.fromisoformat(value["now"])
+        app.config["CLOCK"] = lambda: frozen
+        return output({"now": frozen.isoformat()})
+
     @app.get("/api/messages")
     def get_messages():
         category = request.args.get("category")
@@ -248,6 +262,7 @@ def create_app(config=None):
         def project(oid):
             state = opportunity_state(db(), oid, clock=current_time)
             state.update(opportunity_labels(db(), state, state["normalized_subject"]))
+            state["outside_application"] = latest(db(), oid)
             return state
 
         return output(
@@ -267,6 +282,20 @@ def create_app(config=None):
                 demo=app.config["DEMO"] or app.config["APP_MODE"] == "replay",
             )
         )
+
+    @app.post("/api/opportunities/<int:oid>/applied")
+    def applied(oid):
+        value = body()
+        required = {"applied_at", "human_submission", "expected_revision_id", "expected_activity_id"}
+        if not required <= set(value) or set(value) - required - {"note", "follow_up"}:
+            abort(400, "Expected revision, activity and human declaration required")
+        try:
+            result = record(db(), oid, **value, mode=app.config["APP_MODE"])
+        except ActivityConflict as exc:
+            abort(409, str(exc))
+        except LookupError:
+            abort(404)
+        return output(result)
 
     def event(connection, oid, revision_id, action, *, pid=None, details=None):
         connection.execute(
