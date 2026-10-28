@@ -38,6 +38,7 @@ from inbound.ledger import timestamp
 from inbound.pause import PausedError, check, set_paused
 from inbound.settings import REPO, Settings
 from inbound.sources.gmail_api import GmailError
+from inbound.steps import Alert, Classification, Empty, Kind, emit
 from inbound.triage.taxonomy import CATEGORIES
 from inbound.work import execute, start_run
 
@@ -95,6 +96,10 @@ def create_app(config=None):
         if app.config["APP_MODE"] == "replay":
             value = data.clean_replay(value)
         return jsonify(value), status
+
+    from inbound.api.agent_steps import register
+
+    register(app, db, output, settings)
 
     @app.teardown_appcontext
     def close_db(error=None):
@@ -298,6 +303,8 @@ def create_app(config=None):
                 "UPDATE triage SET corrected_category=?,corrected_at=? WHERE message_id=?",
                 (value["category"], timestamp(), mid),
             )
+            emit(connection, Kind.CORRECTED, Classification(value['category']),
+                 entity_type="message", entity_id=mid)
         return output({"id": mid, "category": value["category"], "previous_category": previous})
 
     @app.get("/api/opportunities")
@@ -351,6 +358,12 @@ def create_app(config=None):
             "created_at,details_json) VALUES (?,?,?,?,?,?)",
             (oid, revision_id, pid, action, timestamp(), json.dumps(details or {})),
         )
+        kinds = {'skipped': Kind.SKIPPED, 'undo_skip': Kind.RESTORED,
+                 'reviewed': Kind.REVIEWED, 'submitted_by_me': Kind.SUBMITTED,
+                 'blocker_acknowledged': Kind.ACKNOWLEDGED}
+        if action in kinds:
+            emit(connection, kinds[action], Empty(), entity_type="opportunity", entity_id=oid,
+                 revision_id=revision_id)
 
     def recovery_input():
         if request.mimetype == "multipart/form-data":
@@ -581,6 +594,7 @@ def create_app(config=None):
             kind,
             opportunity_id=oid,
             source_type=app.config["SOURCE_FORMAT"] if kind == "import" else None,
+            source_provenance=app.config["SOURCE_PROVENANCE"] if kind == "import" else None,
         )
         frozen = current_time() if (app.config["CLOCK"] or stored_clock(db())) else None
         options = {
@@ -627,6 +641,13 @@ def create_app(config=None):
         """A cheap token that changes whenever anything the desk shows changes."""
         connection = db()
         parts = [
+            # Domain mutations include evidence and, in their future migrations, memories
+            # and rules. Journal-only writes still refresh progress via the journal cursor.
+            connection.execute("SELECT generation FROM domain_generation WHERE id=1").fetchone()[0],
+            connection.execute("SELECT COALESCE(MAX(id),0) FROM agent_steps").fetchone()[0]
+            if app.config['APP_MODE'] != 'replay' else connection.execute(
+                "SELECT COALESCE(MAX(id),0) FROM agent_steps WHERE source='synthetic'"
+            ).fetchone()[0],
             tuple(connection.execute(
                 "SELECT (SELECT COALESCE(MAX(version),0) FROM snapshots),"
                 "(SELECT COUNT(*) FROM messages),"
@@ -647,6 +668,23 @@ def create_app(config=None):
             parts.append(gmail_sync.status(settings, connection).get("last_sync_at"))
         token = hashlib.sha256(json.dumps(parts, default=str).encode()).hexdigest()[:16]
         return output({"version": token})
+
+    @app.post('/api/agent/alerts')
+    def record_alert():
+        value = body()
+        if set(value) != {'opportunity_id', 'kind', 'alert_type', 'reason'}:
+            abort(400)
+        kind = {'eligible': Kind.ALERT_ELIGIBLE, 'requested': Kind.ALERT_REQUESTED,
+                'suppressed': Kind.ALERT_SUPPRESSED}.get(value['kind'])
+        oid = value['opportunity_id']
+        if kind is None or type(oid) is not int or not db().execute(
+            'SELECT 1 FROM opportunities WHERE id=?', (oid,)
+        ).fetchone():
+            abort(400)
+        with db():
+            emit(db(), kind, Alert(value['alert_type'], value['reason']),
+                 entity_type='opportunity', entity_id=oid)
+        return output({'recorded': True})
 
     @app.get("/api/gmail")
     def gmail_status():

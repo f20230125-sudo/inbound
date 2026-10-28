@@ -59,11 +59,21 @@ def main(argv=None):
             # Live Gmail checks run inside the desk once Uzair switches them on; never in
             # replay mode, which must stay read-only and synthetic.
             if os.environ.get("APP_MODE", "local") == "local":
+                from inbound.work import interrupt_runs
+
+                with closing(connect(settings.db_path)) as db:
+                    interrupt_runs(db)
                 Poller(settings).start()
             create_app().run(host='127.0.0.1', port=5000, debug=False, use_reloader=False)
             return 0
         if args.command == 'watch':
             from inbound.gmail_sync import Poller
+            from inbound.work import interrupt_runs
+
+            if os.environ.get('APP_MODE', 'local') != 'local':
+                raise ValueError('Gmail watching is available in local mode only')
+            with closing(connect(settings.db_path)) as db:
+                interrupt_runs(db)
 
             def report(result):
                 print(json.dumps(result), flush=True)
@@ -170,7 +180,8 @@ def main(argv=None):
             if args.command == "import":
                 from inbound.work import execute, start_run
 
-                run_id = start_run(db, "import", source_type=args.source)
+                run_id = start_run(db, "import", source_type=args.source,
+                                   source_provenance=args.provenance)
                 execute(settings, run_id, "import", root=args.path, source=args.source,
                         provenance=args.provenance)
                 result = db.execute("SELECT * FROM runs WHERE id=?", (run_id,)).fetchone()

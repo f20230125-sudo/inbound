@@ -5,6 +5,7 @@ from email.utils import parseaddr
 from zoneinfo import ZoneInfo
 
 from inbound.pause import check
+from inbound.steps import Classification, Kind, emit
 from inbound.triage.normalize import current_body, normalize_subject
 
 OFFICE = {"ps@dubai.bits-pilani.ac.in", "psd@dubai.bits-pilani.ac.in"}
@@ -109,6 +110,7 @@ def triage_messages(db, ids=None, personal_contacts=None):
             prediction = classify(
                 row["sender"], row["subject"], row["body_text"], personal_contacts
             )
+            old = db.execute("SELECT category FROM triage WHERE message_id=?", (row['id'],)).fetchone()
             db.execute(
                 "INSERT INTO triage(message_id,category,urgency,reason,rule_id,source_quote,"
                 "confidence) VALUES (?,?,?,?,?,?,?) ON CONFLICT(message_id) DO UPDATE SET "
@@ -125,5 +127,8 @@ def triage_messages(db, ids=None, personal_contacts=None):
                     prediction.confidence,
                 ),
             )
+            if old is None or old['category'] != prediction.category:
+                emit(db, Kind.CLASSIFIED, Classification(prediction.category),
+                     entity_type="message", entity_id=row['id'])
             count += 1
     return count

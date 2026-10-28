@@ -16,6 +16,7 @@ from inbound.packs.render import render
 from inbound.packs.verify import verify
 from inbound.pause import check
 from inbound.settings import REPO, Settings
+from inbound.steps import Empty, Kind, Reference, Verification, emit
 
 TECTONIC = Path("D:/codex/tools/tectonic/tectonic.exe")
 CACHE = REPO / ".local/tectonic-cache/cache"
@@ -136,6 +137,8 @@ def create_pack(db, opportunity_id, *, demo=False, pack_root=None, settings=None
                     state["content_version"],
                 ),
             )
+            emit(db, Kind.PACK_STARTED, Empty(), entity_type="pack", entity_id=pack_id,
+                 revision_id=revision['id'], references=(Reference("opportunity", opportunity_id),))
             if not provisional:
                 db.execute(
                     "UPDATE opportunities SET status='preparing',updated_at=? WHERE id=?",
@@ -196,6 +199,13 @@ def create_pack(db, opportunity_id, *, demo=False, pack_root=None, settings=None
                         "UPDATE opportunities SET status='needs_review',updated_at=? WHERE id=?",
                         (timestamp(), opportunity_id),
                     )
+                facts = Verification(bool(checks['passed']), provisional)
+                refs = (Reference("opportunity", opportunity_id),)
+                emit(db, Kind.VERIFIED, facts, entity_type="pack", entity_id=pack_id,
+                     revision_id=revision['id'], references=refs)
+                if checks['passed']:
+                    emit(db, Kind.READY, facts, entity_type="pack", entity_id=pack_id,
+                         revision_id=revision['id'], references=refs)
             if not checks["passed"]:
                 raise RuntimeError("Pack verification failed")
             counts["built"] = 1
@@ -214,6 +224,8 @@ def create_pack(db, opportunity_id, *, demo=False, pack_root=None, settings=None
                     "UPDATE opportunities SET status='blocked',updated_at=? WHERE id=?",
                     (timestamp(), opportunity_id),
                 )
+                emit(db, Kind.PACK_FAILED, Empty(), entity_type="pack", entity_id=pack_id,
+                     revision_id=revision['id'], references=(Reference("opportunity", opportunity_id),))
             raise
 
 

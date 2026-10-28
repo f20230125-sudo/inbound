@@ -438,3 +438,25 @@ def test_one_oversized_message_is_skipped_not_fatal(live, monkeypatch):
     result = gmail_sync.sync(settings, transport=fake.transport())
     assert result["too_large"] == 1 and result["fetched"] == 1
     assert gmail_sync.sync(settings, transport=fake.transport())["too_large"] == 0  # not retried
+
+
+def test_mail_with_an_attachment_over_10_mb_is_kept_without_its_bytes(live):
+    settings, fake = live
+    mail = EmailMessage()
+    mail["From"] = "ps@dubai.bits-pilani.ac.in"
+    mail["Subject"] = "Call for CV - Harbor Finch,Port Selene"
+    mail["Date"] = format_datetime(datetime(2026, 10, 27, 6, tzinfo=UTC))
+    mail.set_content("Harbor Finch has expressed their interest to hire Students.")
+    mail.add_attachment(b"x" * (10 * 1024 * 1024 + 1), maintype="application",
+                        subtype="pdf", filename="Brochure.pdf")
+    fake.add("huge", mail.as_bytes())
+    result = gmail_sync.sync(settings, transport=fake.transport())
+    assert result["status"] == "success"
+    with closing(connect(settings.db_path)) as db:
+        row = db.execute(
+            "SELECT a.filename,a.bytes_available,a.parse_status FROM attachments a "
+            "JOIN messages m ON m.id=a.message_id WHERE m.provider_id='huge'").fetchone()
+    # The email is kept; the attachment is recorded without bytes (extraction then
+    # reports it as missing rather than dropping the whole message).
+    assert tuple(row)[:2] == ("Brochure.pdf", 0) and row[2] in {"unsupported", "missing"}
+    assert gmail_sync.unimported(settings) == set()  # nothing left to retry every check

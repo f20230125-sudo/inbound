@@ -295,9 +295,10 @@ def load(root, source):
             yield parse_bytes(
                 data, root, source,
                 identity=meta["id"], thread_id=meta["threadId"],
-                labels=", ".join(meta.get("labelIds", [])),
+                labels=", ".join(meta.get("labelIds", [])), keep_oversized=True,
             )
-        except SourceError:
-            # One unparseable message (no date, >10 MB attachment, unsafe name) must not
-            # stop every later sync; it stays on disk for inspection and is skipped.
+        except SourceError as exc:
+            # One unparseable message (no date, unsafe name) must not stop every later
+            # sync: it stays on disk, is marked once, and is not retried on every check.
+            (root / f"{meta['id']}.rejected").write_text(str(exc)[:80], encoding="utf-8")
             continue
