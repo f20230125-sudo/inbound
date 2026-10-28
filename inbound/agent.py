@@ -92,9 +92,13 @@ def agent_state(db, now, *, gmail=None, syncing=False):
                 if entry["deadline_group"] == "uncertain"
                 else "Review opportunity"
                 if entry["kind"] == "call"
+                else "Review task"
+                if entry['kind'] == 'task'
                 else "Review notice",
                 "href": f"/opportunity/{entry['id']}" + ("#pack" if draft else "")
                 if entry["kind"] == "call"
+                else f"/work#task-{entry['id']}"
+                if entry['kind'] == 'task'
                 else f"/work#message-{entry['id']}",
             }
         )
@@ -104,7 +108,8 @@ def agent_state(db, now, *, gmail=None, syncing=False):
         "WHERE COALESCE(t.corrected_category,t.category)='needs_review' "
     ).fetchone()[0]
     call_count = sum(e['kind'] == 'call' for e in summary['decision_queue'])
-    notice_count = len(summary['decision_queue']) - call_count
+    task_count = sum(e['kind'] == 'task' for e in summary['decision_queue'])
+    notice_count = len(summary['decision_queue']) - call_count - task_count
     follow_up_count = 0
     for entry in summary["outside_applications"]:
         follow_up = entry["outside_application"]["follow_up"]
@@ -157,6 +162,9 @@ def agent_state(db, now, *, gmail=None, syncing=False):
         say(f"{call_count} call{'s need' if call_count != 1 else ' needs'} you.", "/work")
     if notice_count:
         say(f"{notice_count} notice{'s need' if notice_count != 1 else ' needs'} you.", "/work")
+    if task_count:
+        say(f"I found {task_count} college task{'s' if task_count != 1 else ''} to review.",
+            '/work#tasks')
     if follow_up_count:
         say(f"{follow_up_count} local follow-up{'s need' if follow_up_count != 1 else ' needs'} you.",
             "/work")
@@ -214,7 +222,8 @@ def agent_state(db, now, *, gmail=None, syncing=False):
         "failed": failed,
         "counts": {"decisions": total, "drafts": drafts},
         "decision_counts": {"calls": call_count, "notices": notice_count,
-                            "follow_ups": follow_up_count, "emails_to_sort": review_count},
+                            "follow_ups": follow_up_count, "emails_to_sort": review_count,
+                            'tasks': task_count},
         "decisions": decisions[:3],
         "briefing": clauses,
         "freshness": {

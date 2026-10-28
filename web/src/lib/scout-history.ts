@@ -1,5 +1,5 @@
 export interface Citation {
-    entity_type: 'revision' | 'message' | 'memory' | 'rule' | 'step' | 'skill';
+    entity_type: 'revision' | 'message' | 'memory' | 'rule' | 'step' | 'skill' | 'task';
     entity_id: number | string;
     version: number | string;
     label: string;
@@ -32,7 +32,7 @@ export function boundedHistory(input: unknown): Turn[] {
         const valid = candidate.reply.items.length <= 120 && candidate.reply.items.every((item: Turn['reply']['items'][number]) =>
             item && typeof item.text === 'string' && Array.isArray(item.citations) && item.citations.every(c =>
                 c && typeof c.label === 'string' && typeof c.url === 'string' &&
-                ['revision', 'message', 'memory', 'rule', 'step', 'skill'].includes(c.entity_type) &&
+                ['revision', 'message', 'memory', 'rule', 'step', 'skill', 'task'].includes(c.entity_type) &&
                 c.url.startsWith('/api/scout/citation?ticket=') && c.url.length <= 64040));
         if (!valid || !candidate.reply.choices.every((c: { key: string; label: string }) => c && typeof c.key === 'string' && typeof c.label === 'string') ||
             !candidate.reply.suggestions.every((s: string) => typeof s === 'string')) continue;

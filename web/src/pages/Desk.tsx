@@ -8,6 +8,7 @@ import { Briefing, ScoutFace } from '../components/scout';
 import { DeadlineDisplay, Loading, Section } from '../components/shared';
 import { Button } from '../components/ui/button';
 import { ScoutCommand } from '../components/scout-command';
+import { DailyBriefing } from '../components/daily-briefing';
 
 export default function DeskPage() {
     const { settings, refresh, setRecordedReplay } = useDesk();
@@ -47,6 +48,7 @@ export default function DeskPage() {
                 {checkError && <p role="alert">{checkError}</p>}
             </div>
         </section>
+        <DailyBriefing />
         <ScoutCommand returnToWork={returnToWork} />
         <div className="dispatch-columns">
             <Section title="Your next decisions" id="decisions">

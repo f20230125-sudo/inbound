@@ -5,6 +5,9 @@ test('Scout dispatch: factual briefing, next decisions, ledger, keyboard and red
     await theme(page, info.project.name.endsWith('-dark'));
     await page.emulateMedia({ reducedMotion: 'reduce' });
     const before = await (await page.request.get('/api/runs')).json();
+    // Prime the saved projection; opening an already current Desk remains read-only.
+    const settings = (await (await page.request.get('/api/settings')).json());
+    expect((await page.request.post('/api/briefing', { headers: { 'X-CSRF-Token': settings.csrf_token }, data: {} })).ok()).toBe(true);
     const state = await (await page.request.get('/api/agent/state')).json();
     const mutations: string[] = [];
     page.on('request', request => { if (request.method() !== 'GET') mutations.push(request.url()); });

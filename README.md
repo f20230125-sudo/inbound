@@ -40,13 +40,30 @@ on myself; nothing else in Inbound uses the network, and no model runs on my mai
 | Page | What I use it for |
 |---|---|
 | **Desk** | Scout's current state, a source-linked briefing, next decisions, the command bar and live activity. |
-| **Work** | Search and filter mail, correct categories, inspect call revisions, review packs and record my own application actions. Past deadlines stay accessible in a collapsed group. |
+| **Work** | College tasks, mail filters and corrections, call revisions, packs and my own application actions. Past deadlines stay accessible in a collapsed group. |
 | **Memory** | Inspect remembered context and its origin, manage local memories, and review each learned rule's scope, examples, recent uses and Undo. |
 | **Settings** | Pause, Gmail checks, notifications, theme, privacy and technical runs. |
 
 Scout's expression reflects actual work, connection health or a needed decision.
 It does not simulate thinking. Opening the desk reads the saved snapshot; it does
 not check Gmail. **Check now** uses the existing guarded read-only check.
+
+The **Daily briefing** covers stored deadlines today/tomorrow, college tasks,
+follow-ups, changed calls, waiting drafts and unresolved decisions. Scout saves it
+on opening and when the Dubai day or stored facts change. Unchanged reads reuse
+the saved version. **Replay briefing** opens the original facts and source excerpts;
+the journal and “What did you do today?” link to that saved version. While paused
+or in read-only replay, the desk shows a preview without saving new work.
+
+Academic mail can become a **Task** with its stated course, deadline, source quote
+and revision history. Date-only deadlines keep their precision; unknown or competing
+dates stay visible. Seating plans do not create tasks. **Done**, **Snooze** and
+**Not mine** record my choices and support Undo. Scout never marks work done itself.
+Opt-in browser alerts also cover supported timed college deadlines within 12 hours;
+there is no LMS login, automatic submission or external delivery.
+
+`python -m inbound briefing` prints the same local briefing in UTF-8. Configure
+`INBOUND_DATA_ROOT` as for the other CLI commands.
 
 The journal distinguishes in-progress work from committed results. A failed import
 keeps its progress and failure record without claiming staged results were published.
@@ -62,6 +79,8 @@ closes the conversation and returns focus to work. Supported requests include:
 - “What's due this week?” — a stated Dubai date range, open deadlines first,
   passed deadlines last, with date-only and uncertain dates kept explicit.
 - “Why is Northstar flagged?” — stored blockers, conflicting facts and rule matches.
+- “What assignments are due?” — college tasks ordered by supported deadlines.
+  “Mark Assignment 2 done” previews a manual task action with confirmation and Undo.
 - “What changed since yesterday?” or “What did you do today?” — committed recorded
   work, with repeated quiet checks folded and times shown in Dubai.
 - “Find backend roles” or “What do you know about my projects?” — local results

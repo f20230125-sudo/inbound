@@ -201,6 +201,31 @@ def today(db, now=None):
         elif entry["kind"] == "ps_admin":
             result["admin_tasks"].append(entry)
 
+    from inbound.tasks import list_tasks
+
+    result['college_tasks'] = list_tasks(db, now, active=True)
+    for task in result['college_tasks']:
+        record = task['deadline']
+        group = deadline_group(record, now)
+        entry = {
+            'id': task['id'], 'kind': 'task',
+            'display_title': f"{task['course'] or 'Course unknown'} · {task['title']}",
+            'subject': task['title'], 'provider_id': '', 'status': task['state'],
+            'deadline': record, 'deadline_group': group,
+            'deadline_label': 'Time not stated' if record.get('precision') == 'date'
+            else record['status'],
+            'attention_reason': f"College task · {record['status']}",
+            'blocked_reason': None, 'conflicts': [], 'preference_score': 0,
+            'preference_reasons': [],
+            'received_at': task['history'][-1]['sent_at'],
+            'decision_priority': 0 if group in {'timed', 'date_only'} else
+            2 if group == 'uncertain' else 3,
+        }
+        if group == 'overdue':
+            result['past_deadlines'].append(entry)
+        else:
+            result['decision_queue'].append(entry)
+
     def due(entry):
         record = entry["deadline"] or {}
         candidates = record.get("candidates", [record])

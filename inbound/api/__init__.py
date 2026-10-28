@@ -84,6 +84,8 @@ def create_app(config=None):
                     abort(403, "Replay requires an exclusively synthetic database")
                 if g.db.execute("SELECT 1 FROM packs WHERE demo<>1").fetchone():
                     abort(403, "Replay requires exclusively demo packs")
+                if g.db.execute("SELECT 1 FROM tasks WHERE source<>'synthetic'").fetchone():
+                    abort(403, "Replay requires exclusively synthetic tasks")
         return g.db
 
     def body():
@@ -716,18 +718,23 @@ def create_app(config=None):
     @app.post('/api/agent/alerts')
     def record_alert():
         value = body()
-        if set(value) != {'opportunity_id', 'kind', 'alert_type', 'reason'}:
+        task_alert = 'task_id' in value
+        identity_key = 'task_id' if task_alert else 'opportunity_id'
+        if set(value) != {identity_key, 'kind', 'alert_type', 'reason'}:
             abort(400)
         kind = {'eligible': Kind.ALERT_ELIGIBLE, 'requested': Kind.ALERT_REQUESTED,
                 'suppressed': Kind.ALERT_SUPPRESSED}.get(value['kind'])
-        oid = value['opportunity_id']
+        oid = value[identity_key]
+        table = 'tasks' if task_alert else 'opportunities'
         if kind is None or type(oid) is not int or not db().execute(
-            'SELECT 1 FROM opportunities WHERE id=?', (oid,)
+            f'SELECT 1 FROM {table} WHERE id=?', (oid,)
         ).fetchone():
+            abort(400)
+        if task_alert != (value['alert_type'] == 'task_deadline'):
             abort(400)
         with db():
             emit(db(), kind, Alert(value['alert_type'], value['reason']),
-                 entity_type='opportunity', entity_id=oid)
+                 entity_type='task' if task_alert else 'opportunity', entity_id=oid)
         return output({'recorded': True})
 
     @app.get("/api/gmail")
@@ -778,4 +785,8 @@ def create_app(config=None):
     from inbound.api.scout import register as register_scout
 
     register_scout(app, db, output, settings, current_time, change_opportunity_status, run_gmail_check)
+
+    from inbound.api.tasks import register as register_tasks
+
+    register_tasks(app, db, output, current_time)
     return app

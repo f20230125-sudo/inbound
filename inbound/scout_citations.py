@@ -81,6 +81,14 @@ def step(row):
                 item['href'], row['occurred_at'], row['source'])
 
 
+def task(db, value):
+    return make('task', value['id'], value['version'], 'College task · source excerpt',
+                {'course': value['course'], 'title': value['title'],
+                 'deadline': value['deadline'], 'source_quote': value['source_quote'],
+                 'revision_id': value['revision_id']}, value['href'],
+                value['history'][-1]['created_at'], value['source'])
+
+
 def skill(db, sid):
     row = db.execute('SELECT * FROM skills WHERE id=? AND active=1 AND approved=1',
                      (sid,)).fetchone()
@@ -108,7 +116,11 @@ def resolve(db, captured, *, replay=False):
         if record is None:
             return None
         return captured | {'content': record, 'newer_information': bool(record['newer_version'])}
-    if kind == 'revision':
+    if kind == 'task':
+        row = db.execute('SELECT source,version FROM tasks WHERE id=?', (identity,)).fetchone()
+        current = dict(row) if row else None
+        newer = row is None or row['version'] != captured['version']
+    elif kind == 'revision':
         current = revision(db, identity, captured['field'])
         if current:
             latest = latest_revision(db, captured['opportunity_id'])

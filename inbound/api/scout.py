@@ -110,7 +110,18 @@ def register(app, db, output, settings, clock, skip, check_now):
         undo = None
         suggestion = None
         refs = []
-        if kind == 'skip':
+        if kind in {'task_done', 'task_undo'}:
+            from inbound import tasks
+
+            task = tasks.mutate(connection, action['id'],
+                                'done' if kind == 'task_done' else 'undo', action['version'],
+                                clock(), expected_generation=expected)
+            refs = [scout_citations.task(connection, task)]
+            text = 'You marked this college task done.' if kind == 'task_done' else (
+                'You undid your college task action.')
+            if kind == 'task_done':
+                undo = {'kind': 'task_undo', 'id': task['id'], 'version': task['version']}
+        elif kind == 'skip':
             result, _ = skip(action['id'], {'status': 'skipped', 'reason': action['value']},
                              expected_generation=expected, expected_revision=action['revision'],
                              expected_content_version=action['content_version'])

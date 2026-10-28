@@ -18,6 +18,7 @@ interface Desk {
     refresh: () => Promise<void>;
     savePause: (value: boolean) => Promise<void>;
     setRecordedReplay: (value: boolean) => void;
+    recordedReplay: boolean;
 }
 const Context = createContext<Desk | null>(null);
 export function useDesk() { return useContext(Context)!; }
@@ -27,7 +28,7 @@ function LegacyRoute({ to, hash }: { to: string; hash?: string }) {
 }
 function DeskRoute() {
     const location = useLocation();
-    return location.search || /^#(inbox|message-|source-)/.test(location.hash) ? <LegacyRoute to="/work" /> : <DeskPage />;
+    return location.search && !new URLSearchParams(location.search).has('briefing') || /^#(inbox|message-|source-)/.test(location.hash) ? <LegacyRoute to="/work" /> : <DeskPage />;
 }
 export default function App() {
     const [settings, setSettings] = useState<Settings>();
@@ -48,7 +49,7 @@ export default function App() {
         setError(true);
     } }, []);
     useEffect(() => { void refresh(); }, [refresh, location.pathname]);
-    const live = useLive(refresh, !!settings && settings.mode !== 'replay' && !recordedReplay, location.pathname !== '/');
+    const live = useLive(refresh, !!settings && settings.mode !== 'replay' && !recordedReplay && !new URLSearchParams(location.search).has('briefing'), location.pathname !== '/');
     useEffect(() => {
         const visible = () => { if (!document.hidden) void refresh(); };
         document.addEventListener('visibilitychange', visible);
@@ -111,7 +112,7 @@ export default function App() {
             <main id="main" tabIndex={-1}><h1 id="page-title" tabIndex={-1}>{title}</h1><div className="meta clock"><p>Dubai time · UTC+04:00</p>{settings?.frozen_clock && <p>Frozen synthetic clock: {date(settings.clock)} · Dubai</p>}</div><div role="status" className="sr-only">{title}</div>
                 {error && !settings && location.pathname === '/' && <section className="scout-presence" aria-label="Scout"><ScoutFace mood="disconnected" /><div><h2>Scout</h2><p role="status">I can't reach the local service.</p></div></section>}
                 {error && <Failure text="Settings could not be loaded." retry={() => void refresh()}/>}
-                {!settings ? !error && <Loading text="Loading settings…"/> : <Context.Provider value={{ settings: { ...settings, clock }, refresh, savePause, setRecordedReplay }}><Routes>
+                {!settings ? !error && <Loading text="Loading settings…"/> : <Context.Provider value={{ settings: { ...settings, clock }, refresh, savePause, setRecordedReplay, recordedReplay }}><Routes>
                     <Route path="/" element={<DeskRoute />}/><Route path="/desk" element={<LegacyRoute to="/" />}/>
                     <Route path="/work" element={<TodayPage />}/>
                     <Route path="/today" element={<LegacyRoute to="/work" />}/><Route path="/inbox" element={<LegacyRoute to="/work" />}/><Route path="/applications" element={<LegacyRoute to="/work" />}/>
