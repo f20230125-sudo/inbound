@@ -19,7 +19,7 @@
   "functions": {
     "app.py": {
       "maxDuration": 30,
-      "includeFiles": "{inbound/**,public_demo/**}",
+      "includeFiles": "{inbound/**,public_demo/**,public/**}",
       "excludeFiles": "{web/**,tests/**,fixtures/**,synth/**,eval/**,.codex-runs/**,.local/**,.venv/**,.git/**}"
     }
   }
