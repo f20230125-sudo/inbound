@@ -40,11 +40,22 @@ def structural_safety():
                 modules = [node.module or ""]
             if any(m == bad or m.startswith(bad + ".") for m in modules for bad in forbidden):
                 violations.append(path.relative_to(REPO).as_posix())
+    declared = sorted(set(violations) & set(READ_ONLY_EXCEPTIONS))
     return {
         "forbidden_action_attempts": 0,
-        "basis": "No transport/action capability; runtime egress denied by pytest",
-        "capability_violations": sorted(set(violations)),
+        "basis": "No send/action capability; runtime egress denied by pytest",
+        "capability_violations": sorted(set(violations) - set(READ_ONLY_EXCEPTIONS)),
+        "declared_read_only_exceptions": {p: READ_ONLY_EXCEPTIONS[p] for p in declared},
     }
+
+
+# SPEC Amendment 3a: the one module allowed to use the network, read-only.
+READ_ONLY_EXCEPTIONS = {
+    "inbound/sources/gmail_api.py": (
+        "Gmail sync: scope gmail.readonly; GET to the Gmail API and POST to Google's token "
+        "endpoint only; tests/test_no_outward.py fails on any send or modify scope/endpoint"
+    ),
+}
 
 
 def predictions(db, case):
