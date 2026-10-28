@@ -12,6 +12,11 @@ export function badgeVariant(value: string): 'outline' | 'review' | 'destructive
     return 'outline';
 }
 export function normalizeSubject(value: string) { return value.replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/[–—−]/g, '-').replace(/\s+/g, ' ').trim().replace(/^(?:(?:re|fwd):\s*)+/i, ''); }
+export function fallbackTitle(value: string) { return normalizeSubject(value).replace(/^Call for CV\s*-\s*(?:PS II\s*-\s*Second Semester\s+\d{4}\s*-\s*\d{4}\s*-\s*)?/i, ''); }
+export function cityText(value: unknown) {
+    const values = [...new Set((Array.isArray(value) ? value : [value]).filter(Boolean).map(v => String(v).replace(/[\u200B-\u200D\uFEFF]/g, '').trim()))];
+    return values.length ? values[0] + (values.length > 1 ? ` (${values.slice(1).join('; ')})` : '') : 'City unknown';
+}
 export function callTitle(value: {
     company?: unknown;
     city?: unknown;
@@ -20,9 +25,11 @@ export function callTitle(value: {
     }[] | null;
     subject?: string;
 }) {
-    return value.company ? [value.company, value.roles?.[0]?.title || 'Role unknown', value.city || 'City unknown'].map(v => String(v).replace(/[\u200B-\u200D\uFEFF]/g, '')).join(' · ') : normalizeSubject(value.subject || '');
+    const roles = value.roles || [];
+    const role = roles.length > 1 ? `${roles.length} roles` : roles[0]?.title || 'Role unknown';
+    return value.company ? [value.company, role, cityText(value.city)].map(v => String(v).replace(/[\u200B-\u200D\uFEFF]/g, '')).join(' · ') : fallbackTitle(value.subject || '');
 }
-export function opportunityTitle(op: Opportunity) { return callTitle({ company: op.fields.company?.normalized, city: op.fields.city?.normalized, roles: op.fields.roles?.normalized as {
+export function opportunityTitle(op: Opportunity) { return op.display_title || callTitle({ company: op.fields.company?.normalized, city: op.fields.city?.normalized, roles: op.fields.roles?.normalized as {
         title: string;
     }[] | null, subject: op.normalized_subject }); }
 export function date(value?: string | null, dateOnly = false) {

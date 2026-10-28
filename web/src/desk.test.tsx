@@ -1,6 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { expect, it, vi } from 'vitest';
-import { badgeVariant, deadlineText, callTitle } from './lib/format';
+import { badgeVariant, deadlineText, callTitle, cityText, opportunityTitle } from './lib/format';
+import { FieldProvenance } from './components/facts';
+import type { Opportunity } from './types';
 import { CopyAnswer, Highlight, PauseControl } from './components/shared';
 const now = '2026-10-28T02:30:00+04:00';
 it('keeps date-only values free of invented times', () => {
@@ -24,6 +26,26 @@ it('uses semantic badge colours only', () => {
 it('uses effective company, role and city, with a normalized fallback', () => {
     expect(callTitle({ company: 'Ledgercraft', roles: [{ title: 'Backend Intern' }], city: 'Cedar Quay', subject: 'Re: raw' })).toBe('Ledgercraft · Backend Intern · Cedar Quay');
     expect(callTitle({ subject: 'Re: Fwd: Call\u200b  for CV' })).toBe('Call for CV');
+});
+it('formats city observations and counts roles until a pack recommendation exists', () => {
+    const roles = ['Research Intern', 'Backend Intern', 'Design Intern', 'Test Intern'].map(title => ({ title }));
+    expect(callTitle({ company: 'Lantern Forge', city: ['DSO', 'Dubai'], roles })).toBe('Lantern Forge · 4 roles · DSO (Dubai)');
+    expect(opportunityTitle({ display_title: 'Lantern Forge · Backend Intern · DSO (Dubai)' } as Opportunity)).toBe('Lantern Forge · Backend Intern · DSO (Dubai)');
+});
+it('cleans standard call prefixes in unknown-company titles', () => {
+    expect(callTitle({ subject: 'Re: Fwd: Re: Call for CV – PS II – Second Semester 2026-2027 – ZK?' })).toBe('ZK?');
+    expect(callTitle({ subject: 'Fwd: Call for CV - Lantern Forge' })).toBe('Lantern Forge');
+});
+it('shows city observations in Facts while keeping both source observations', () => {
+    const field = { status: 'found', normalized: ['DSO', 'Dubai'], source_text: 'City: Dubai', observations: [
+        { value: 'DSO', source_text: 'Lantern Forge,DSO' },
+        { value: 'Dubai', source_text: 'City: Dubai' },
+    ] };
+    render(<FieldProvenance name="city" field={field} revisions={[]}/>);
+    expect(screen.getByText('DSO (Dubai)').className).toBe('field-value');
+    expect(screen.getByText('Both observations retained', { exact: false })).toBeTruthy();
+    expect(cityText(null)).toBe('City unknown');
+    expect(cityText('Dubai')).toBe('Dubai');
 });
 it('copies the exact approved answer and announces success', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);

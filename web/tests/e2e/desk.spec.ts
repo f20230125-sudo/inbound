@@ -36,6 +36,7 @@ test('keyboard founder demo: provenance, revisions, provisional, conflicts and r
     await expect(administration.locator('[data-case="P-D22"]')).toBeVisible();
     await page.getByLabel('Category:', { exact: true }).selectOption('ps_call');
     await expect(page).toHaveURL(/category=ps_call/);
+    await keyboardActivate(page, page.getByRole('button', { name: /^Show all / }));
     await keyboardActivate(page, page.locator(`#message-link-${ids['P-D12'].id}`));
     await expect(page.getByRole('heading', { name: 'Ledgercraft', exact: true })).toBeVisible();
     const facts = page.locator('#facts');
@@ -61,10 +62,13 @@ test('keyboard founder demo: provenance, revisions, provisional, conflicts and r
     await audit(page);
     await keyboardActivate(page, page.getByRole('link', { name: 'Back to Today / Inbox', exact: true }));
     await page.getByLabel('Category:', { exact: true }).selectOption('');
+    await keyboardActivate(page, page.getByRole('button', { name: /^Show all / }));
     await keyboardActivate(page, page.locator(`#message-link-${ids.J09.id}`));
     await expect(page.locator('#facts')).toContainText('Conflicting');
     await expect(page.getByText('Deadline conflicting · No countdown', { exact: true })).toBeVisible();
     await keyboardActivate(page, page.getByRole('link', { name: 'Back to Today / Inbox', exact: true }));
+    await expect(page).toHaveURL(/all=1/);
+    await expect(page.locator('#inbox [data-case]')).toHaveCount(190);
     await expect(page.locator(`#message-${ids.J06.id}`)).toContainText('No exact PS-office sender match.');
     await keyboardActivate(page, page.locator(`#message-link-${ids['P-H21'].id}`));
     const mlRole = page.locator('#roles summary').filter({ hasText: 'Machine' }).first();
@@ -77,6 +81,46 @@ test('keyboard founder demo: provenance, revisions, provisional, conflicts and r
     await expect(page.getByText('Offline mode — live model calls are disabled.', { exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Run ledger', exact: true })).toBeVisible();
     await audit(page);
+});
+
+test('Inbox starts with recent messages and expands by keyboard, retaining filters and return focus', async ({ page }, info) => {
+    await theme(page, info.project.name.endsWith('-dark'));
+    const messages = await (await page.request.get('/api/messages')).json();
+    await page.goto('/');
+    const inbox = page.locator('#inbox');
+    await expect(inbox.locator('[data-case]')).toHaveCount(25);
+    expect(await inbox.locator('[data-case]').evaluateAll(nodes => nodes.map(n => n.getAttribute('data-case')))).toEqual(messages.slice(0, 25).map((m: { provider_id: string }) => m.provider_id));
+    const summary = page.getByRole('heading', { name: 'Overdue / blocked', exact: true });
+    expect((await summary.boundingBox())!.y).toBeLessThan((await inbox.boundingBox())!.y);
+    await keyboardActivate(page, page.getByRole('button', { name: `Show all ${messages.length}`, exact: true }));
+    await expect(inbox.locator('[data-case]')).toHaveCount(messages.length);
+    await expect(page.getByRole('button', { name: 'Show fewer messages' })).toBeFocused();
+    await page.getByLabel('Category:', { exact: true }).selectOption('ps_call');
+    const calls = messages.filter((m: { category: string }) => m.category === 'ps_call');
+    await expect(inbox.locator('[data-case]')).toHaveCount(Math.min(25, calls.length));
+    await keyboardActivate(page, page.getByRole('button', { name: `Show all ${calls.length}`, exact: true }));
+    await expect(inbox.locator('[data-case]')).toHaveCount(calls.length);
+    const last = inbox.locator('a[id^="message-link-"]').last();
+    const id = await last.getAttribute('id');
+    await keyboardActivate(page, last);
+    await keyboardActivate(page, page.getByRole('link', { name: 'Back to Today / Inbox', exact: true }));
+    await expect(page).toHaveURL(/category=ps_call.*all=1/);
+    await expect(page.locator(`#${id}`)).toBeFocused();
+    await keyboardActivate(page, page.getByRole('button', { name: 'Show fewer messages' }));
+    await expect(inbox.locator('[data-case]')).toHaveCount(25);
+    await expect(page.getByRole('button', { name: `Show all ${calls.length}`, exact: true })).toBeFocused();
+    await audit(page);
+    await keyboardActivate(page, page.getByRole('button', { name: 'Clear filters', exact: true }));
+    await expect(inbox.locator('[data-case]')).toHaveCount(25);
+    const summaryData = await (await page.request.get('/api/today')).json();
+    const admin = summaryData.admin_tasks[0];
+    expect(messages.slice(0, 25).some((m: { id: number }) => m.id === admin.id)).toBe(false);
+    const administration = page.locator('[data-slot=card]').filter({ has: page.getByRole('heading', { name: 'PS administration', exact: true }) });
+    await keyboardActivate(page, administration.locator(`[data-case="${admin.provider_id}"]`).getByRole('link', { name: 'View source', exact: true }));
+    await expect(page.locator(`#message-${admin.id}`)).toBeInViewport();
+    await expect(inbox.locator('[data-case]')).toHaveCount(messages.length);
+    await keyboardActivate(page, page.getByRole('button', { name: 'Show fewer messages', exact: true }));
+    await expect(inbox.locator('[data-case]')).toHaveCount(25);
 });
 test('Pause persists and prevents UI pack builds and imports', async ({ page }) => {
     const ids = await identities(page);

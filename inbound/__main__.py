@@ -5,11 +5,10 @@ import sys
 from contextlib import closing
 from pathlib import Path
 
-from inbound.db import connect, import_messages
+from inbound.db import connect
 from inbound.ledger import run
 from inbound.pause import check, set_paused
 from inbound.settings import Settings
-from inbound.sources import eml_dir, export_txt
 from inbound.triage.rules import triage_messages
 
 
@@ -68,13 +67,21 @@ def main(argv=None):
                 set_paused(db, args.command == "pause")
                 print(json.dumps({"paused": args.command == "pause"}))
                 return 0
+            if args.command == "import":
+                from inbound.work import execute, start_run
+
+                run_id = start_run(db, "import", source_type=args.source)
+                execute(settings, run_id, "import", root=args.path, source=args.source,
+                        provenance=args.provenance)
+                result = db.execute("SELECT * FROM runs WHERE id=?", (run_id,)).fetchone()
+                if result["status"] != "success":
+                    print(json.dumps({"error": result["error"]}))
+                    return 2
+                print(result["counts_json"])
+                return 0
             with run(db, args.command) as counts:
                 check(db)
-                if args.command == "import":
-                    loader = export_txt.load if args.source == "export" else eml_dir.load
-                    counts.update(import_messages(db, loader(args.path, args.provenance)))
-                    print(json.dumps(counts, sort_keys=True))
-                elif args.command == "triage":
+                if args.command == "triage":
                     counts["triaged"] = triage_messages(
                         db, personal_contacts=settings.personal_contacts
                     )

@@ -5,7 +5,8 @@ from datetime import UTC, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from inbound.extract.pipeline import latest_revision, opportunity_state
-from inbound.triage.normalize import normalize, normalize_subject
+from inbound.presentation import opportunity_labels
+from inbound.triage.normalize import normalize_subject
 
 DUBAI = ZoneInfo("Asia/Dubai")
 
@@ -95,6 +96,7 @@ def today(db, now=None):
                 "received_at": message["received_at"],
                 "provider_id": message["provider_id"],
                 "subject": message["subject"],
+                **opportunity_labels(db, state, message["subject"]),
             }
         )
     for row in db.execute(
@@ -116,20 +118,8 @@ def today(db, now=None):
             }
         )
     for entry in entries:
-        company = entry.get("company")
-        roles = entry.get("roles") or []
-        entry["display_title"] = (
-            " · ".join(
-                normalize(str(value))
-                for value in (
-                    company,
-                    roles[0]["title"] if roles else "Role unknown",
-                    entry.get("city") or "City unknown",
-                )
-            )
-            if company
-            else normalize_subject(entry["subject"])
-        )
+        if entry["kind"] == "ps_admin":
+            entry["display_title"] = normalize_subject(entry["subject"])
         group = deadline_group(entry["deadline"], now)
         entry["deadline_group"] = group
         entry["deadline_label"] = (

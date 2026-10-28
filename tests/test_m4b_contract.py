@@ -8,7 +8,9 @@ def test_digest_effective_title_and_blocker_reason(database):
         opportunity(database, case)
     summary = today(database, CLOCK)
     ledger = next(row for row in summary["new_calls"] if row["provider_id"] == "P-D12")
-    assert ledger["display_title"] == "Ledgercraft · Backend Intern · Cedar Quay"
+    # M6: without a pack, a multi-role call shows the count rather than its first role.
+    assert len(ledger["roles"]) == 2
+    assert ledger["display_title"] == "Ledgercraft · 2 roles · Cedar Quay"
     assert ledger["city"] == "Cedar Quay"
     blocked = next(row for row in summary["attention"] if row["provider_id"] == "P-D16")
     assert blocked["attention_reason"].startswith("Blocked: ")

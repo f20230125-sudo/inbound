@@ -97,6 +97,9 @@ export interface PackRef {
     provisional: number;
 }
 export interface Opportunity {
+    display_title?: string;
+    city_display?: string;
+    role_label?: string;
     id: number;
     revision_id: number;
     company: string | null;

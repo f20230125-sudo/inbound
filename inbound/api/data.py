@@ -11,6 +11,7 @@ from inbound.extract.call import safe_lines
 from inbound.extract.pipeline import opportunity_state
 from inbound.packs.answers import answers
 from inbound.packs.rank import rank
+from inbound.presentation import opportunity_labels
 
 
 def clean_replay(value):
@@ -126,6 +127,7 @@ def opportunity(db, oid, *, clock=None, demo=False):
     if not db.execute("SELECT 1 FROM opportunities WHERE id=?", (oid,)).fetchone():
         abort(404)
     state = opportunity_state(db, oid, clock=clock)
+    state.update(opportunity_labels(db, state, state["normalized_subject"]))
     revisions = []
     sources = {}
     for row in db.execute(

@@ -23,6 +23,7 @@ export default function App() {
     const [dark, setDark] = useState(() => localStorage.getItem('inbound-theme') === 'dark');
     const location = useLocation();
     const initialRoute = useRef(true);
+    const previousPath = useRef(location.pathname);
     const title = location.pathname.startsWith('/opportunity') ? titles[1] : location.pathname.startsWith('/settings') ? titles[2] : titles[0];
     const refresh = useCallback(async () => { try {
         setSettings(await request<Settings>('/settings'));
@@ -48,6 +49,11 @@ export default function App() {
         if (location.pathname.startsWith('/opportunity/'))
             sessionStorage.setItem('inbound-last-opportunity', location.pathname);
         if (initialRoute.current) { initialRoute.current = false; return; }
+        const pathChanged = previousPath.current !== location.pathname;
+        previousPath.current = location.pathname;
+        // Filter and expansion changes keep focus on the control the reader used.
+        if (!pathChanged && !location.hash)
+            return;
         const restore = () => {
             if (location.state?.restore) {
                 const target = document.getElementById(sessionStorage.getItem('inbound-inbox-focus') || '');
