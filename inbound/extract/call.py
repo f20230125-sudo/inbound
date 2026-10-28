@@ -156,6 +156,9 @@ def extract_call(message, attachments=(), *, category=None):
     if mailbox == "ps@dubai-bits-pilani.ac.in":
         quotes.append(message.sender)
     body = safe_lines(current_body(message.body_text))
+    # Category learning never authorizes an unfamiliar sender to create PS work.
+    if category == "ps_call" and mailbox not in {"ps@dubai.bits-pilani.ac.in"}:
+        category = "needs_review"
     result = {
         "fields": {},
         "kind": None,

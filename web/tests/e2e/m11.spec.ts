@@ -18,7 +18,7 @@ test('Scout dispatch: factual briefing, next decisions, ledger, keyboard and red
     await expect(page.getByRole('heading', { name: 'My latest work', exact: true })).toBeVisible();
     await page.keyboard.press('Control+k');
     await expect(page.getByRole('textbox', { name: 'Ask Scout or give a command' })).toBeFocused();
-    await expect(page.getByText('Commands arrive in M15.', { exact: true })).toBeVisible();
+    await expect(page.getByText('Use the page controls for now.', { exact: true })).toBeVisible();
     await expect(page.getByRole('textbox', { name: 'Ask Scout or give a command' })).toHaveAttribute('readonly', '');
     await page.keyboard.press('Escape');
     await expect(page.getByRole('link', { name: 'Open all work', exact: true })).toBeFocused();

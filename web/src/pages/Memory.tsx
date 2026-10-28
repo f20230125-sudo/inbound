@@ -3,6 +3,7 @@ import { useDesk } from '../App';
 import { DATA_CHANGED, request } from '../lib/api';
 import { date } from '../lib/format';
 import { Failure, Loading, mutationReason } from '../components/shared';
+import { LearnedRules } from '../components/learning';
 import { SafeMarkdown } from '../components/memory-markdown';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -64,7 +65,7 @@ export default function MemoryPage() {
             setSnapshot(result); setLoadError(false);
             if (action === 'add' || action === 'edit') closeEditor();
             if (action === 'forget') { setForget(undefined); document.getElementById('memory-add')?.focus(); }
-            setMessage(action === 'forget' ? 'Forgotten. Removed from active retrieval and memory history. The original curated file remains with Claude.' : action === 'disable' ? 'Disabled. Removed from active retrieval.' : action === 'enable' ? 'Enabled for retrieval. No behavior rule activated.' : 'Saved locally. No behavior rule activated.');
+            setMessage(action === 'forget' ? 'Forgotten. Removed from active retrieval and memory history. The original curated file remains with Claude.' : action === 'disable' ? 'Disabled. Removed from active retrieval.' : action === 'enable' ? 'Enabled for retrieval. Prose stays remembered only. Choose a structured preference below to say what should generalize.' : 'Saved locally. Prose stays remembered only. Choose a structured preference below to say what should generalize.');
         } catch (error) { setActionError(error instanceof Error ? error.message : 'Memory could not be saved.'); }
         finally { setBusy(false); }
     }
@@ -81,7 +82,7 @@ export default function MemoryPage() {
         if (!snapshot) return;
         setForget(undefined); setActionError('');
         setEditor({ id: item?.id, version: snapshot.version, returnId: item ? `edit-${item.id}` : 'memory-add',
-            document: item ? { name: item.name, description: item.description, type: item.type, content: item.content } : { ...empty } });
+            document: item ? { ...(item.title ? { title: item.title } : {}), name: item.name, description: item.description, type: item.type, content: item.content } : { ...empty } });
     }
     function field<K extends keyof MemoryDocument>(key: K, value: MemoryDocument[K]) {
         setEditor(old => old && { ...old, document: { ...old.document, [key]: value } });
@@ -89,7 +90,7 @@ export default function MemoryPage() {
     return <div className="memory-page">
         <section className="memory-intro" aria-labelledby="memory-title"><h2 id="memory-title">What I know about you</h2>
             <p>These are saved memories I can refer to. Remembered prose has no active behavior rule. Memory never approves a CV claim or a skill.</p>
-            <p className="meta">Current message evidence takes precedence over memory. Built-in restrictions always apply. Learned behavior arrives in M14.</p>
+            <p className="meta">Current message evidence takes precedence over memory. Built-in restrictions always apply. Explicit rules and their effects are shown below.</p>
             <div className="memory-toolbar"><Button id="memory-add" disabled={!!reason || busy || !snapshot} onClick={() => edit()}>Add memory</Button><Button variant="outline" disabled={!!reason || busy} onClick={() => void refresh()}>Refresh snapshot</Button></div>
             {reason && <p>{reason}. Saved memories remain readable.</p>}
             <p className="meta">{snapshot?.version ? `Snapshot ${snapshot.version} · Published ${date(snapshot.published_at)}` : 'No memory snapshot published yet.'} · Local service checks for changes every minute while running.</p>
@@ -102,7 +103,7 @@ export default function MemoryPage() {
             event.preventDefault();
             const item = editor.id ? snapshot?.items.find(i => i.id === editor.id) : undefined;
             if (editor.id && !item) { setActionError('Memory changed; cancel and refresh before saving.'); return; }
-            void change(editor.id ? 'edit' : 'add', item, editor.version, editor.document);
+            void change(editor.id ? 'edit' : 'add', item, editor.version, { ...editor.document, ...(editor.id ? {} : { title: editor.document.name }) });
         }} onKeyDown={event => { if (event.key === 'Escape' && !busy) { event.preventDefault(); closeEditor(); } }}>
             <h2>{editor.id ? 'Edit memory' : 'Add a memory'}</h2>
             <p>Saved locally. Editing a curated memory creates a local override; its original source stays visible when it disagrees.</p>
@@ -122,7 +123,7 @@ export default function MemoryPage() {
             <h2 id={`memory-group-${type}`}>{title}</h2>
             {snapshot.items.filter(i => i.type === type).length === 0 && <p className="meta">No saved memories in this section.</p>}
             {snapshot.items.filter(i => i.type === type).map(item => <article id={`memory-${item.id}`} key={item.id} className="memory-entry" aria-labelledby={`memory-name-${item.id}`}>
-                <h3 id={`memory-name-${item.id}`}>{item.name}</h3><p className="meta">{item.description}</p>
+                <h3 id={`memory-name-${item.id}`}>{item.display_title || item.name}</h3><p className="meta">{item.name} · {item.description}</p>
                 <p><strong>{item.status === 'disabled' ? 'Disabled · Excluded from retrieval' : 'Remembered · No active behavior rule'}</strong></p>
                 <p className="meta">{item.scope}</p><SafeMarkdown text={item.content} />
                 <dl className="memory-source"><div><dt>Source</dt><dd>{item.origin === 'imported' ? 'Curated snapshot' : 'Saved locally'} · {item.file}{item.local_file && <> · Edited locally in {item.local_file}</>}</dd></div><div><dt>Last change</dt><dd>{date(item.changed_at)} · Version {item.version}</dd></div></dl>
@@ -131,6 +132,6 @@ export default function MemoryPage() {
                 <div className="memory-toolbar"><Button id={`edit-${item.id}`} variant="outline" aria-label={`Edit ${item.name}`} disabled={!!reason || busy} onClick={() => edit(item)}>Edit</Button><Button variant="outline" aria-label={`${item.status === 'disabled' ? 'Enable' : 'Disable'} ${item.name}`} disabled={!!reason || busy} onClick={() => void change(item.status === 'disabled' ? 'enable' : 'disable', item)}> {item.status === 'disabled' ? 'Enable' : 'Disable'}</Button><Button id={`forget-${item.id}`} variant="outline" aria-label={`Forget ${item.name}`} disabled={!!reason || busy} onClick={() => { setEditor(undefined); setActionError(''); setForget({ item, version: snapshot.version }); }}>Forget</Button></div>
             </article>)}
         </section>)}
-        <section className="section" aria-labelledby="memory-learned"><h2 id="memory-learned">Learned rules</h2><p>No learned rules yet. Visible rules, their scopes and Undo arrive in M14.</p></section>
+        <LearnedRules />
     </div>;
 }

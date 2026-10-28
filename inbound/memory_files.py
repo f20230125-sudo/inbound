@@ -139,7 +139,12 @@ def signature(info):
 
 
 def validate(value):
-    if not isinstance(value, dict) or set(value) != {"name", "description", "type", "content"}:
+    required = {"name", "description", "type", "content"}
+    if (
+        not isinstance(value, dict)
+        or not required <= set(value)
+        or set(value) - required - {"title"}
+    ):
         raise ValueError("Memory name, description, type and content required")
     for key, limit in (("name", 200), ("description", 2000), ("content", MAX_FILE_BYTES)):
         text = value[key]
@@ -147,6 +152,12 @@ def validate(value):
             raise ValueError("Invalid memory text")
         if any(ord(c) < 32 and c not in "\n\r\t" for c in text):
             raise ValueError("Control characters in memory")
+    if "title" in value and (
+        not isinstance(value["title"], str)
+        or not value["title"].strip()
+        or len(value["title"].encode()) > 200
+    ):
+        raise ValueError("Invalid memory title")
     if not isinstance(value["type"], str) or value["type"] not in TYPES:
         raise ValueError("Unsupported memory type")
     return value
@@ -165,7 +176,7 @@ def parse(data):
         if isinstance(token, yaml.tokens.BlockMappingStartToken):
             maps += 1
         if (
-            count > 32
+            count > 40
             or maps > 1
             or isinstance(
                 token,
@@ -181,14 +192,14 @@ def parse(data):
         ):
             raise ValueError("Only a bounded scalar metadata map is supported")
     node = yaml.compose(front, Loader=yaml.BaseLoader)
-    if not isinstance(node, yaml.MappingNode) or not 3 <= len(node.value) <= 4:
+    if not isinstance(node, yaml.MappingNode) or not 3 <= len(node.value) <= 5:
         raise ValueError("Memory metadata required")
     metadata = {}
     for key, value in node.value:
         if not isinstance(key, yaml.ScalarNode) or not isinstance(value, yaml.ScalarNode):
             # This is malformed external data, rather than a Python caller type error.
             raise ValueError("Memory metadata must contain scalar values")  # noqa: TRY004
-        if key.value in metadata or key.value not in {"name", "description", "type", "source"}:
+        if key.value in metadata or key.value not in {"name", "description", "type", "source", "title"}:
             raise ValueError("Duplicate or unsupported metadata")
         metadata[key.value] = value.value
     source = metadata.pop("source", None)
@@ -201,6 +212,8 @@ def parse(data):
 def encode(document, source):
     validate(document)
     metadata = {k: document[k] for k in ("name", "description", "type")}
+    if "title" in document:
+        metadata["title"] = document["title"]
     if source is not None:
         metadata["source"] = source
     data = (

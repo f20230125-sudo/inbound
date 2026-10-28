@@ -137,3 +137,31 @@ M4b presentation contract fixes:
   PDFium dependency, and serializes rasterization. It adds no subprocess or transport.
   This supports mobile and headless browsers without relying on a native PDF plugin;
   the restrictive page CSP stays intact. The HTML evidence remains available.
+
+Learning is local and explicit:
+
+- `GET /api/learning` returns visible rules with versions, scopes, examples and
+  recent uses. `GET /api/learning/review` returns grouped unfamiliar senders and
+  the unresolved/stored totals. Neither endpoint writes.
+- Category corrections return `learning_rule`: a suggested exact-mailbox rule
+  with an exact normalized subject. Skip responses return a suggested preference
+  for supported reasons; the reason itself remains in opportunity history.
+- `POST /api/learning/sender` accepts `message_id`, `category`, `subject` (literal
+  normalized equality, or null). Multiple stored subjects require a condition.
+- `POST /api/learning/preference` accepts a supported `effect` and suggests it.
+  `POST /api/learning/instruction` accepts a supported explicit `instruction` and
+  activates it. Supported effects: `prefer_remote`, `prefer_hybrid`,
+  `prefer_in_person`, `avoid_relocation`. Prose memories are not executable rules.
+- `POST /api/learning/<id>` accepts `action: activate|undo`, `expected_version`.
+  Activation applies to future mail; Undo leaves original actions and past packs.
+- `GET /api/learning/<id>/preview` returns counts, examples and a token. Separate
+  `POST /api/learning/<id>/reprocess` requires `expected_version`, `expected_token`.
+  A content change invalidates the preview. Reprocessing changes categories only,
+  preserves manual corrections and never rebuilds opportunities or packs.
+
+All mutation guards apply, including a second Pause/import check inside the write
+transaction. Replay excludes private rules, examples and uses. Learned categories
+cannot authorize a sender to create PS opportunities. Decision urgency precedes
+preference fit; current source facts precede memory. Imported memory supports an
+optional scalar `title`; display falls back to the description's first clause,
+then the humanised slug, without changing stable IDs.

@@ -1,9 +1,10 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router';
 import { useDesk } from '../App';
-import { request, useResource } from '../lib/api';
+import { DATA_CHANGED, request, useResource } from '../lib/api';
 import { categories, date, deadlineGroup, fieldValue, label, normalizeSubject, opportunityTitle, statuses } from '../lib/format';
-import type { Entry, Message, Opportunity, Today } from '../types';
+import type { Entry, LearnedRule, Message, Opportunity, Today } from '../types';
+import { RuleSuggestion, SenderReview } from '../components/learning';
 import { OutsideApplicationStatus } from '../components/actions';
 import { Button } from '../components/ui/button';
 import { DeadlineDisplay, Failure, Highlight, Loading, Section, SnapshotBanner, StatusBadge } from '../components/shared';
@@ -19,7 +20,7 @@ export function AttentionList({ title, entries, now, empty }: {
     empty: string;
 }) {
     const [expanded, setExpanded] = useState(false);
-    return <Section title={title}><ul className={`summary-list ${expanded ? 'expanded' : ''}`}>{entries.map((entry, index) => <li key={`${entry.kind}-${entry.id}`} className={`summary-item ${index >= 3 ? 'extra' : ''} ${entry.deadline_group === 'overdue' ? 'expired-row' : ''}`} data-case={entry.provider_id}>{entry.kind === 'ps_admin' ? <AdminNotice entry={entry} now={now}/> : <><p className="meta">Call · {entry.provider_id}</p><strong>{entry.display_title}</strong>{['Needs your decision', 'Past deadlines'].includes(title) && <p className={entry.deadline_group === 'overdue' ? 'past' : 'review'}>{entry.attention_reason}</p>}<DeadlineDisplay record={entry.deadline} now={now}/><p className="meta">{entry.mode && label(entry.mode)} {entry.stipend != null && `· ${fieldValue(entry.stipend)}`}</p><Link id={`summary-${title}-${entry.id}`} to={`/opportunity/${entry.id}`} onClick={() => remember(`summary-${title}-${entry.id}`)}>Open opportunity</Link></>}</li>)}</ul>{!entries.length ? <p>{empty}</p> : <Button variant="outline" onClick={() => setExpanded(v => !v)} aria-expanded={expanded}>{expanded ? 'Show fewer' : `View all (${entries.length})`}</Button>}</Section>;
+    return <Section title={title}><ul className={`summary-list ${expanded ? 'expanded' : ''}`}>{entries.map((entry, index) => <li key={`${entry.kind}-${entry.id}`} className={`summary-item ${index >= 3 ? 'extra' : ''} ${entry.deadline_group === 'overdue' ? 'expired-row' : ''}`} data-case={entry.provider_id}>{entry.kind === 'ps_admin' ? <AdminNotice entry={entry} now={now}/> : <><p className="meta">Call · {entry.provider_id}</p><strong>{entry.display_title}</strong>{['Needs your decision', 'Past deadlines'].includes(title) && <p className={entry.deadline_group === 'overdue' ? 'past' : 'review'}>{entry.attention_reason}</p>}<DeadlineDisplay record={entry.deadline} now={now}/><>{entry.preference_reasons?.map(reason => <p className="meta" key={reason.rule_id}><a href={reason.href}>{reason.text}</a> · {reason.evidence} · {reason.score > 0 ? "+" : ""}{reason.score} preference fit; deadline priority unchanged.</p>)}</><p className="meta">{entry.mode && label(entry.mode)} {entry.stipend != null && `· ${fieldValue(entry.stipend)}`}</p><Link id={`summary-${title}-${entry.id}`} to={`/opportunity/${entry.id}`} onClick={() => remember(`summary-${title}-${entry.id}`)}>Open opportunity</Link></>}</li>)}</ul>{!entries.length ? <p>{empty}</p> : <Button variant="outline" onClick={() => setExpanded(v => !v)} aria-expanded={expanded}>{expanded ? 'Show fewer' : `View all (${entries.length})`}</Button>}</Section>;
 }
 export function CategoryCorrection({ message, done }: {
     message: Message;
@@ -31,6 +32,7 @@ export function CategoryCorrection({ message, done }: {
     const [error, setError] = useState(false);
     const [saved, setSaved] = useState('');
     const [previous, setPrevious] = useState<string>();
+    const [rule, setRule] = useState<LearnedRule>();
     const [events, setEvents] = useState<{
         category: string;
         created_at: string;
@@ -44,10 +46,12 @@ export function CategoryCorrection({ message, done }: {
         setError(false);
         try {
             const result = await request<{
-                previous_category: string;
+                previous_category: string; learning_rule: LearnedRule | null;
             }>(`/messages/${message.id}/category`, settings.csrf_token, { category });
             setEvents(v => [...v, { category, created_at: new Date().toISOString() }]);
             setPrevious(result.previous_category);
+            setRule(result.learning_rule || undefined);
+            window.dispatchEvent(new Event(DATA_CHANGED));
             setSaved(`Category changed to ${label(category)}.`);
             done(message.id, category);
         }
@@ -65,7 +69,7 @@ export function CategoryCorrection({ message, done }: {
         keyboard.current = false;
         void save(draft);
     } }} onChange={e => { setDraft(e.target.value); if (!keyboard.current)
-        void save(e.target.value); }} onBlur={() => { keyboard.current = false; setDraft(message.category); }}>{Object.entries(categories).map(([value, text]) => <option value={value} key={value}>{text}</option>)}</select></label>{blocked && <p>{blocked}</p>}{saved && <p role="status">{saved} <Button variant="outline" disabled={!!blocked || busy} onClick={() => previous && void save(previous)}>Undo</Button></p>}{error && <p role="alert">Category was not changed. Retry.</p>}<details><summary>Classification history</summary><p>Original: {label(message.original_category)} · {message.rule_id}</p><p>{message.reason}</p><p>{message.source_quote}</p>{[...message.classification_history, ...events].map((h, i) => <p key={i}>{label(h.category)} · {date(h.created_at)}</p>)}</details></div>;
+        void save(e.target.value); }} onBlur={() => { keyboard.current = false; setDraft(message.category); }}>{Object.entries(categories).map(([value, text]) => <option value={value} key={value}>{text}</option>)}</select></label>{blocked && <p>{blocked}</p>}{saved && <p role="status">{saved} <Button variant="outline" disabled={!!blocked || busy} onClick={() => previous && void save(previous)}>Undo</Button></p>}{error && <p role="alert">Category was not changed. Retry.</p>}{rule && <RuleSuggestion rule={rule} />}<details><summary>Classification history</summary><p>Original: {label(message.original_category)} · {message.rule_id}</p><p>{message.reason}</p><p>{message.source_quote}</p>{[...message.classification_history, ...events].map((h, i) => <p key={i}>{label(h.category)} · {date(h.created_at)}</p>)}</details></div>;
 }
 export function MessageCard({ message, op, done }: {
     message: Message;
@@ -149,7 +153,7 @@ export default function TodayPage() {
             window.setTimeout(() => { const next = filtered[index + 1] || filtered[index - 1]; (document.getElementById(`message-link-${next?.id}`) || document.getElementById('inbox'))?.focus(); }, 0);
         }
     }
-    return <>{summary.error ? <Failure text="Today could not be loaded." retry={summary.reload}/> : !summary.value ? <Loading text="Loading Today and Inbox…"/> : <><SnapshotBanner snapshot={summary.value.snapshot}/>{!all.length && inbox.value && <Section title="No messages imported."><p>Import an export folder or EML folder to start.</p>{settings.mode === 'local' && <Link to="/settings#import">Import messages</Link>}</Section>}<div className="summary-grid"><AttentionList title="Deadlines within 48 hours" entries={summary.value.deadlines_48h} now={settings.clock} empty="No supported deadlines within the next 48 hours."/><AttentionList title="New calls" entries={summary.value.new_calls.filter(e => deadlineGroup(e.deadline, settings.clock) !== 2)} now={settings.clock} empty="No new calls in this snapshot."/><AttentionList title="PS administration" entries={summary.value.admin_tasks.filter(e => deadlineGroup(e.deadline, settings.clock) !== 2)} now={settings.clock} empty="No PS administration notices in this snapshot."/></div><AttentionList title="Needs your decision" entries={(summary.value.decision_queue || summary.value.attention).filter(e => deadlineGroup(e.deadline, settings.clock) !== 2)} now={settings.clock} empty="No active decisions."/><AttentionList title="Date-only deadlines" entries={summary.value.date_only} now={settings.clock} empty="No date-only deadlines today or tomorrow."/><AttentionList title="Unknown / conflicting deadlines" entries={summary.value.uncertain_deadlines} now={settings.clock} empty="No uncertain deadlines."/><details id="past-deadlines"><summary>Past deadlines</summary><AttentionList title="Past deadlines" entries={summary.value.past_deadlines || summary.value.attention.filter(e => deadlineGroup(e.deadline, settings.clock) === 2)} now={settings.clock} empty="No past deadlines."/></details><Section title="Outside applications / follow-ups">{summary.value.outside_applications?.length ? <ul>{summary.value.outside_applications.map(entry => <li key={entry.id}><Link to={`/opportunity/${entry.id}`}>{entry.display_title}</Link><OutsideApplicationStatus activity={entry.outside_application}/></li>)}</ul> : <p>No outside applications recorded.</p>}</Section></>}<Section title="Inbox" id="inbox"><div className="filters">{[
+    return <>{summary.error ? <Failure text="Today could not be loaded." retry={summary.reload}/> : !summary.value ? <Loading text="Loading Today and Inbox…"/> : <><SnapshotBanner snapshot={summary.value.snapshot}/>{!all.length && inbox.value && <Section title="No messages imported."><p>Import an export folder or EML folder to start.</p>{settings.mode === 'local' && <Link to="/settings#import">Import messages</Link>}</Section>}<div className="summary-grid"><AttentionList title="Deadlines within 48 hours" entries={summary.value.deadlines_48h} now={settings.clock} empty="No supported deadlines within the next 48 hours."/><AttentionList title="New calls" entries={summary.value.new_calls.filter(e => deadlineGroup(e.deadline, settings.clock) !== 2)} now={settings.clock} empty="No new calls in this snapshot."/><AttentionList title="PS administration" entries={summary.value.admin_tasks.filter(e => deadlineGroup(e.deadline, settings.clock) !== 2)} now={settings.clock} empty="No PS administration notices in this snapshot."/></div><AttentionList title="Needs your decision" entries={(summary.value.decision_queue || summary.value.attention).filter(e => deadlineGroup(e.deadline, settings.clock) !== 2)} now={settings.clock} empty="No active decisions."/><AttentionList title="Date-only deadlines" entries={summary.value.date_only} now={settings.clock} empty="No date-only deadlines today or tomorrow."/><AttentionList title="Unknown / conflicting deadlines" entries={summary.value.uncertain_deadlines} now={settings.clock} empty="No uncertain deadlines."/><details id="past-deadlines"><summary>Past deadlines</summary><AttentionList title="Past deadlines" entries={summary.value.past_deadlines || summary.value.attention.filter(e => deadlineGroup(e.deadline, settings.clock) === 2)} now={settings.clock} empty="No past deadlines."/></details><Section title="Outside applications / follow-ups">{summary.value.outside_applications?.length ? <ul>{summary.value.outside_applications.map(entry => <li key={entry.id}><Link to={`/opportunity/${entry.id}`}>{entry.display_title}</Link><OutsideApplicationStatus activity={entry.outside_application}/></li>)}</ul> : <p>No outside applications recorded.</p>}</Section></>}<SenderReview /><Section title="Inbox" id="inbox"><div className="filters">{[
             ['category', 'Category:', category, { '': 'All categories', ...categories }],
             ['attention', 'Attention:', attention, { '': 'All messages', due: 'Due within 48 hours', overdue: 'Overdue', review: 'Needs review', corrected: 'Corrected' }],
             ['status', 'Application status:', status, { '': 'All statuses', ...statuses }],

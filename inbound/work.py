@@ -91,6 +91,10 @@ def _import_pipeline(
     counts["triaged"] = triage_messages(db, personal_contacts=contacts)
     progress("extraction")
     counts.update(extract_messages(db, clock=clock))
+    from inbound.learning_preferences import record_uses
+
+    with db:
+        record_uses(db)
     progress("provenance")
     index_locations(db)
     progress("snapshot")
@@ -168,6 +172,7 @@ def staged_import(db, settings, run_id, root, source, provenance, clock):
                     "attachment_locations",
                     "attachment_recoveries",
                     "snapshots",
+                    "learned_rule_uses",
                 ):
                     db.execute(
                         f"INSERT OR REPLACE INTO main.{table} SELECT * FROM import_stage.{table}"

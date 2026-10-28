@@ -1,5 +1,6 @@
 ---
 name: Reading list
+title: Reading list
 description: Fictional reading reference
 type: reference
 ---

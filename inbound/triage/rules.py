@@ -100,7 +100,7 @@ def urgency(deadline, now):
 
 def triage_messages(db, ids=None, personal_contacts=None):
     check(db)
-    rows = db.execute("SELECT id,sender,subject,body_text FROM messages ORDER BY sent_at,id")
+    rows = db.execute("SELECT id,sender,subject,body_text,content_hash,source FROM messages ORDER BY sent_at,id")
     count = 0
     with db:
         for row in rows.fetchall():
@@ -110,6 +110,9 @@ def triage_messages(db, ids=None, personal_contacts=None):
             prediction = classify(
                 row["sender"], row["subject"], row["body_text"], personal_contacts
             )
+            from inbound.learning import prediction as learned_prediction
+
+            prediction = learned_prediction(db, row, prediction)
             old = db.execute("SELECT category FROM triage WHERE message_id=?", (row['id'],)).fetchone()
             db.execute(
                 "INSERT INTO triage(message_id,category,urgency,reason,rule_id,source_quote,"

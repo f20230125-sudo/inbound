@@ -1,5 +1,6 @@
 ---
 name: Moonseed garden
+title: Moonseed garden
 description: Fictional project, never approved CV evidence
 type: project
 source: moonseed
