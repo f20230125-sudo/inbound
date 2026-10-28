@@ -26,4 +26,6 @@ app = create_app({
     "WEB_DIST": HERE / "public",
     "DEMO": True,
     "ASYNC_WORK": False,
+    # Only the demo's own addresses (the production alias and its deployment URLs).
+    "HOSTED_HOSTS": r"inbound-scout(?:-[a-z0-9]+-uzair-ba1c)?\.vercel\.app|127\.0\.0\.1(?::[0-9]{1,5})?",
 })

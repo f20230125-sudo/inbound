@@ -123,7 +123,12 @@ def create_app(config=None):
 
     @app.before_request
     def guard():
-        if not re.fullmatch(r"(?:127\.0\.0\.1|localhost)(?::[0-9]{1,5})?", request.host):
+        hosted = app.config.get("HOSTED_HOSTS")
+        if hosted and settings.hosted_replay and app.config["APP_MODE"] == "replay":
+            # The public read-only demo answers only on its own published hosts.
+            if not re.fullmatch(hosted, request.host):
+                abort(403, "Unknown host")
+        elif not re.fullmatch(r"(?:127\.0\.0\.1|localhost)(?::[0-9]{1,5})?", request.host):
             abort(403, "Local Host required")
         if ":" in request.host and not 1 <= int(request.host.rsplit(":", 1)[1]) <= 65535:
             abort(403, "Invalid local port")
