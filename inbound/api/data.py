@@ -258,7 +258,9 @@ def artifact(row, settings):
     filename = files.get("pdf")
     if not filename:
         abort(404)
-    path = Path(filename).resolve()
+    path = Path(filename)
+    # The public demo stores pack files relative to its data root so it can move hosts.
+    path = (path if path.is_absolute() else settings.data_root / path).resolve()
     allowed = (settings.data_root / "packs" / row["id"]).resolve()
     root = (settings.data_root / "packs").resolve()
     if (

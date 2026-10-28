@@ -1,0 +1,107 @@
+{
+  "projects": [
+    {
+      "id": "demo-p3",
+      "bullets": [
+        "p3-b2",
+        "p3-b1"
+      ],
+      "why": [
+        "P-D15-r1-q1",
+        "P-D15-r1-q2",
+        "P-D15-r1-q3"
+      ]
+    },
+    {
+      "id": "demo-p1",
+      "bullets": [
+        "p1-b1",
+        "p1-b2"
+      ],
+      "why": [
+        "P-D15-r1-q1",
+        "P-D15-r1-q2"
+      ]
+    },
+    {
+      "id": "demo-p4",
+      "bullets": [
+        "p4-b1",
+        "p4-b2"
+      ],
+      "why": [
+        "P-D15-r1-q1"
+      ]
+    },
+    {
+      "id": "demo-p5",
+      "bullets": [
+        "p5-b1",
+        "p5-b2"
+      ],
+      "why": [
+        "P-D15-r1-q1"
+      ]
+    }
+  ],
+  "skills": [
+    "demo-skill-python",
+    "demo-skill-sql",
+    "demo-skill-sql-window-functions",
+    "demo-skill-csv-validation",
+    "demo-skill-flask",
+    "demo-skill-sqlite",
+    "demo-skill-pytest",
+    "demo-skill-duckdb",
+    "demo-skill-sqlite-fts5",
+    "demo-skill-bm25",
+    "demo-skill-docker"
+  ],
+  "gaps": [],
+  "coverage": {
+    "supported": 3,
+    "total": 3,
+    "ratio": 1.0
+  },
+  "fit": "supported",
+  "fit_reason": "",
+  "also_built": [
+    "demo-p2"
+  ],
+  "line_costs": {
+    "p3-b2": 2,
+    "p3-b1": 1,
+    "p1-b1": 1,
+    "p1-b2": 1,
+    "p4-b1": 1,
+    "p4-b2": 1,
+    "p5-b1": 1,
+    "p5-b2": 1
+  },
+  "requirements": [
+    {
+      "id": "P-D15-r1-q1",
+      "text": "Python"
+    },
+    {
+      "id": "P-D15-r1-q2",
+      "text": "SQL window functions"
+    },
+    {
+      "id": "P-D15-r1-q3",
+      "text": "CSV validation"
+    }
+  ],
+  "profile": {
+    "family": "data",
+    "text": "Computer Science undergraduate who builds and tests data systems in \\textbf{Python} and \\textbf{SQL}: a \\textbf{tick-level backtesting engine} validated with null tests and a no-look-ahead proof, \\textbf{ETL pipelines} from raw files into SQL databases with automated data-quality checks, and dashboards in Power BI and React. Every result is checked against a baseline or a control, and reported even when it disappoints.",
+    "needs_uzair_review": false,
+    "not_tailored": false
+  },
+  "recommended_role": {
+    "id": 25,
+    "title": "Data Intern",
+    "reason": "Best evidence coverage: 3 of 3 requirements supported; ties use SPEC/source role order."
+  },
+  "other_roles": []
+}

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "flask",
+  "buildCommand": "npm --prefix web ci && npm --prefix web run build && rm -rf public && cp -r web/dist public",
+  "rewrites": [
+    { "source": "/((?!api(?:/|$)|assets/).*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "no-referrer" },
+        { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains" }
+      ]
+    }
+  ],
+  "functions": {
+    "app.py": {
+      "maxDuration": 30,
+      "includeFiles": "{inbound/**,public_demo/**}",
+      "excludeFiles": "{web/**,tests/**,fixtures/**,synth/**,eval/**,.codex-runs/**,.local/**,.venv/**,.git/**}"
+    }
+  }
+}

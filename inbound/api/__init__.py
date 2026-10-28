@@ -73,6 +73,8 @@ def create_app(config=None):
     app.config.update(config or {})
     if app.config["APP_MODE"] not in {"local", "replay"}:
         raise ValueError("Unknown app mode")
+    if app.config["SETTINGS"].hosted_replay and app.config["APP_MODE"] != "replay":
+        raise ValueError("A hosted data root is only allowed for the read-only replay")
     settings = app.config["SETTINGS"]
     app.extensions["work_executor"] = ThreadPoolExecutor(max_workers=2)
 

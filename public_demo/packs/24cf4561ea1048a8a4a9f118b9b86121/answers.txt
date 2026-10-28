@@ -1,0 +1,19 @@
+id: demo-p4
+purpose: search invented course notes.
+technologies: Python, SQLite, SQLite FTS5, BM25, pytest
+challenge_fix: unstable ties; added a stable document-ID tie-break.
+
+id: demo-p1
+purpose: track a fictional shared pantry.
+technologies: Python, Flask, SQLite, SQL, pytest
+challenge_fix: partial stock updates; wrapped related writes in one transaction.
+
+id: demo-p3
+purpose: summarize invented harbor-event data.
+technologies: Python, SQL, SQL window functions, CSV validation, DuckDB, pytest
+challenge_fix: duplicate input records; introduced a stable event key and duplicate checks.
+
+id: demo-p5
+purpose: demonstrate a repeatable build for a fictional service.
+technologies: Python, Flask, Docker, Linux, GitHub Actions, CI/CD
+challenge_fix: inconsistent dependency versions; pinned the demonstration dependencies.

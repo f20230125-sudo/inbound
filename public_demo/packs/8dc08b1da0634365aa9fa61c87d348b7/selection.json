@@ -1,0 +1,208 @@
+{
+  "projects": [
+    {
+      "id": "demo-p1",
+      "bullets": [
+        "p1-b1",
+        "p1-b2"
+      ],
+      "why": [
+        "P-D12-r1-q1",
+        "P-D12-r1-q2",
+        "P-D12-r1-q3"
+      ]
+    },
+    {
+      "id": "demo-p3",
+      "bullets": [
+        "p3-b2",
+        "p3-b1"
+      ],
+      "why": [
+        "P-D12-r1-q1",
+        "P-D12-r1-q3"
+      ]
+    },
+    {
+      "id": "demo-p5",
+      "bullets": [
+        "p5-b1",
+        "p5-b2"
+      ],
+      "why": [
+        "P-D12-r1-q1",
+        "P-D12-r1-q2"
+      ]
+    },
+    {
+      "id": "demo-p4",
+      "bullets": [
+        "p4-b1",
+        "p4-b2"
+      ],
+      "why": [
+        "P-D12-r1-q1"
+      ]
+    }
+  ],
+  "skills": [
+    "demo-skill-python",
+    "demo-skill-flask",
+    "demo-skill-sql",
+    "demo-skill-sqlite",
+    "demo-skill-pytest",
+    "demo-skill-sql-window-functions",
+    "demo-skill-csv-validation",
+    "demo-skill-duckdb",
+    "demo-skill-sqlite-fts5",
+    "demo-skill-bm25",
+    "demo-skill-docker"
+  ],
+  "gaps": [],
+  "coverage": {
+    "supported": 3,
+    "total": 3,
+    "ratio": 1.0
+  },
+  "fit": "supported",
+  "fit_reason": "",
+  "also_built": [
+    "demo-p2"
+  ],
+  "line_costs": {
+    "p1-b1": 1,
+    "p1-b2": 1,
+    "p3-b2": 2,
+    "p3-b1": 1,
+    "p5-b1": 1,
+    "p5-b2": 1,
+    "p4-b1": 1,
+    "p4-b2": 1
+  },
+  "requirements": [
+    {
+      "id": "P-D12-r1-q1",
+      "text": "Python"
+    },
+    {
+      "id": "P-D12-r1-q2",
+      "text": "Flask"
+    },
+    {
+      "id": "P-D12-r1-q3",
+      "text": "SQL"
+    }
+  ],
+  "profile": {
+    "family": "data",
+    "text": "Computer Science undergraduate who builds and tests data systems in \\textbf{Python} and \\textbf{SQL}: a \\textbf{tick-level backtesting engine} validated with null tests and a no-look-ahead proof, \\textbf{ETL pipelines} from raw files into SQL databases with automated data-quality checks, and dashboards in Power BI and React. Every result is checked against a baseline or a control, and reported even when it disappoints.",
+    "needs_uzair_review": false,
+    "not_tailored": false
+  },
+  "recommended_role": {
+    "id": 18,
+    "title": "Backend Intern",
+    "reason": "Best evidence coverage: 3 of 3 requirements supported; ties use SPEC/source role order."
+  },
+  "other_roles": [
+    {
+      "id": 19,
+      "title": "Test Engineering Intern",
+      "coverage": {
+        "projects": [
+          {
+            "id": "demo-p2",
+            "bullets": [
+              "p2-b2",
+              "p2-b1"
+            ],
+            "why": [
+              "P-D12-r2-q2"
+            ]
+          },
+          {
+            "id": "demo-p4",
+            "bullets": [
+              "p4-b2",
+              "p4-b1"
+            ],
+            "why": [
+              "P-D12-r2-q1"
+            ]
+          },
+          {
+            "id": "demo-p1",
+            "bullets": [
+              "p1-b2",
+              "p1-b1"
+            ],
+            "why": [
+              "P-D12-r2-q1"
+            ]
+          },
+          {
+            "id": "demo-p3",
+            "bullets": [
+              "p3-b2",
+              "p3-b1"
+            ],
+            "why": [
+              "P-D12-r2-q1"
+            ]
+          }
+        ],
+        "skills": [
+          "demo-skill-pytest",
+          "demo-skill-vitest",
+          "demo-skill-python",
+          "demo-skill-flask",
+          "demo-skill-sqlite",
+          "demo-skill-sql",
+          "demo-skill-typescript",
+          "demo-skill-sql-window-functions",
+          "demo-skill-csv-validation",
+          "demo-skill-duckdb",
+          "demo-skill-sqlite-fts5",
+          "demo-skill-bm25"
+        ],
+        "gaps": [],
+        "coverage": {
+          "supported": 2,
+          "total": 2,
+          "ratio": 1.0
+        },
+        "fit": "supported",
+        "fit_reason": "",
+        "also_built": [
+          "demo-p5"
+        ],
+        "line_costs": {
+          "p2-b2": 1,
+          "p2-b1": 2,
+          "p4-b2": 1,
+          "p4-b1": 1,
+          "p1-b2": 1,
+          "p1-b1": 1,
+          "p3-b2": 2,
+          "p3-b1": 1
+        },
+        "requirements": [
+          {
+            "id": "P-D12-r2-q1",
+            "text": "pytest"
+          },
+          {
+            "id": "P-D12-r2-q2",
+            "text": "Vitest"
+          }
+        ],
+        "profile": {
+          "family": "ai",
+          "text": "Computer Science undergraduate building \\textbf{AI agents and LLM applications} in \\textbf{Python}: the Gemini API with structured outputs and typed tool calling, Claude through Claude Code, \\textbf{RAG} with measured retrieval, and REST backends on SQL databases. Projects are measured against baselines where one exists, and the results are reported even when they disappoint.",
+          "needs_uzair_review": true,
+          "not_tailored": true
+        }
+      }
+    }
+  ]
+}

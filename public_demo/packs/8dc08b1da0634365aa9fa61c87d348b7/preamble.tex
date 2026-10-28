@@ -1,0 +1,24 @@
+\documentclass[letterpaper,10pt]{article}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fontspec}
+\setmainfont{lmroman10}[Extension=.otf, UprightFont=*-regular, BoldFont=*-bold,
+ ItalicFont=*-italic, BoldItalicFont=*-bolditalic, Ligatures=NoCommon]
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-0.5in}
+\addtolength{\textheight}{1in}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlist[itemize]{leftmargin=0.18in,itemsep=1pt,parsep=0pt,topsep=3pt}
+\titleformat{\section}{\large\scshape}{}{0em}{}
+\titlespacing*{\section}{0pt}{7pt}{3pt}
+\raggedright
+\newcommand{\resumeItem}[1]{\item\small{#1}}
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[label={},leftmargin=0pt]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}}
