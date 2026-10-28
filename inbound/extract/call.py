@@ -26,20 +26,42 @@ def safe_lines(text):
 
 def deadline_fields(text, message, source="message", attachment_name=None, admin=False):
     candidates = []
-    for line in text.splitlines():
+    lines = text.splitlines()
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        index += 1
+        # Plain-text exports may wrap after "at". Keep the newline in the evidence
+        # rather than accepting the incomplete first line as a date-only deadline.
+        if (
+            re.search(r"\bat\s*\**\s*$", line, re.IGNORECASE)
+            and index < len(lines)
+            and re.fullmatch(
+                r"\s*\**\s*(?:\d{1,2}:\d{2}\s*(?:AM|PM)?|\d{4}\s*hrs|\d{1,2}\s*(?:AM|PM))"
+                r"\s*(?:UTC|GMT)?\s*\**\s*",
+                lines[index],
+                re.IGNORECASE,
+            )
+        ):
+            line += "\n" + lines[index]
+            index += 1
         if admin:
             phrases = [
                 m.group().rstrip(" .")
                 for m in re.finditer(
                     r"\b(?:on or before|by)\b.*?(?=\s*(?:/|;|\band by\b|\bby\b)|$)",
                     line,
-                    re.IGNORECASE,
+                    re.IGNORECASE | re.DOTALL,
                 )
             ]
         elif re.search(
             r"\b(?:deadline|closing time|final extension|CVs due)\b", line, re.IGNORECASE
         ):
-            label = re.match(r"\s*\**CV Submission Deadline\**\s*:\s*(.*)", line, re.IGNORECASE)
+            label = re.match(
+                r"\s*\**CV Submission Deadline\**\s*:\s*(.*)",
+                line,
+                re.IGNORECASE | re.DOTALL,
+            )
             phrases = [label[1] if label else line.strip()]
         else:
             phrases = []
@@ -213,7 +235,9 @@ def extract_call(message, attachments=(), *, category=None):
         ),
         "",
     )
-    inline_marker = re.search(r"Job Title & (?:Expected Skills|JD)|Job Title|\bJD\b", body)
+    inline_marker = re.search(
+        r"Job Title & (?:Expected Skills|JD)|Job Title|\bJD\b|\bPositions available\s*:", body
+    )
     role_text = body
     role_origin = "message"
     role_attachment = None

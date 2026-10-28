@@ -8,9 +8,11 @@ import secrets
 import sqlite3
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
+from io import BytesIO
 from pathlib import Path
+from threading import Lock
 
-from flask import Flask, abort, g, jsonify, request, send_from_directory, session
+from flask import Flask, abort, g, jsonify, request, send_file, send_from_directory, session
 from werkzeug.exceptions import HTTPException
 
 from inbound.api import data
@@ -22,6 +24,8 @@ from inbound.pause import PausedError, check, set_paused
 from inbound.settings import REPO, Settings
 from inbound.triage.taxonomy import CATEGORIES
 from inbound.work import execute, start_run
+
+_PREVIEW_LOCK = Lock()
 
 
 def create_app(config=None):
@@ -136,6 +140,7 @@ def create_app(config=None):
         result = {
             "mode": app.config["APP_MODE"],
             "offline": True,
+            "source_format": app.config["SOURCE_FORMAT"],
             "paused": connection.execute(
                 "SELECT value FROM settings WHERE key='paused'"
             ).fetchone()[0]
@@ -312,6 +317,17 @@ def create_app(config=None):
     def get_pdf(pid):
         path = data.artifact(data.pack_row(db(), pid), settings)
         return send_from_directory(path.parent, path.name, mimetype="application/pdf")
+
+    @app.get("/api/packs/<pid>/preview")
+    def get_preview(pid):
+        import pdfplumber
+
+        path = data.artifact(data.pack_row(db(), pid), settings)
+        image = BytesIO()
+        with _PREVIEW_LOCK, pdfplumber.open(path) as pdf:
+            pdf.pages[0].to_image(resolution=110).original.save(image, format="PNG")
+        image.seek(0)
+        return send_file(image, mimetype="image/png")
 
     @app.post("/api/packs/<pid>/status")
     def pack_status(pid):

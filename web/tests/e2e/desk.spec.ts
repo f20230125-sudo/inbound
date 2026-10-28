@@ -1,0 +1,123 @@
+import { expect } from '@playwright/test';
+import { audit, identities, keyboardActivate, test, theme } from './helpers.js';
+for (const view of ['Today / Inbox', 'Opportunity / Pack', 'Settings / Runs']) {
+    test(`${view}: axe, console, overflow`, async ({ page }, info) => {
+        await theme(page, info.project.name.endsWith('-dark'));
+        const ids = await identities(page);
+        await page.goto(view === 'Today / Inbox' ? '/' : view === 'Settings / Runs' ? '/settings' : `/opportunity/${ids['P-D12'].opportunity_id}`);
+        await expect(page.getByRole('heading', { level: 1, name: view })).toBeVisible();
+        await expect(page.getByText(view === 'Today / Inbox' ? 'Inbox' : view === 'Settings / Runs' ? 'Payload policy — read-only' : 'Selected projects', { exact: true })).toBeVisible();
+        await expect(page.locator('html')).toHaveClass(info.project.name.endsWith('-dark') ? 'dark' : '');
+        await audit(page);
+        await page.screenshot({ path: info.outputPath('view.png'), fullPage: true });
+    });
+}
+test('light-first theme persists explicit toggle and skip link is first', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('html')).not.toHaveClass('dark');
+    await page.keyboard.press('Tab');
+    await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#main')).toBeFocused();
+    await keyboardActivate(page, page.getByRole('button', { name: 'Dark mode' }));
+    await page.reload();
+    await expect(page.locator('html')).toHaveClass('dark');
+});
+test('keyboard founder demo: provenance, revisions, provisional, conflicts and roles', async ({ page }, info) => {
+    await theme(page, info.project.name.endsWith('-dark'));
+    const ids = await identities(page);
+    await page.goto('/');
+    const overdue = page.locator('[data-slot=card]').filter({ has: page.getByRole('heading', { name: 'Overdue / blocked', exact: true }) });
+    await keyboardActivate(page, overdue.getByRole('button', { name: /View all/ }));
+    await expect(overdue.locator('[data-case="P-D06"]')).toContainText('Deadline passed before receipt');
+    await expect(page.locator('[data-case="P-D21"]').first()).toContainText('Time not stated');
+    const administration = page.locator('[data-slot=card]').filter({ has: page.getByRole('heading', { name: 'PS administration', exact: true }) });
+    await keyboardActivate(page, administration.getByRole('button', { name: /View all/ }));
+    await expect(administration.locator('[data-case="P-D22"]')).toBeVisible();
+    await page.getByLabel('Category:', { exact: true }).selectOption('ps_call');
+    await expect(page).toHaveURL(/category=ps_call/);
+    await keyboardActivate(page, page.locator(`#message-link-${ids['P-D12'].id}`));
+    await expect(page.getByRole('heading', { name: 'Ledgercraft', exact: true })).toBeVisible();
+    const facts = page.locator('#facts');
+    await keyboardActivate(page, facts.locator('summary').first());
+    await expect(facts.locator('mark').first()).toBeVisible();
+    await expect(page.getByRole('table', { name: 'Backend Intern requirement coverage' })).toContainText('Supported');
+    await expect(page.getByText('Passed', { exact: true }).first()).toBeVisible();
+    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    await keyboardActivate(page, page.getByRole('button', { name: 'Copy answer', exact: true }).first());
+    await expect(page.getByText('Copied', { exact: true }).first()).toBeVisible();
+    await audit(page);
+    await keyboardActivate(page, page.getByRole('link', { name: 'Back to Today / Inbox', exact: true }));
+    await expect(page).toHaveURL(/category=ps_call/);
+    await expect(page.locator(`#message-link-${ids['P-D12'].id}`)).toBeFocused();
+    await keyboardActivate(page, page.locator(`#message-link-${ids['P-D02'].id}`));
+    await expect(page.locator('#facts')).toContainText('29 Oct 2026, 08:00');
+    await expect(page.locator('#facts')).toContainText('28 Oct 2026, 00:20');
+    await expect(page.getByRole('heading', { name: 'Revision history', exact: true })).toBeVisible();
+    await keyboardActivate(page, page.getByRole('link', { name: 'Back to Today / Inbox', exact: true }));
+    await keyboardActivate(page, page.locator(`#message-link-${ids['P-D16'].id}`));
+    await expect(page.getByText('Provisional preview', { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Mark reviewed', exact: true })).toBeDisabled();
+    await audit(page);
+    await keyboardActivate(page, page.getByRole('link', { name: 'Back to Today / Inbox', exact: true }));
+    await page.getByLabel('Category:', { exact: true }).selectOption('');
+    await keyboardActivate(page, page.locator(`#message-link-${ids.J09.id}`));
+    await expect(page.locator('#facts')).toContainText('Conflicting');
+    await expect(page.getByText('Deadline conflicting · No countdown', { exact: true })).toBeVisible();
+    await keyboardActivate(page, page.getByRole('link', { name: 'Back to Today / Inbox', exact: true }));
+    await expect(page.locator(`#message-${ids.J06.id}`)).toContainText('No exact PS-office sender match.');
+    await keyboardActivate(page, page.locator(`#message-link-${ids['P-H21'].id}`));
+    const mlRole = page.locator('#roles summary').filter({ hasText: 'Machine' }).first();
+    await expect(mlRole, 'P-H21 must expose the source ML role and its requirements').toHaveCount(1);
+    await keyboardActivate(page, mlRole);
+    await expect(page.locator('#roles')).toContainText('PyTorch');
+    await expect(page.locator('#roles')).toContainText('TensorFlow');
+    await expect(page.getByRole('cell', { name: 'Gap: no approved evidence', exact: true }).first()).toBeVisible();
+    await keyboardActivate(page, page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Settings / Runs' }));
+    await expect(page.getByText('Offline mode — live model calls are disabled.', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Run ledger', exact: true })).toBeVisible();
+    await audit(page);
+});
+test('Pause persists and prevents UI pack builds and imports', async ({ page }) => {
+    const ids = await identities(page);
+    await page.goto(`/opportunity/${ids['P-D12'].opportunity_id}`);
+    const runsBefore = await (await page.request.get('/api/runs')).json();
+    await keyboardActivate(page, page.getByRole('button', { name: 'Pause new work', exact: true }));
+    try {
+        await expect(page.getByRole('button', { name: 'Build pack', exact: true })).toBeDisabled();
+        await page.reload();
+        await expect(page.getByText('Paused — imports, extraction and pack work are stopped.', { exact: true })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Build pack', exact: true })).toBeDisabled();
+        await page.goto('/settings');
+        await expect(page.locator('#import').getByRole('button', { name: 'Import messages', exact: true })).toBeDisabled();
+        expect((await (await page.request.get('/api/runs')).json()).length).toBe(runsBefore.length);
+    }
+    finally {
+        await page.getByRole('button', { name: 'Resume work', exact: true }).first().click();
+    }
+});
+test('provisional review requires acknowledgement bound to the new pack', async ({ page }) => {
+    const ids = await identities(page);
+    await page.goto(`/opportunity/${ids['P-D16'].opportunity_id}`);
+    const latestId = async () => (await (await page.request.get(`/api/opportunities/${ids['P-D16'].opportunity_id}`)).json()).packs[0].id as string;
+    const previousPack = await latestId();
+    await page.getByRole('button', { name: 'Build provisional preview', exact: true }).click();
+    await expect.poll(latestId).not.toBe(previousPack);
+    const newPack = await latestId();
+    await expect(page.locator('.pdf-page')).toHaveAttribute('src', `/api/packs/${newPack}/preview`, { timeout: 30000 });
+    await expect(page.getByText('Pack preparing', { exact: false })).toHaveCount(0, { timeout: 30000 });
+    await expect(page.getByText('Provisional preview', { exact: true }).first()).toBeVisible();
+    const review = page.getByRole('button', { name: 'Mark reviewed', exact: true });
+    await expect(review).toBeDisabled();
+    const ack = page.getByRole('checkbox', { name: 'I understand that the JD was not read and this pack may miss requirements.' });
+    await expect(ack).toBeEnabled();
+    await expect(ack).not.toBeChecked();
+    await ack.focus();
+    await page.keyboard.press('Space');
+    await expect(ack).toBeChecked();
+    await expect(review).toBeEnabled();
+    await keyboardActivate(page, review);
+    await expect(page.getByText('JD unreadable — provisional preview only', { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Mark submitted by me', exact: true })).toBeEnabled();
+    await audit(page);
+});

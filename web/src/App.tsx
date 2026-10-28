@@ -1,0 +1,80 @@
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { Link, NavLink, Route, Routes, useLocation } from 'react-router';
+import type { Run, Settings } from './types';
+import { request } from './lib/api';
+import { date } from './lib/format';
+import { PauseControl, Failure, Loading } from './components/shared';
+import { Button } from './components/ui/button';
+import TodayPage from './pages/Today';
+import OpportunityPage from './pages/Opportunity';
+import SettingsPage from './pages/Settings';
+interface Desk {
+    settings: Settings;
+    refresh: () => Promise<void>;
+    savePause: (value: boolean) => Promise<void>;
+}
+const Context = createContext<Desk | null>(null);
+export function useDesk() { return useContext(Context)!; }
+const titles = ['Today / Inbox', 'Opportunity / Pack', 'Settings / Runs'];
+export default function App() {
+    const [settings, setSettings] = useState<Settings>();
+    const [error, setError] = useState(false);
+    const [activeWork, setActiveWork] = useState(false);
+    const [dark, setDark] = useState(() => localStorage.getItem('inbound-theme') === 'dark');
+    const location = useLocation();
+    const initialRoute = useRef(true);
+    const title = location.pathname.startsWith('/opportunity') ? titles[1] : location.pathname.startsWith('/settings') ? titles[2] : titles[0];
+    const refresh = useCallback(async () => { try {
+        setSettings(await request<Settings>('/settings'));
+        setError(false);
+    }
+    catch {
+        setError(true);
+    } }, []);
+    useEffect(() => { void refresh(); }, [refresh, location.pathname]);
+    useEffect(() => { document.documentElement.classList.toggle('dark', dark); }, [dark]);
+    useEffect(() => {
+        const checkRuns = () => { if (!document.hidden)
+            void request<Run[]>('/runs').then(runs => setActiveWork(runs.some(r => r.status === 'running'))).catch(() => { }); };
+        checkRuns();
+        const started = () => setActiveWork(true);
+        window.addEventListener('inbound-work-started', started);
+        const timer = activeWork ? window.setInterval(checkRuns, 5000) : undefined;
+        document.addEventListener('visibilitychange', checkRuns);
+        return () => { clearInterval(timer); window.removeEventListener('inbound-work-started', started); document.removeEventListener('visibilitychange', checkRuns); };
+    }, [activeWork, location.pathname]);
+    useEffect(() => {
+        document.title = `${title} · Inbound`;
+        if (location.pathname.startsWith('/opportunity/'))
+            sessionStorage.setItem('inbound-last-opportunity', location.pathname);
+        if (initialRoute.current) { initialRoute.current = false; return; }
+        const restore = () => {
+            if (location.state?.restore) {
+                const target = document.getElementById(sessionStorage.getItem('inbound-inbox-focus') || '');
+                if (!target)
+                    return false;
+                window.scrollTo(0, Number(sessionStorage.getItem('inbound-inbox-scroll') || 0));
+                target.focus({ preventScroll: true });
+            }
+            else
+                document.getElementById('page-title')?.focus();
+            if (location.hash)
+                document.getElementById(location.hash.slice(1))?.scrollIntoView();
+            return true;
+        };
+        if (restore())
+            return;
+        const observer = new MutationObserver(() => { if (restore())
+            observer.disconnect(); });
+        observer.observe(document.getElementById('main')!, { childList: true, subtree: true });
+        const cancel = () => observer.disconnect();
+        window.addEventListener('pointerdown', cancel, { once: true });
+        window.addEventListener('keydown', cancel, { once: true });
+        return () => { observer.disconnect(); window.removeEventListener('pointerdown', cancel); window.removeEventListener('keydown', cancel); };
+    }, [location.pathname, location.state, location.hash, title]);
+    async function savePause(paused: boolean) { const result = await request<{
+        paused: boolean;
+    }>('/settings', settings?.csrf_token, { paused }); setSettings(v => v && { ...v, paused: result.paused }); }
+    const todayLink = `/${sessionStorage.getItem('inbound-inbox-query') || ''}`;
+    return <><a className="skip-link" href="#main">Skip to content</a><header className="app-header"><div><Link to="/" className="brand">Inbound</Link><p>{settings?.mode === 'replay' ? 'Synthetic replay · Read-only' : 'Local · Offline'}</p></div><div className="header-actions">{settings && <PauseControl paused={settings.paused} replay={settings.mode === 'replay'} save={savePause} active={activeWork}/>}<Button variant="outline" aria-pressed={dark} onClick={() => { setDark(v => !v); localStorage.setItem('inbound-theme', dark ? 'light' : 'dark'); }}>Dark mode</Button></div></header><div className="desk-shell"><nav aria-label="Primary"><NavLink to={todayLink} end>{titles[0]}</NavLink><NavLink to={sessionStorage.getItem('inbound-last-opportunity') || '/opportunity'}>{titles[1]}</NavLink><NavLink to="/settings">{titles[2]}</NavLink></nav><main id="main" tabIndex={-1}><h1 id="page-title" tabIndex={-1}>{title}</h1><div className="meta clock"><p>Dubai time · UTC+04:00</p>{settings?.frozen_clock && <p>Frozen synthetic clock: {date(settings.clock)} · Dubai</p>}</div><div role="status" className="sr-only">{title}</div>{error ? <Failure text="Settings could not be loaded." retry={() => void refresh()}/> : !settings ? <Loading text="Loading settings…"/> : <Context.Provider value={{ settings, refresh, savePause }}><Routes><Route path="/" element={<TodayPage />}/><Route path="/opportunity/:id?" element={<OpportunityPage />}/><Route path="/settings" element={<SettingsPage />}/><Route path="*" element={<p>Choose a call from <Link to="/">Today / Inbox</Link></p>}/></Routes></Context.Provider>}</main></div></>;
+}
