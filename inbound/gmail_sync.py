@@ -155,8 +155,41 @@ def sync(settings, *, transport=None, clock=None):
         state = read_json(state_path(settings)) or {}
         state["import_pending"] = row["status"] != "success"
         write_json(state_path(settings), state)
+        if row["status"] == "success":
+            result["auto_packs"] = auto_packs(settings)
     record_result(settings, result=result)
     return result
+
+
+def auto_packs(settings, limit=5):
+    """Draft packs for calls that became buildable: readable requirements, not blocked,
+    no pack yet for the current revision. Drafts only (needs_review); never reviewed or sent."""
+    from inbound.work import execute, start_run
+
+    with closing(connect(settings.db_path)) as db:
+        check(db)
+        if not db.execute("SELECT 1 FROM evidence_snapshots WHERE scope='public'").fetchone():
+            return 0  # the CV evidence registry has not been imported on this desk yet
+        candidates = [row[0] for row in db.execute(
+            "SELECT o.id FROM opportunities o "
+            "JOIN opportunity_revisions r ON r.id=(SELECT MAX(id) FROM opportunity_revisions "
+            "WHERE opportunity_id=o.id) "
+            "WHERE o.blocked_reason IS NULL "
+            "AND o.status NOT IN ('blocked','skipped','submitted_by_me') "
+            "AND EXISTS (SELECT 1 FROM roles WHERE revision_id=r.id "
+            "AND requirements_json NOT IN ('null','[]')) "
+            "AND NOT EXISTS (SELECT 1 FROM packs WHERE opportunity_id=o.id AND revision_id=r.id) "
+            "ORDER BY o.id DESC LIMIT ?", (limit,),
+        )]
+    built = 0
+    for opportunity_id in candidates:
+        with closing(connect(settings.db_path)) as db:
+            run_id = start_run(db, "pack", opportunity_id=opportunity_id)
+        execute(settings, run_id, "pack", opportunity_id=opportunity_id)
+        with closing(connect(settings.db_path)) as db:
+            ok = db.execute("SELECT status FROM runs WHERE id=?", (run_id,)).fetchone()[0]
+        built += ok == "success"
+    return built
 
 
 class Poller:

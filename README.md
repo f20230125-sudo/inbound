@@ -29,6 +29,10 @@ on myself; nothing else in Inbound uses the network, and no model runs on my mai
   that need acknowledgement before review.
 - Flask serves a loopback API and the React/TypeScript desk. A persistent Pause
   control stops imports, extraction, and pack work. A ledger records local runs.
+- Everything is live: the open desk watches a change token every 10 seconds and
+  refreshes in place, new calls with a readable JD get a draft pack automatically
+  (marked for review, never reviewed or sent), and optional browser notifications on
+  this PC flag a new PS call or a deadline within 12 hours I have not acted on.
 
 ```mermaid
 flowchart LR

@@ -269,3 +269,34 @@ def test_poller_survives_any_sync_failure(live, monkeypatch):
     seen = []
     assert gmail_sync.Poller(settings, on_result=seen.append).tick() == {"error": "KeyError"}
     assert seen == [{"error": "KeyError"}]
+
+
+def test_version_token_moves_only_when_something_changes(tmp_path):
+    settings = Settings(data_root=tmp_path)
+    app = create_app({"TESTING": True, "ASYNC_WORK": False, "SETTINGS": settings,
+                      "SOURCE_PROVENANCE": "synthetic", "DEMO": True})
+    client = app.test_client()
+    first = client.get("/api/version").json["version"]
+    assert client.get("/api/version").json["version"] == first
+    assert post(client, "/api/settings", {"paused": True}).status_code == 200
+    paused = client.get("/api/version").json["version"]
+    assert paused != first
+    assert post(client, "/api/settings", {"paused": False}).status_code == 200
+    assert client.get("/api/version").json["version"] != paused
+    assert post(client, "/api/import").status_code == 202
+    assert client.get("/api/version").json["version"] not in {first, paused}
+
+
+def test_new_buildable_call_gets_one_draft_pack_automatically(live):
+    from inbound.evidence.registry import store_registry
+
+    settings, fake = live
+    first = gmail_sync.sync(settings, transport=fake.transport())
+    assert first["auto_packs"] == 0  # no evidence registry on this desk yet: nothing built
+    with closing(connect(settings.db_path)) as db:
+        store_registry(db, json.loads(Path("fixtures/evidence_snapshot.json").read_text("utf8")))
+    assert gmail_sync.auto_packs(settings) == 1
+    assert gmail_sync.auto_packs(settings) == 0  # one draft per revision, not one per check
+    with closing(connect(settings.db_path)) as db:
+        pack = db.execute("SELECT status,demo FROM packs").fetchone()
+    assert tuple(pack) == ("needs_review", 0)  # a draft for review, never marked reviewed
