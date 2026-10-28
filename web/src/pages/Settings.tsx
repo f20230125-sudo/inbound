@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { useDesk } from '../App';
-import { request } from '../lib/api';
+import { DATA_CHANGED, request } from '../lib/api';
 import { alertsEnabled, setAlertsEnabled } from '../lib/live';
 import { date, label } from '../lib/format';
 import type { Run, Settings } from '../types';
@@ -143,6 +143,8 @@ export default function SettingsPage() {
     } }, []);
     const active = runs?.some(r => r.status === 'running');
     useEffect(() => { void refreshRuns(); }, [refreshRuns]);
+    // Background work (a Gmail check, an automatic draft) shows up without a reload.
+    useEffect(() => { const changed = () => void refreshRuns(); window.addEventListener(DATA_CHANGED, changed); return () => window.removeEventListener(DATA_CHANGED, changed); }, [refreshRuns]);
     useEffect(() => { if (!active)
         return; const timer = window.setInterval(() => { if (!document.hidden)
         void refreshRuns(); }, 5000); const visible = () => { if (!document.hidden)

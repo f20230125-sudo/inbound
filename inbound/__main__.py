@@ -56,8 +56,10 @@ def main(argv=None):
             from inbound.api import create_app
             from inbound.gmail_sync import Poller
 
-            # Live Gmail checks run inside the desk once Uzair switches them on.
-            Poller(settings).start()
+            # Live Gmail checks run inside the desk once Uzair switches them on; never in
+            # replay mode, which must stay read-only and synthetic.
+            if os.environ.get("APP_MODE", "local") == "local":
+                Poller(settings).start()
             create_app().run(host='127.0.0.1', port=5000, debug=False, use_reloader=False)
             return 0
         if args.command == 'watch':

@@ -22,15 +22,22 @@ export function setAlertsEnabled(on: boolean) { store(ALERTS_KEY, on ? 'on' : 'o
 /** Alerts on this PC only: a new PS call, or a deadline within 12 h not yet acted on. */
 export function alertsFor(today: Today, now: Date, seen: string[]): { key: string; title: string; body: string; id: number }[] {
     const out: { key: string; title: string; body: string; id: number }[] = [];
-    for (const entry of today.new_calls) {
-        if (entry.kind !== 'ps_admin') out.push({ key: `new:${entry.id}`, title: 'New PS call', body: entry.display_title, id: entry.id });
+    // A call can leave 'new' within seconds (blocked by a missing JD, or given a draft pack),
+    // so look for first sightings across every Today list, not only new_calls.
+    const lists = [today.new_calls, today.attention, today.deadlines_48h, today.date_only, today.uncertain_deadlines];
+    const firstSeen = new Set<number>();
+    for (const entry of lists.flat()) {
+        if (entry.kind === 'ps_admin' || firstSeen.has(entry.id)) continue;
+        firstSeen.add(entry.id);
+        out.push({ key: `new:${entry.id}`, title: 'New PS call', body: entry.display_title, id: entry.id });
     }
     const applied = new Set((today.outside_applications || []).map(a => a.id));
     for (const entry of today.deadlines_48h as Entry[]) {
         const value = entry.deadline?.normalized;
         if (typeof value !== 'string' || value.length <= 10 || applied.has(entry.id) || ['skipped', 'submitted_by_me'].includes(entry.status || '')) continue;
         const hours = (new Date(value).getTime() - now.getTime()) / 3600000;
-        if (hours > 0 && hours <= 12) out.push({ key: `due12:${entry.id}`, title: 'Deadline within 12 hours', body: `${entry.display_title} · ${entry.deadline_label}`, id: entry.id });
+        // The key carries the deadline itself, so an amended deadline alerts again.
+        if (hours > 0 && hours <= 12) out.push({ key: `due12:${entry.id}:${value}`, title: 'Deadline within 12 hours', body: `${entry.display_title} · ${entry.deadline_label}`, id: entry.id });
     }
     return out.filter(a => !seen.includes(a.key));
 }

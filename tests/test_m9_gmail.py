@@ -300,3 +300,141 @@ def test_new_buildable_call_gets_one_draft_pack_automatically(live):
     with closing(connect(settings.db_path)) as db:
         pack = db.execute("SELECT status,demo FROM packs").fetchone()
     assert tuple(pack) == ("needs_review", 0)  # a draft for review, never marked reviewed
+
+
+# Review r7 fixes (Codex review of Claude's M9/M9b, 28 Oct).
+
+def test_history_is_read_completely_so_the_cursor_never_skips_mail(live):
+    settings, fake = live
+    gmail_sync.sync(settings, transport=fake.transport())
+    for n in range(5):
+        fake.add(f"h{n}", raw_call(f"h{n}", attach=False))
+    original = fake.handler
+
+    def paged(request):
+        if request.url.path.endswith("/history") and "pageToken" not in request.url.params:
+            response = original(request).json()
+            items = response["history"]
+            return httpx.Response(200, json={"history": items[:2], "nextPageToken": "p2"})
+        if request.url.path.endswith("/history"):
+            response = original(request).json()
+            return httpx.Response(200, json={"history": response["history"][2:]})
+        return original(request)
+
+    result = gmail_sync.sync(settings, transport=httpx.MockTransport(paged))
+    assert result["fetched"] == 5
+
+
+def test_saved_but_unimported_mail_is_imported_on_the_next_check(live):
+    settings, fake = live
+    client = GmailClient(gmail_api.read_json(gmail_api.token_path(settings)),
+                         transport=fake.transport())
+    gmail_sync.fetch_new(settings, client)  # downloaded, then "crashed" before import
+    assert gmail_sync.unimported(settings) == {"g1"}
+    result = gmail_sync.sync(settings, transport=fake.transport())
+    assert result["fetched"] == 0 and result["imported"] == 1
+    assert gmail_sync.unimported(settings) == set()
+
+
+def test_pause_during_a_fetch_stops_it_and_keeps_the_cursor(live):
+    settings, fake = live
+    for n in range(3):
+        fake.add(f"p{n}", raw_call(f"p{n}", attach=False))
+    original = fake.handler
+    calls = {"raw": 0}
+
+    def pausing(request):
+        if "/messages/" in request.url.path:
+            calls["raw"] += 1
+            if calls["raw"] == 2:
+                with closing(connect(settings.db_path)) as db:
+                    set_paused(db, True)
+        return original(request)
+
+    with pytest.raises(PausedError):
+        gmail_sync.sync(settings, transport=httpx.MockTransport(pausing))
+    assert calls["raw"] == 2
+    assert (gmail_api.read_json(gmail_sync.state_path(settings)) or {}).get("history_id") is None
+
+
+def test_refresh_rejects_a_scope_broader_than_read_only(live):
+    settings, fake = live
+    fake.token_scope = f"{SCOPE} https://www.googleapis.com/auth/gmail.modify"
+    client = GmailClient(gmail_api.read_json(gmail_api.token_path(settings)),
+                         transport=fake.transport())
+    with pytest.raises(GmailError):
+        client.profile()
+
+
+def test_rate_limit_403_is_retried(live, monkeypatch):
+    settings, fake = live
+    monkeypatch.setattr(gmail_api.time, "sleep", lambda seconds: None)
+    original = fake.handler
+    state = {"limited": 2}
+
+    def throttled(request):
+        if "/messages/" in request.url.path and state["limited"]:
+            state["limited"] -= 1
+            return httpx.Response(403, json={"error": {"errors": [{"reason": "rateLimitExceeded"}]}})
+        return original(request)
+
+    assert gmail_sync.sync(settings, transport=httpx.MockTransport(throttled))["fetched"] == 1
+
+
+def test_a_different_account_cannot_reuse_this_folder(live):
+    settings, fake = live
+    gmail_sync.sync(settings, transport=fake.transport())
+    original = fake.handler
+
+    def other(request):
+        if request.url.path.endswith("/profile"):
+            return httpx.Response(200, json={"emailAddress": "someone@demo.invalid",
+                                             "historyId": "999"})
+        return original(request)
+
+    with pytest.raises(GmailError):
+        gmail_sync.sync(settings, transport=httpx.MockTransport(other))
+
+
+def test_only_one_sync_runs_at_a_time(live):
+    settings, fake = live
+    assert gmail_sync._SYNC_LOCK.acquire(blocking=False)
+    try:
+        assert gmail_sync.sync(settings, transport=fake.transport()) == {
+            "skipped": "another Gmail check is running"}
+    finally:
+        gmail_sync._SYNC_LOCK.release()
+    assert fake.calls == []
+
+
+def test_a_skip_made_before_the_build_wins(live):
+    from inbound.evidence.registry import store_registry
+
+    settings, fake = live
+    gmail_sync.sync(settings, transport=fake.transport())
+    with closing(connect(settings.db_path)) as db:
+        store_registry(db, json.loads(Path("fixtures/evidence_snapshot.json").read_text("utf8")))
+        db.execute("UPDATE opportunities SET status='skipped'")
+        db.commit()
+    assert gmail_sync.auto_packs(settings) == 0
+
+
+def test_poller_survives_a_failure_while_scheduling(live, monkeypatch):
+    settings, _ = live
+
+    def broken(self):
+        raise OSError("state unreadable")
+
+    monkeypatch.setattr(gmail_sync.Poller, "due", broken)
+    assert gmail_sync.Poller(settings).tick() == {"error": "OSError"}
+
+
+def test_one_oversized_message_is_skipped_not_fatal(live, monkeypatch):
+    settings, fake = live
+    fake.add("big", raw_call("big", attach=False))
+    monkeypatch.setattr(gmail_api, "MAX_RAW_BYTES", 2000)
+    fake.messages["big"] = raw_call("big") * 2  # with the PDF: well over the patched cap
+    fake.messages["g1"] = raw_call("g1", attach=False)
+    result = gmail_sync.sync(settings, transport=fake.transport())
+    assert result["too_large"] == 1 and result["fetched"] == 1
+    assert gmail_sync.sync(settings, transport=fake.transport())["too_large"] == 0  # not retried

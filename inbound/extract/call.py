@@ -108,6 +108,11 @@ def align_area(subject_parts, body_parts):
     rest = [p.strip() for p in pieces[cut:] if p.strip()]
     if not rest:
         return body_parts
+    city = subject_parts.get("city")
+    if city and normalize(rest[0]) != normalize(city):
+        # The next part is not the subject's city: the company may really differ
+        # (e.g. body "Alpha, Labs,Port Selene"); keep the body as written and let it conflict.
+        return body_parts
     return {**body_parts, "company": ",".join(pieces[:cut]).strip(), "city": rest[0],
             "area": ", ".join(rest[1:]) or None}
 

@@ -623,7 +623,11 @@ def create_app(config=None):
                 "(SELECT COUNT(*) FROM category_history),"
                 "(SELECT COUNT(*)||':'||COALESCE(MAX(id),'') FROM packs),"
                 "(SELECT GROUP_CONCAT(status,'') FROM packs),"
-                "(SELECT COALESCE(MAX(id),0)||':'||COUNT(finished_at) FROM runs),"
+                "(SELECT COALESCE(MAX(id),0)||':'||COUNT(finished_at)||':'||"
+                "COALESCE(GROUP_CONCAT(stage,''),'') FROM runs WHERE status='running'"
+                " OR id=(SELECT MAX(id) FROM runs)),"
+                "(SELECT GROUP_CONCAT(scope||length(metadata_json),'') FROM evidence_snapshots),"
+                "(SELECT COUNT(*) FROM evidence_bullets),"
                 "(SELECT COALESCE(SUM(content_version),0) FROM opportunities),"
                 "(SELECT value FROM settings WHERE key='paused')"
             ).fetchone()),

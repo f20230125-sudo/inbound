@@ -18,13 +18,16 @@ export function useResource<T>(path: string, retainOnReload = false) {
     const [version, setVersion] = useState(0);
     // Live updates refetch in the background: the current view stays on screen meanwhile.
     const silent = useRef(false);
+    const retry = useRef<number | undefined>(undefined);
     const reload = useCallback(() => setVersion(v => v + 1), []);
     useEffect(() => {
         const changed = () => { silent.current = true; setVersion(v => v + 1); };
         window.addEventListener(DATA_CHANGED, changed);
         return () => window.removeEventListener(DATA_CHANGED, changed);
     }, []);
-    useEffect(() => { let active = true; const background = silent.current; silent.current = false; if (!retainOnReload && !background) setValue(undefined); if (!background) setError(false); request<T>(path).then(v => { if (active) { setValue(v); setError(false); } }).catch(() => { if (active && !background)
-        setError(true); }); return () => { active = false; }; }, [path, version, retainOnReload]);
+    useEffect(() => { let active = true; const background = silent.current; silent.current = false; if (!retainOnReload && !background) setValue(undefined); if (!background) setError(false); request<T>(path).then(v => { if (active) { setValue(v); setError(false); } }).catch(() => { if (!active) return;
+        if (!background) { setError(true); return; }
+        // The change token has already moved on; retry so a failed background refresh never leaves stale data.
+        retry.current = window.setTimeout(() => { silent.current = true; setVersion(v => v + 1); }, 10000); }); return () => { active = false; clearTimeout(retry.current); }; }, [path, version, retainOnReload]);
     return { value, error, reload };
 }
