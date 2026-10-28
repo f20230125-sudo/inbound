@@ -3,6 +3,7 @@
 import json
 import os
 import subprocess
+from contextlib import nullcontext
 from pathlib import Path
 from uuid import uuid4
 
@@ -63,8 +64,8 @@ def compile_tex(directory):
     return directory / "body.pdf"
 
 
-def create_pack(db, opportunity_id, *, demo=False, pack_root=None, settings=None):
-    with run(db, "pack") as counts:
+def create_pack(db, opportunity_id, *, demo=False, pack_root=None, settings=None, run_counts=None):
+    with (run(db, "pack") if run_counts is None else nullcontext(run_counts)) as counts:
         check(db)
         state = opportunity_state(db, opportunity_id)
         if demo:

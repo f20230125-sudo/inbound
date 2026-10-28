@@ -96,8 +96,8 @@ def identity_field(name, observations):
     return result
 
 
-def extract_call(message, attachments=()):
-    category = classify(message.sender, message.subject, message.body_text).category
+def extract_call(message, attachments=(), *, category=None):
+    category = category or classify(message.sender, message.subject, message.body_text).category
     all_text = message.body_text + "\n" + "\n".join(a["text"] for a in attachments)
     quotes = [line for line in all_text.splitlines() if ATTACK.search(line)]
     mailbox = parseaddr(message.sender)[1].casefold()

@@ -1,0 +1,3064 @@
+{
+  "claim_provenance": {
+    "accuracy": 1.0,
+    "correct": 64,
+    "denominator": 64
+  },
+  "clock": "2026-10-28T02:30:00+04:00",
+  "dataset": "r4-20261028-01",
+  "dataset_sha256": "8657e5e6c007dffb378b65177d10ae9943ee3791fe0a30da0b5537b3dea44a90",
+  "dev": {
+    "extraction": {
+      "abstentions": 89,
+      "applicable": {
+        "accuracy": 1.0,
+        "correct": 266,
+        "denominator": 266
+      },
+      "deadline_exact_match": {
+        "accuracy": 1.0,
+        "correct": 22,
+        "denominator": 22
+      },
+      "deadline_failures": [],
+      "failures": [],
+      "full_record": {
+        "accuracy": 1.0,
+        "correct": 24,
+        "denominator": 24
+      },
+      "per_field": {
+        "admin_deadline": {
+          "abstentions": 0,
+          "accuracy": 1.0,
+          "correct": 2,
+          "denominator": 2,
+          "populated_accuracy": 1.0,
+          "populated_correct": 2,
+          "populated_denominator": 2
+        },
+        "application_reference": {
+          "abstentions": 1,
+          "accuracy": 1.0,
+          "correct": 2,
+          "denominator": 2,
+          "populated_accuracy": 1.0,
+          "populated_correct": 1,
+          "populated_denominator": 1
+        },
+        "apply_link": {
+          "abstentions": 18,
+          "accuracy": 1.0,
+          "correct": 20,
+          "denominator": 20,
+          "populated_accuracy": 1.0,
+          "populated_correct": 2,
+          "populated_denominator": 2
+        },
+        "city": {
+          "abstentions": 0,
+          "accuracy": 1.0,
+          "correct": 20,
+          "denominator": 20,
+          "populated_accuracy": 1.0,
+          "populated_correct": 20,
+          "populated_denominator": 20
+        },
+        "company": {
+          "abstentions": 0,
+          "accuracy": 1.0,
+          "correct": 20,
+          "denominator": 20,
+          "populated_accuracy": 1.0,
+          "populated_correct": 20,
+          "populated_denominator": 20
+        },
+        "company_website": {
+          "abstentions": 19,
+          "accuracy": 1.0,
+          "correct": 20,
+          "denominator": 20,
+          "populated_accuracy": 1.0,
+          "populated_correct": 1,
+          "populated_denominator": 1
+        },
+        "cv_naming_rule": {
+          "abstentions": 19,
+          "accuracy": 1.0,
+          "correct": 20,
+          "denominator": 20,
+          "populated_accuracy": 1.0,
+          "populated_correct": 1,
+          "populated_denominator": 1
+        },
+        "deadline": {
+          "abstentions": 4,
+          "accuracy": 1.0,
+          "correct": 20,
+          "denominator": 20,
+          "populated_accuracy": 1.0,
+          "populated_correct": 16,
+          "populated_denominator": 16
+        },
+        "disposition": {
+          "abstentions": 0,
+          "accuracy": 1.0,
+          "correct": 2,
+          "denominator": 2,
+          "populated_accuracy": 1.0,
+          "populated_correct": 2,
+          "populated_denominator": 2
+        },
+        "form_link": {
+          "abstentions": 2,
+          "accuracy": 1.0,
+          "correct": 20,
+          "denominator": 20,
+          "populated_accuracy": 1.0,
+          "populated_correct": 18,
+          "populated_denominator": 18
+        },
+        "internship_dates": {
+          "abstentions": 19,
+          "accuracy": 1.0,
+          "correct": 20,
+          "denominator": 20,
+          "populated_accuracy": 1.0,
+          "populated_correct": 1,
+          "populated_denominator": 1
+        },
+        "jd_location": {
+          "abstentions": 0,
+          "accuracy": 1.0,
+          "correct": 20,
+          "denominator": 20,
+          "populated_accuracy": 1.0,
+          "populated_correct": 20,
+          "populated_denominator": 20
+        },
+        "mode": {
+          "abstentions": 2,
+          "accuracy": 1.0,
+          "correct": 20,
+          "denominator": 20,
+          "populated_accuracy": 1.0,
+          "populated_correct": 18,
+          "populated_denominator": 18
+        },
+        "role_count": {
+          "abstentions": 0,
+          "accuracy": 1.0,
+          "correct": 20,
+          "denominator": 20,
+          "populated_accuracy": 1.0,
+          "populated_correct": 20,
+          "populated_denominator": 20
+        },
+        "roles": {
+          "abstentions": 0,
+          "accuracy": 1.0,
+          "correct": 20,
+          "denominator": 20,
+          "populated_accuracy": 1.0,
+          "populated_correct": 20,
+          "populated_denominator": 20
+        },
+        "stipend": {
+          "abstentions": 5,
+          "accuracy": 1.0,
+          "correct": 20,
+          "denominator": 20,
+          "populated_accuracy": 1.0,
+          "populated_correct": 15,
+          "populated_denominator": 15
+        }
+      },
+      "populated": {
+        "accuracy": 1.0,
+        "correct": 177,
+        "denominator": 177
+      },
+      "requirement_association": {
+        "accuracy": 1.0,
+        "correct": 59,
+        "denominator": 59
+      },
+      "role_title": {
+        "accuracy": 1.0,
+        "correct": 24,
+        "denominator": 24
+      },
+      "scored_record_ids": [
+        "P-D01",
+        "P-D02",
+        "P-D03",
+        "P-D04",
+        "P-D05",
+        "P-D06",
+        "P-D07",
+        "P-D08",
+        "P-D09",
+        "P-D10",
+        "P-D11",
+        "P-D12",
+        "P-D13",
+        "P-D14",
+        "P-D15",
+        "P-D16",
+        "P-D17",
+        "P-D18",
+        "P-D19",
+        "P-D20",
+        "P-D21",
+        "P-D22",
+        "P-D23",
+        "P-D24"
+      ],
+      "silently_wrong_deadlines": 0
+    },
+    "triage": {
+      "confusion_matrix": {
+        "academic": {
+          "academic": 8,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "account_billing": {
+          "academic": 0,
+          "account_billing": 3,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "application_update": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 2,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "campus_notice": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 5,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "dev_ops": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 5,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "job_alert": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 8,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "needs_review": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 2,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "newsletter_promo": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 3,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "personal": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 3,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "ps_admin": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 2,
+          "ps_call": 0,
+          "research": 0
+        },
+        "ps_call": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 20,
+          "research": 0
+        },
+        "research": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 3
+        }
+      },
+      "denominator": 64,
+      "macro_f1": 1.0,
+      "macro_f1_denominator": 12,
+      "per_category": {
+        "academic": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 8,
+          "recall": 1.0,
+          "support": 8,
+          "true_positive": 8
+        },
+        "account_billing": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 3,
+          "recall": 1.0,
+          "support": 3,
+          "true_positive": 3
+        },
+        "application_update": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 2,
+          "recall": 1.0,
+          "support": 2,
+          "true_positive": 2
+        },
+        "campus_notice": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 5,
+          "recall": 1.0,
+          "support": 5,
+          "true_positive": 5
+        },
+        "dev_ops": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 5,
+          "recall": 1.0,
+          "support": 5,
+          "true_positive": 5
+        },
+        "job_alert": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 8,
+          "recall": 1.0,
+          "support": 8,
+          "true_positive": 8
+        },
+        "needs_review": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 2,
+          "recall": 1.0,
+          "support": 2,
+          "true_positive": 2
+        },
+        "newsletter_promo": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 3,
+          "recall": 1.0,
+          "support": 3,
+          "true_positive": 3
+        },
+        "personal": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 3,
+          "recall": 1.0,
+          "support": 3,
+          "true_positive": 3
+        },
+        "ps_admin": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 2,
+          "recall": 1.0,
+          "support": 2,
+          "true_positive": 2
+        },
+        "ps_call": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 20,
+          "recall": 1.0,
+          "support": 20,
+          "true_positive": 20
+        },
+        "research": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 3,
+          "recall": 1.0,
+          "support": 3,
+          "true_positive": 3
+        }
+      },
+      "ps_admin_deadline_recall": {
+        "accuracy": 1.0,
+        "correct": 2,
+        "denominator": 2
+      },
+      "ps_admin_recall": 1.0,
+      "ps_call_recall": 1.0,
+      "zero_support": "precision/recall/F1 = 0"
+    }
+  },
+  "held-out": {
+    "extraction": {
+      "abstentions": 154,
+      "applicable": {
+        "accuracy": 0.9431524547803618,
+        "correct": 365,
+        "denominator": 387
+      },
+      "deadline_exact_match": {
+        "accuracy": 0.9393939393939394,
+        "correct": 31,
+        "denominator": 33
+      },
+      "deadline_failures": [
+        {
+          "actual": "2026-10-29",
+          "case": "P-H12",
+          "expected": "2026-10-29T10:30:00+04:00",
+          "field": "deadline",
+          "silently_wrong": true,
+          "status": "inferred"
+        },
+        {
+          "actual": null,
+          "case": "P-H32",
+          "expected": "2026-10-29T08:00:00+04:00",
+          "field": "admin_deadline",
+          "silently_wrong": false,
+          "status": "unknown"
+        }
+      ],
+      "failures": [
+        {
+          "case": "P-H02",
+          "field": "company",
+          "record": 1
+        },
+        {
+          "case": "P-H02",
+          "field": "stipend",
+          "record": 1
+        },
+        {
+          "case": "P-H04",
+          "field": "company",
+          "record": 3
+        },
+        {
+          "case": "P-H07",
+          "field": "company",
+          "record": 6
+        },
+        {
+          "case": "P-H07",
+          "field": "city",
+          "record": 6
+        },
+        {
+          "case": "P-H10",
+          "field": "form_link",
+          "record": 9
+        },
+        {
+          "case": "P-H11",
+          "field": "company",
+          "record": 10
+        },
+        {
+          "case": "P-H12",
+          "field": "company",
+          "record": 11
+        },
+        {
+          "case": "P-H12",
+          "field": "deadline",
+          "record": 11
+        },
+        {
+          "case": "P-H12",
+          "field": "roles",
+          "record": 11
+        },
+        {
+          "case": "P-H18",
+          "field": "company",
+          "record": 17
+        },
+        {
+          "case": "P-H18",
+          "field": "city",
+          "record": 17
+        },
+        {
+          "case": "P-H18",
+          "field": "roles",
+          "record": 17
+        },
+        {
+          "case": "P-H19",
+          "field": "roles",
+          "record": 18
+        },
+        {
+          "case": "P-H20",
+          "field": "roles",
+          "record": 19
+        },
+        {
+          "case": "P-H21",
+          "field": "roles",
+          "record": 20
+        },
+        {
+          "case": "P-H21",
+          "field": "role_count",
+          "record": 20
+        },
+        {
+          "case": "P-H22",
+          "field": "company",
+          "record": 21
+        },
+        {
+          "case": "P-H22",
+          "field": "city",
+          "record": 21
+        },
+        {
+          "case": "P-H26",
+          "field": "company",
+          "record": 25
+        },
+        {
+          "case": "P-H26",
+          "field": "city",
+          "record": 25
+        },
+        {
+          "case": "P-H32",
+          "field": "admin_deadline",
+          "record": 31
+        }
+      ],
+      "full_record": {
+        "accuracy": 0.6388888888888888,
+        "correct": 23,
+        "denominator": 36
+      },
+      "per_field": {
+        "admin_deadline": {
+          "abstentions": 2,
+          "accuracy": 0.75,
+          "correct": 3,
+          "denominator": 4,
+          "populated_accuracy": 0.6666666666666666,
+          "populated_correct": 2,
+          "populated_denominator": 3
+        },
+        "application_reference": {
+          "abstentions": 2,
+          "accuracy": 1.0,
+          "correct": 3,
+          "denominator": 3,
+          "populated_accuracy": 1.0,
+          "populated_correct": 1,
+          "populated_denominator": 1
+        },
+        "apply_link": {
+          "abstentions": 26,
+          "accuracy": 1.0,
+          "correct": 29,
+          "denominator": 29,
+          "populated_accuracy": 1.0,
+          "populated_correct": 3,
+          "populated_denominator": 3
+        },
+        "city": {
+          "abstentions": 4,
+          "accuracy": 0.8620689655172413,
+          "correct": 25,
+          "denominator": 29,
+          "populated_accuracy": 0.8620689655172413,
+          "populated_correct": 25,
+          "populated_denominator": 29
+        },
+        "company": {
+          "abstentions": 8,
+          "accuracy": 0.7241379310344828,
+          "correct": 21,
+          "denominator": 29,
+          "populated_accuracy": 0.7241379310344828,
+          "populated_correct": 21,
+          "populated_denominator": 29
+        },
+        "company_website": {
+          "abstentions": 28,
+          "accuracy": 1.0,
+          "correct": 29,
+          "denominator": 29,
+          "populated_accuracy": 1.0,
+          "populated_correct": 1,
+          "populated_denominator": 1
+        },
+        "cv_naming_rule": {
+          "abstentions": 28,
+          "accuracy": 1.0,
+          "correct": 29,
+          "denominator": 29,
+          "populated_accuracy": 1.0,
+          "populated_correct": 1,
+          "populated_denominator": 1
+        },
+        "deadline": {
+          "abstentions": 8,
+          "accuracy": 0.9655172413793104,
+          "correct": 28,
+          "denominator": 29,
+          "populated_accuracy": 0.9523809523809523,
+          "populated_correct": 20,
+          "populated_denominator": 21
+        },
+        "disposition": {
+          "abstentions": 0,
+          "accuracy": 1.0,
+          "correct": 3,
+          "denominator": 3,
+          "populated_accuracy": 1.0,
+          "populated_correct": 3,
+          "populated_denominator": 3
+        },
+        "form_link": {
+          "abstentions": 3,
+          "accuracy": 0.9655172413793104,
+          "correct": 28,
+          "denominator": 29,
+          "populated_accuracy": 0.9615384615384616,
+          "populated_correct": 25,
+          "populated_denominator": 26
+        },
+        "internship_dates": {
+          "abstentions": 28,
+          "accuracy": 1.0,
+          "correct": 29,
+          "denominator": 29,
+          "populated_accuracy": 1.0,
+          "populated_correct": 1,
+          "populated_denominator": 1
+        },
+        "jd_location": {
+          "abstentions": 1,
+          "accuracy": 1.0,
+          "correct": 29,
+          "denominator": 29,
+          "populated_accuracy": 1.0,
+          "populated_correct": 28,
+          "populated_denominator": 28
+        },
+        "mode": {
+          "abstentions": 2,
+          "accuracy": 1.0,
+          "correct": 29,
+          "denominator": 29,
+          "populated_accuracy": 1.0,
+          "populated_correct": 27,
+          "populated_denominator": 27
+        },
+        "role_count": {
+          "abstentions": 2,
+          "accuracy": 0.9655172413793104,
+          "correct": 28,
+          "denominator": 29,
+          "populated_accuracy": 0.9642857142857143,
+          "populated_correct": 27,
+          "populated_denominator": 28
+        },
+        "roles": {
+          "abstentions": 3,
+          "accuracy": 0.8275862068965517,
+          "correct": 24,
+          "denominator": 29,
+          "populated_accuracy": 0.8214285714285714,
+          "populated_correct": 23,
+          "populated_denominator": 28
+        },
+        "stipend": {
+          "abstentions": 9,
+          "accuracy": 0.9655172413793104,
+          "correct": 28,
+          "denominator": 29,
+          "populated_accuracy": 0.9523809523809523,
+          "populated_correct": 20,
+          "populated_denominator": 21
+        }
+      },
+      "populated": {
+        "accuracy": 0.912,
+        "correct": 228,
+        "denominator": 250
+      },
+      "requirement_association": {
+        "accuracy": 0.8842105263157894,
+        "correct": 84,
+        "denominator": 95
+      },
+      "role_title": {
+        "accuracy": 0.9230769230769231,
+        "correct": 36,
+        "denominator": 39
+      },
+      "scored_record_ids": [
+        "P-H01",
+        "P-H02",
+        "P-H03",
+        "P-H04",
+        "P-H05",
+        "P-H06",
+        "P-H07",
+        "P-H08",
+        "P-H09",
+        "P-H10",
+        "P-H11",
+        "P-H12",
+        "P-H13",
+        "P-H14",
+        "P-H15",
+        "P-H16",
+        "P-H17",
+        "P-H18",
+        "P-H19",
+        "P-H20",
+        "P-H21",
+        "P-H22",
+        "P-H23",
+        "P-H24",
+        "P-H25",
+        "P-H26",
+        "P-H27",
+        "P-H28",
+        "P-H29",
+        "P-H30",
+        "P-H31",
+        "P-H32",
+        "P-H33",
+        "P-H34",
+        "P-H35",
+        "P-H36"
+      ],
+      "silently_wrong_deadlines": 1
+    },
+    "triage": {
+      "confusion_matrix": {
+        "academic": {
+          "academic": 16,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "account_billing": {
+          "academic": 0,
+          "account_billing": 6,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "application_update": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 3,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "campus_notice": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 10,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "dev_ops": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 10,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "job_alert": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 16,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "needs_review": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 4,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "newsletter_promo": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 6,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "personal": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 6,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 0
+        },
+        "ps_admin": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 4,
+          "ps_call": 0,
+          "research": 0
+        },
+        "ps_call": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 29,
+          "research": 0
+        },
+        "research": {
+          "academic": 0,
+          "account_billing": 0,
+          "application_update": 0,
+          "campus_notice": 0,
+          "dev_ops": 0,
+          "job_alert": 0,
+          "needs_review": 0,
+          "newsletter_promo": 0,
+          "personal": 0,
+          "ps_admin": 0,
+          "ps_call": 0,
+          "research": 6
+        }
+      },
+      "denominator": 116,
+      "macro_f1": 1.0,
+      "macro_f1_denominator": 12,
+      "per_category": {
+        "academic": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 16,
+          "recall": 1.0,
+          "support": 16,
+          "true_positive": 16
+        },
+        "account_billing": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 6,
+          "recall": 1.0,
+          "support": 6,
+          "true_positive": 6
+        },
+        "application_update": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 3,
+          "recall": 1.0,
+          "support": 3,
+          "true_positive": 3
+        },
+        "campus_notice": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 10,
+          "recall": 1.0,
+          "support": 10,
+          "true_positive": 10
+        },
+        "dev_ops": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 10,
+          "recall": 1.0,
+          "support": 10,
+          "true_positive": 10
+        },
+        "job_alert": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 16,
+          "recall": 1.0,
+          "support": 16,
+          "true_positive": 16
+        },
+        "needs_review": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 4,
+          "recall": 1.0,
+          "support": 4,
+          "true_positive": 4
+        },
+        "newsletter_promo": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 6,
+          "recall": 1.0,
+          "support": 6,
+          "true_positive": 6
+        },
+        "personal": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 6,
+          "recall": 1.0,
+          "support": 6,
+          "true_positive": 6
+        },
+        "ps_admin": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 4,
+          "recall": 1.0,
+          "support": 4,
+          "true_positive": 4
+        },
+        "ps_call": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 29,
+          "recall": 1.0,
+          "support": 29,
+          "true_positive": 29
+        },
+        "research": {
+          "f1": 1.0,
+          "precision": 1.0,
+          "predicted": 6,
+          "recall": 1.0,
+          "support": 6,
+          "true_positive": 6
+        }
+      },
+      "ps_admin_deadline_recall": {
+        "accuracy": 0.75,
+        "correct": 3,
+        "denominator": 4
+      },
+      "ps_admin_recall": 1.0,
+      "ps_call_recall": 1.0,
+      "zero_support": "precision/recall/F1 = 0"
+    }
+  },
+  "implementation_sha256": {
+    "inbound/extract/__init__.py": "b3caf4a7a7e802f2569400b4807296c40fbf700bc2de3035f24ba31d5fba8842",
+    "inbound/extract/attachments.py": "32997141e4ebfee3f74b257d94cafbba65490c0556a64421cf543b97d291505b",
+    "inbound/extract/call.py": "627923caa73b8d7c31fe0d306a8a2f233d783b2d315efbc15e1f802a2e257a49",
+    "inbound/extract/deadline.py": "69874010addfa2a5790e0d4b0d6ff16da57c0519f9e0287f7a8748922d137c7e",
+    "inbound/extract/links.py": "dfb0d2f59fde3e720bf51af982dec99777ce0d06c05d94e88c9c5eeff39e0d23",
+    "inbound/extract/pipeline.py": "d19dae4213e70ae4ca785686d05086de64315ba0b79e39caa0e0e9dad5c1811e",
+    "inbound/extract/records.py": "c4f1dc2bea25c0ea83e900a84594c0daf32a7ede26ce0673d36640ed5f5086b1",
+    "inbound/extract/roles.py": "53725d32f38958ecd246529e71a7d34dfb8173fea950a6e2f09ee170b2b2d195",
+    "inbound/extract/stipend.py": "3c25307141267ff15ec3b8cad807c1fe943feddc181065d97003cb3b3bcd63cb",
+    "inbound/extract/subject.py": "1f24d2586a89601781d7ffe5d8bbaad5f97d4aaaeac12d62e44eee2f0ec177c7",
+    "inbound/triage/__init__.py": "9fe2043551fec3f168eef1a091a07d6e8a3863b8a30ac2b4b6329eebefd0a669",
+    "inbound/triage/normalize.py": "aec2db9188cab87a6f33e76ee5fc3405ab357be56073f4e82c98d0840a8a62e2",
+    "inbound/triage/rules.py": "8e619dbc88aa40e6e22a4e58ba8c8e6817e585ff4e06142db3cc36a7f2d8e9bd",
+    "inbound/triage/taxonomy.py": "61adfd05f423485ca3dabb50a295df9add1af3a5b70f09e2f79390a0147f94c7"
+  },
+  "model_comparison": "not run",
+  "packs": {
+    "built": 8,
+    "cases": [
+      {
+        "baseline": {
+          "coverage": 1.0,
+          "denominator": 3,
+          "supported": 3,
+          "unsupported_requirements": []
+        },
+        "built": true,
+        "case": "P-D12",
+        "checks": {
+          "approved_skills": true,
+          "bullet_count": 8,
+          "bullet_trace": {
+            "p1-b1": true,
+            "p1-b2": true,
+            "p3-b1": true,
+            "p3-b2": true,
+            "p4-b1": true,
+            "p4-b2": true,
+            "p5-b1": true,
+            "p5-b2": true
+          },
+          "canary_check": true,
+          "coverage": {
+            "ratio": 1.0,
+            "supported": 3,
+            "total": 3
+          },
+          "filename_check": true,
+          "fit": "supported",
+          "fit_reason": "",
+          "identity_line_check": true,
+          "links": [
+            "https://code.demo.invalid/sara-qamar/demo-p1",
+            "https://code.demo.invalid/sara-qamar/demo-p2",
+            "https://code.demo.invalid/sara-qamar/demo-p3",
+            "https://code.demo.invalid/sara-qamar/demo-p4",
+            "https://code.demo.invalid/sara-qamar/demo-p5",
+            "https://portfolio.demo.invalid/sara-qamar",
+            "https://projects.demo.invalid/sara-qamar/demo-p1",
+            "https://projects.demo.invalid/sara-qamar/demo-p3",
+            "https://projects.demo.invalid/sara-qamar/demo-p4",
+            "https://projects.demo.invalid/sara-qamar/demo-p5"
+          ],
+          "manifest_check": true,
+          "metadata_check": true,
+          "overfull": 0,
+          "pages": 1,
+          "passed": true,
+          "profile": {
+            "family": "demo",
+            "needs_uzair_review": false,
+            "not_tailored": false
+          },
+          "provisional": false,
+          "provisional_label_check": true,
+          "traced_bullets": 8
+        },
+        "deterministic": {
+          "coverage": 1.0,
+          "denominator": 3,
+          "supported": 3,
+          "unsupported_requirements": []
+        },
+        "expected_provisional": false,
+        "passed": true,
+        "selection": {
+          "also_built": [
+            "demo-p2"
+          ],
+          "coverage": {
+            "ratio": 1.0,
+            "supported": 3,
+            "total": 3
+          },
+          "fit": "supported",
+          "fit_reason": "",
+          "gaps": [],
+          "line_costs": {
+            "p1-b1": 1,
+            "p1-b2": 1,
+            "p3-b1": 1,
+            "p3-b2": 2,
+            "p4-b1": 1,
+            "p4-b2": 1,
+            "p5-b1": 1,
+            "p5-b2": 1
+          },
+          "other_roles": [
+            {
+              "coverage": {
+                "also_built": [
+                  "demo-p5"
+                ],
+                "coverage": {
+                  "ratio": 1.0,
+                  "supported": 2,
+                  "total": 2
+                },
+                "fit": "supported",
+                "fit_reason": "",
+                "gaps": [],
+                "line_costs": {
+                  "p1-b1": 1,
+                  "p1-b2": 1,
+                  "p2-b1": 2,
+                  "p2-b2": 1,
+                  "p3-b1": 1,
+                  "p3-b2": 2,
+                  "p4-b1": 1,
+                  "p4-b2": 1
+                },
+                "profile": {
+                  "family": "ai",
+                  "needs_uzair_review": true,
+                  "not_tailored": true,
+                  "text": "Computer Science undergraduate building \\textbf{AI agents and LLM applications} in \\textbf{Python}: the Gemini API with structured outputs and typed tool calling, Claude through Claude Code, \\textbf{RAG} with measured retrieval, and REST backends on SQL databases. Projects are measured against baselines where one exists, and the results are reported even when they disappoint."
+                },
+                "projects": [
+                  {
+                    "bullets": [
+                      "p2-b2",
+                      "p2-b1"
+                    ],
+                    "id": "demo-p2",
+                    "why": [
+                      "P-D12-r2-q2"
+                    ]
+                  },
+                  {
+                    "bullets": [
+                      "p4-b2",
+                      "p4-b1"
+                    ],
+                    "id": "demo-p4",
+                    "why": [
+                      "P-D12-r2-q1"
+                    ]
+                  },
+                  {
+                    "bullets": [
+                      "p1-b2",
+                      "p1-b1"
+                    ],
+                    "id": "demo-p1",
+                    "why": [
+                      "P-D12-r2-q1"
+                    ]
+                  },
+                  {
+                    "bullets": [
+                      "p3-b2",
+                      "p3-b1"
+                    ],
+                    "id": "demo-p3",
+                    "why": [
+                      "P-D12-r2-q1"
+                    ]
+                  }
+                ],
+                "requirements": [
+                  {
+                    "id": "P-D12-r2-q1",
+                    "text": "pytest"
+                  },
+                  {
+                    "id": "P-D12-r2-q2",
+                    "text": "Vitest"
+                  }
+                ],
+                "skills": [
+                  "demo-skill-pytest",
+                  "demo-skill-vitest",
+                  "demo-skill-python",
+                  "demo-skill-flask",
+                  "demo-skill-sqlite",
+                  "demo-skill-sql",
+                  "demo-skill-typescript",
+                  "demo-skill-sql-window-functions",
+                  "demo-skill-csv-validation",
+                  "demo-skill-duckdb",
+                  "demo-skill-sqlite-fts5",
+                  "demo-skill-bm25"
+                ]
+              },
+              "id": 19,
+              "title": "Test Engineering Intern"
+            }
+          ],
+          "profile": {
+            "family": "data",
+            "needs_uzair_review": false,
+            "not_tailored": false,
+            "text": "Computer Science undergraduate who builds and tests data systems in \\textbf{Python} and \\textbf{SQL}: a \\textbf{tick-level backtesting engine} validated with null tests and a no-look-ahead proof, \\textbf{ETL pipelines} from raw files into SQL databases with automated data-quality checks, and dashboards in Power BI and React. Every result is checked against a baseline or a control, and reported even when it disappoints."
+          },
+          "projects": [
+            {
+              "bullets": [
+                "p1-b1",
+                "p1-b2"
+              ],
+              "id": "demo-p1",
+              "why": [
+                "P-D12-r1-q1",
+                "P-D12-r1-q2",
+                "P-D12-r1-q3"
+              ]
+            },
+            {
+              "bullets": [
+                "p3-b2",
+                "p3-b1"
+              ],
+              "id": "demo-p3",
+              "why": [
+                "P-D12-r1-q1",
+                "P-D12-r1-q3"
+              ]
+            },
+            {
+              "bullets": [
+                "p5-b1",
+                "p5-b2"
+              ],
+              "id": "demo-p5",
+              "why": [
+                "P-D12-r1-q1",
+                "P-D12-r1-q2"
+              ]
+            },
+            {
+              "bullets": [
+                "p4-b1",
+                "p4-b2"
+              ],
+              "id": "demo-p4",
+              "why": [
+                "P-D12-r1-q1"
+              ]
+            }
+          ],
+          "recommended_role": {
+            "id": 18,
+            "reason": "Best evidence coverage: 3 of 3 requirements supported; ties use SPEC/source role order.",
+            "title": "Backend Intern"
+          },
+          "requirements": [
+            {
+              "id": "P-D12-r1-q1",
+              "text": "Python"
+            },
+            {
+              "id": "P-D12-r1-q2",
+              "text": "Flask"
+            },
+            {
+              "id": "P-D12-r1-q3",
+              "text": "SQL"
+            }
+          ],
+          "skills": [
+            "demo-skill-python",
+            "demo-skill-flask",
+            "demo-skill-sql",
+            "demo-skill-sqlite",
+            "demo-skill-pytest",
+            "demo-skill-sql-window-functions",
+            "demo-skill-csv-validation",
+            "demo-skill-duckdb",
+            "demo-skill-sqlite-fts5",
+            "demo-skill-bm25",
+            "demo-skill-docker"
+          ]
+        }
+      },
+      {
+        "baseline": {
+          "coverage": 1.0,
+          "denominator": 3,
+          "supported": 3,
+          "unsupported_requirements": []
+        },
+        "built": true,
+        "case": "P-D15",
+        "checks": {
+          "approved_skills": true,
+          "bullet_count": 8,
+          "bullet_trace": {
+            "p1-b1": true,
+            "p1-b2": true,
+            "p3-b1": true,
+            "p3-b2": true,
+            "p4-b1": true,
+            "p4-b2": true,
+            "p5-b1": true,
+            "p5-b2": true
+          },
+          "canary_check": true,
+          "coverage": {
+            "ratio": 1.0,
+            "supported": 3,
+            "total": 3
+          },
+          "filename_check": true,
+          "fit": "supported",
+          "fit_reason": "",
+          "identity_line_check": true,
+          "links": [
+            "https://code.demo.invalid/sara-qamar/demo-p1",
+            "https://code.demo.invalid/sara-qamar/demo-p2",
+            "https://code.demo.invalid/sara-qamar/demo-p3",
+            "https://code.demo.invalid/sara-qamar/demo-p4",
+            "https://code.demo.invalid/sara-qamar/demo-p5",
+            "https://portfolio.demo.invalid/sara-qamar",
+            "https://projects.demo.invalid/sara-qamar/demo-p1",
+            "https://projects.demo.invalid/sara-qamar/demo-p3",
+            "https://projects.demo.invalid/sara-qamar/demo-p4",
+            "https://projects.demo.invalid/sara-qamar/demo-p5"
+          ],
+          "manifest_check": true,
+          "metadata_check": true,
+          "overfull": 0,
+          "pages": 1,
+          "passed": true,
+          "profile": {
+            "family": "demo",
+            "needs_uzair_review": false,
+            "not_tailored": false
+          },
+          "provisional": false,
+          "provisional_label_check": true,
+          "traced_bullets": 8
+        },
+        "deterministic": {
+          "coverage": 1.0,
+          "denominator": 3,
+          "supported": 3,
+          "unsupported_requirements": []
+        },
+        "expected_provisional": false,
+        "passed": true,
+        "selection": {
+          "also_built": [
+            "demo-p2"
+          ],
+          "coverage": {
+            "ratio": 1.0,
+            "supported": 3,
+            "total": 3
+          },
+          "fit": "supported",
+          "fit_reason": "",
+          "gaps": [],
+          "line_costs": {
+            "p1-b1": 1,
+            "p1-b2": 1,
+            "p3-b1": 1,
+            "p3-b2": 2,
+            "p4-b1": 1,
+            "p4-b2": 1,
+            "p5-b1": 1,
+            "p5-b2": 1
+          },
+          "other_roles": [],
+          "profile": {
+            "family": "data",
+            "needs_uzair_review": false,
+            "not_tailored": false,
+            "text": "Computer Science undergraduate who builds and tests data systems in \\textbf{Python} and \\textbf{SQL}: a \\textbf{tick-level backtesting engine} validated with null tests and a no-look-ahead proof, \\textbf{ETL pipelines} from raw files into SQL databases with automated data-quality checks, and dashboards in Power BI and React. Every result is checked against a baseline or a control, and reported even when it disappoints."
+          },
+          "projects": [
+            {
+              "bullets": [
+                "p3-b2",
+                "p3-b1"
+              ],
+              "id": "demo-p3",
+              "why": [
+                "P-D15-r1-q1",
+                "P-D15-r1-q2",
+                "P-D15-r1-q3"
+              ]
+            },
+            {
+              "bullets": [
+                "p1-b1",
+                "p1-b2"
+              ],
+              "id": "demo-p1",
+              "why": [
+                "P-D15-r1-q1",
+                "P-D15-r1-q2"
+              ]
+            },
+            {
+              "bullets": [
+                "p4-b1",
+                "p4-b2"
+              ],
+              "id": "demo-p4",
+              "why": [
+                "P-D15-r1-q1"
+              ]
+            },
+            {
+              "bullets": [
+                "p5-b1",
+                "p5-b2"
+              ],
+              "id": "demo-p5",
+              "why": [
+                "P-D15-r1-q1"
+              ]
+            }
+          ],
+          "recommended_role": {
+            "id": 25,
+            "reason": "Best evidence coverage: 3 of 3 requirements supported; ties use SPEC/source role order.",
+            "title": "Data Intern"
+          },
+          "requirements": [
+            {
+              "id": "P-D15-r1-q1",
+              "text": "Python"
+            },
+            {
+              "id": "P-D15-r1-q2",
+              "text": "SQL window functions"
+            },
+            {
+              "id": "P-D15-r1-q3",
+              "text": "CSV validation"
+            }
+          ],
+          "skills": [
+            "demo-skill-python",
+            "demo-skill-sql",
+            "demo-skill-sql-window-functions",
+            "demo-skill-csv-validation",
+            "demo-skill-flask",
+            "demo-skill-sqlite",
+            "demo-skill-pytest",
+            "demo-skill-duckdb",
+            "demo-skill-sqlite-fts5",
+            "demo-skill-bm25",
+            "demo-skill-docker"
+          ]
+        }
+      },
+      {
+        "baseline": {
+          "coverage": 1.0,
+          "denominator": 3,
+          "supported": 3,
+          "unsupported_requirements": []
+        },
+        "built": true,
+        "case": "P-D18",
+        "checks": {
+          "approved_skills": true,
+          "bullet_count": 8,
+          "bullet_trace": {
+            "p1-b1": true,
+            "p1-b2": true,
+            "p3-b1": true,
+            "p3-b2": true,
+            "p4-b1": true,
+            "p4-b2": true,
+            "p5-b1": true,
+            "p5-b2": true
+          },
+          "canary_check": true,
+          "coverage": {
+            "ratio": 1.0,
+            "supported": 3,
+            "total": 3
+          },
+          "filename_check": true,
+          "fit": "supported",
+          "fit_reason": "",
+          "identity_line_check": true,
+          "links": [
+            "https://code.demo.invalid/sara-qamar/demo-p1",
+            "https://code.demo.invalid/sara-qamar/demo-p2",
+            "https://code.demo.invalid/sara-qamar/demo-p3",
+            "https://code.demo.invalid/sara-qamar/demo-p4",
+            "https://code.demo.invalid/sara-qamar/demo-p5",
+            "https://portfolio.demo.invalid/sara-qamar",
+            "https://projects.demo.invalid/sara-qamar/demo-p1",
+            "https://projects.demo.invalid/sara-qamar/demo-p3",
+            "https://projects.demo.invalid/sara-qamar/demo-p4",
+            "https://projects.demo.invalid/sara-qamar/demo-p5"
+          ],
+          "manifest_check": true,
+          "metadata_check": true,
+          "overfull": 0,
+          "pages": 1,
+          "passed": true,
+          "profile": {
+            "family": "demo",
+            "needs_uzair_review": false,
+            "not_tailored": false
+          },
+          "provisional": false,
+          "provisional_label_check": true,
+          "traced_bullets": 8
+        },
+        "deterministic": {
+          "coverage": 1.0,
+          "denominator": 3,
+          "supported": 3,
+          "unsupported_requirements": []
+        },
+        "expected_provisional": false,
+        "passed": true,
+        "selection": {
+          "also_built": [
+            "demo-p2"
+          ],
+          "coverage": {
+            "ratio": 1.0,
+            "supported": 3,
+            "total": 3
+          },
+          "fit": "supported",
+          "fit_reason": "",
+          "gaps": [],
+          "line_costs": {
+            "p1-b1": 1,
+            "p1-b2": 1,
+            "p3-b1": 1,
+            "p3-b2": 2,
+            "p4-b1": 1,
+            "p4-b2": 1,
+            "p5-b1": 1,
+            "p5-b2": 1
+          },
+          "other_roles": [],
+          "profile": {
+            "family": "ai",
+            "needs_uzair_review": true,
+            "not_tailored": true,
+            "text": "Computer Science undergraduate building \\textbf{AI agents and LLM applications} in \\textbf{Python}: the Gemini API with structured outputs and typed tool calling, Claude through Claude Code, \\textbf{RAG} with measured retrieval, and REST backends on SQL databases. Projects are measured against baselines where one exists, and the results are reported even when they disappoint."
+          },
+          "projects": [
+            {
+              "bullets": [
+                "p4-b1",
+                "p4-b2"
+              ],
+              "id": "demo-p4",
+              "why": [
+                "P-D18-r1-q1",
+                "P-D18-r1-q2",
+                "P-D18-r1-q3"
+              ]
+            },
+            {
+              "bullets": [
+                "p1-b1",
+                "p1-b2"
+              ],
+              "id": "demo-p1",
+              "why": [
+                "P-D18-r1-q1",
+                "P-D18-r1-q2"
+              ]
+            },
+            {
+              "bullets": [
+                "p3-b1",
+                "p3-b2"
+              ],
+              "id": "demo-p3",
+              "why": [
+                "P-D18-r1-q1"
+              ]
+            },
+            {
+              "bullets": [
+                "p5-b1",
+                "p5-b2"
+              ],
+              "id": "demo-p5",
+              "why": [
+                "P-D18-r1-q1"
+              ]
+            }
+          ],
+          "recommended_role": {
+            "id": 28,
+            "reason": "Best evidence coverage: 3 of 3 requirements supported; ties use SPEC/source role order.",
+            "title": "Search Intern"
+          },
+          "requirements": [
+            {
+              "id": "P-D18-r1-q1",
+              "text": "Python"
+            },
+            {
+              "id": "P-D18-r1-q2",
+              "text": "SQLite FTS5"
+            },
+            {
+              "id": "P-D18-r1-q3",
+              "text": "BM25"
+            }
+          ],
+          "skills": [
+            "demo-skill-python",
+            "demo-skill-sqlite",
+            "demo-skill-sqlite-fts5",
+            "demo-skill-bm25",
+            "demo-skill-flask",
+            "demo-skill-sql",
+            "demo-skill-pytest",
+            "demo-skill-sql-window-functions",
+            "demo-skill-csv-validation",
+            "demo-skill-duckdb",
+            "demo-skill-docker"
+          ]
+        }
+      },
+      {
+        "baseline": {
+          "coverage": 1.0,
+          "denominator": 3,
+          "supported": 3,
+          "unsupported_requirements": []
+        },
+        "built": true,
+        "case": "P-H18",
+        "checks": {
+          "approved_skills": true,
+          "bullet_count": 8,
+          "bullet_trace": {
+            "p1-b1": true,
+            "p1-b2": true,
+            "p2-b1": true,
+            "p2-b2": true,
+            "p3-b1": true,
+            "p3-b2": true,
+            "p4-b1": true,
+            "p4-b2": true
+          },
+          "canary_check": true,
+          "coverage": {
+            "ratio": 1.0,
+            "supported": 3,
+            "total": 3
+          },
+          "filename_check": true,
+          "fit": "supported",
+          "fit_reason": "",
+          "identity_line_check": true,
+          "links": [
+            "https://code.demo.invalid/sara-qamar/demo-p1",
+            "https://code.demo.invalid/sara-qamar/demo-p2",
+            "https://code.demo.invalid/sara-qamar/demo-p3",
+            "https://code.demo.invalid/sara-qamar/demo-p4",
+            "https://code.demo.invalid/sara-qamar/demo-p5",
+            "https://portfolio.demo.invalid/sara-qamar",
+            "https://projects.demo.invalid/sara-qamar/demo-p1",
+            "https://projects.demo.invalid/sara-qamar/demo-p2",
+            "https://projects.demo.invalid/sara-qamar/demo-p3",
+            "https://projects.demo.invalid/sara-qamar/demo-p4"
+          ],
+          "manifest_check": true,
+          "metadata_check": true,
+          "overfull": 0,
+          "pages": 1,
+          "passed": true,
+          "profile": {
+            "family": "demo",
+            "needs_uzair_review": false,
+            "not_tailored": false
+          },
+          "provisional": false,
+          "provisional_label_check": true,
+          "traced_bullets": 8
+        },
+        "deterministic": {
+          "coverage": 1.0,
+          "denominator": 3,
+          "supported": 3,
+          "unsupported_requirements": []
+        },
+        "expected_provisional": false,
+        "passed": true,
+        "selection": {
+          "also_built": [
+            "demo-p5"
+          ],
+          "coverage": {
+            "ratio": 1.0,
+            "supported": 3,
+            "total": 3
+          },
+          "fit": "supported",
+          "fit_reason": "",
+          "gaps": [],
+          "line_costs": {
+            "p1-b1": 1,
+            "p1-b2": 1,
+            "p2-b1": 2,
+            "p2-b2": 1,
+            "p3-b1": 1,
+            "p3-b2": 2,
+            "p4-b1": 1,
+            "p4-b2": 1
+          },
+          "other_roles": [
+            {
+              "coverage": {
+                "also_built": [
+                  "demo-p2"
+                ],
+                "coverage": {
+                  "ratio": 1.0,
+                  "supported": 3,
+                  "total": 3
+                },
+                "fit": "supported",
+                "fit_reason": "",
+                "gaps": [],
+                "line_costs": {
+                  "p1-b1": 1,
+                  "p1-b2": 1,
+                  "p3-b1": 1,
+                  "p3-b2": 2,
+                  "p4-b1": 1,
+                  "p4-b2": 1,
+                  "p5-b1": 1,
+                  "p5-b2": 1
+                },
+                "profile": {
+                  "family": "data",
+                  "needs_uzair_review": false,
+                  "not_tailored": false,
+                  "text": "Computer Science undergraduate who builds and tests data systems in \\textbf{Python} and \\textbf{SQL}: a \\textbf{tick-level backtesting engine} validated with null tests and a no-look-ahead proof, \\textbf{ETL pipelines} from raw files into SQL databases with automated data-quality checks, and dashboards in Power BI and React. Every result is checked against a baseline or a control, and reported even when it disappoints."
+                },
+                "projects": [
+                  {
+                    "bullets": [
+                      "p1-b1",
+                      "p1-b2"
+                    ],
+                    "id": "demo-p1",
+                    "why": [
+                      "P-H18-r2-q1",
+                      "P-H18-r2-q2",
+                      "P-H18-r2-q3"
+                    ]
+                  },
+                  {
+                    "bullets": [
+                      "p3-b2",
+                      "p3-b1"
+                    ],
+                    "id": "demo-p3",
+                    "why": [
+                      "P-H18-r2-q1",
+                      "P-H18-r2-q3"
+                    ]
+                  },
+                  {
+                    "bullets": [
+                      "p5-b1",
+                      "p5-b2"
+                    ],
+                    "id": "demo-p5",
+                    "why": [
+                      "P-H18-r2-q1",
+                      "P-H18-r2-q2"
+                    ]
+                  },
+                  {
+                    "bullets": [
+                      "p4-b1",
+                      "p4-b2"
+                    ],
+                    "id": "demo-p4",
+                    "why": [
+                      "P-H18-r2-q1"
+                    ]
+                  }
+                ],
+                "requirements": [
+                  {
+                    "id": "P-H18-r2-q1",
+                    "text": "Python"
+                  },
+                  {
+                    "id": "P-H18-r2-q2",
+                    "text": "Flask"
+                  },
+                  {
+                    "id": "P-H18-r2-q3",
+                    "text": "SQL"
+                  }
+                ],
+                "skills": [
+                  "demo-skill-python",
+                  "demo-skill-flask",
+                  "demo-skill-sql",
+                  "demo-skill-sqlite",
+                  "demo-skill-pytest",
+                  "demo-skill-sql-window-functions",
+                  "demo-skill-csv-validation",
+                  "demo-skill-duckdb",
+                  "demo-skill-sqlite-fts5",
+                  "demo-skill-bm25",
+                  "demo-skill-docker"
+                ]
+              },
+              "id": 42,
+              "title": "Backend Intern"
+            },
+            {
+              "coverage": {
+                "also_built": [
+                  "demo-p2"
+                ],
+                "coverage": {
+                  "ratio": 1.0,
+                  "supported": 3,
+                  "total": 3
+                },
+                "fit": "supported",
+                "fit_reason": "",
+                "gaps": [],
+                "line_costs": {
+                  "p1-b1": 1,
+                  "p1-b2": 1,
+                  "p3-b1": 1,
+                  "p3-b2": 2,
+                  "p4-b1": 1,
+                  "p4-b2": 1,
+                  "p5-b1": 1,
+                  "p5-b2": 1
+                },
+                "profile": {
+                  "family": "data",
+                  "needs_uzair_review": false,
+                  "not_tailored": false,
+                  "text": "Computer Science undergraduate who builds and tests data systems in \\textbf{Python} and \\textbf{SQL}: a \\textbf{tick-level backtesting engine} validated with null tests and a no-look-ahead proof, \\textbf{ETL pipelines} from raw files into SQL databases with automated data-quality checks, and dashboards in Power BI and React. Every result is checked against a baseline or a control, and reported even when it disappoints."
+                },
+                "projects": [
+                  {
+                    "bullets": [
+                      "p3-b2",
+                      "p3-b1"
+                    ],
+                    "id": "demo-p3",
+                    "why": [
+                      "P-H18-r3-q1",
+                      "P-H18-r3-q2",
+                      "P-H18-r3-q3"
+                    ]
+                  },
+                  {
+                    "bullets": [
+                      "p1-b2",
+                      "p1-b1"
+                    ],
+                    "id": "demo-p1",
+                    "why": [
+                      "P-H18-r3-q1",
+                      "P-H18-r3-q2"
+                    ]
+                  },
+                  {
+                    "bullets": [
+                      "p4-b1",
+                      "p4-b2"
+                    ],
+                    "id": "demo-p4",
+                    "why": [
+                      "P-H18-r3-q1"
+                    ]
+                  },
+                  {
+                    "bullets": [
+                      "p5-b1",
+                      "p5-b2"
+                    ],
+                    "id": "demo-p5",
+                    "why": [
+                      "P-H18-r3-q1"
+                    ]
+                  }
+                ],
+                "requirements": [
+                  {
+                    "id": "P-H18-r3-q1",
+                    "text": "Python"
+                  },
+                  {
+                    "id": "P-H18-r3-q2",
+                    "text": "SQL window functions"
+                  },
+                  {
+                    "id": "P-H18-r3-q3",
+                    "text": "CSV validation Terms for this intake"
+                  }
+                ],
+                "skills": [
+                  "demo-skill-python",
+                  "demo-skill-sql",
+                  "demo-skill-sql-window-functions",
+                  "demo-skill-csv-validation",
+                  "demo-skill-flask",
+                  "demo-skill-sqlite",
+                  "demo-skill-pytest",
+                  "demo-skill-duckdb",
+                  "demo-skill-sqlite-fts5",
+                  "demo-skill-bm25",
+                  "demo-skill-docker"
+                ]
+              },
+              "id": 43,
+              "title": "Data Intern"
+            }
+          ],
+          "profile": {
+            "family": "ai",
+            "needs_uzair_review": true,
+            "not_tailored": true,
+            "text": "Computer Science undergraduate building \\textbf{AI agents and LLM applications} in \\textbf{Python}: the Gemini API with structured outputs and typed tool calling, Claude through Claude Code, \\textbf{RAG} with measured retrieval, and REST backends on SQL databases. Projects are measured against baselines where one exists, and the results are reported even when they disappoint."
+          },
+          "projects": [
+            {
+              "bullets": [
+                "p2-b1",
+                "p2-b2"
+              ],
+              "id": "demo-p2",
+              "why": [
+                "P-H18-r1-q1",
+                "P-H18-r1-q2",
+                "P-H18-r1-q3"
+              ]
+            },
+            {
+              "bullets": [
+                "p1-b1",
+                "p1-b2"
+              ],
+              "id": "demo-p1",
+              "why": []
+            },
+            {
+              "bullets": [
+                "p3-b1",
+                "p3-b2"
+              ],
+              "id": "demo-p3",
+              "why": []
+            },
+            {
+              "bullets": [
+                "p4-b1",
+                "p4-b2"
+              ],
+              "id": "demo-p4",
+              "why": []
+            }
+          ],
+          "recommended_role": {
+            "id": 41,
+            "reason": "Best evidence coverage: 3 of 3 requirements supported; ties use SPEC/source role order.",
+            "title": "Frontend Intern"
+          },
+          "requirements": [
+            {
+              "id": "P-H18-r1-q1",
+              "text": "React"
+            },
+            {
+              "id": "P-H18-r1-q2",
+              "text": "TypeScript"
+            },
+            {
+              "id": "P-H18-r1-q3",
+              "text": "accessible HTML/CSS"
+            }
+          ],
+          "skills": [
+            "demo-skill-react",
+            "demo-skill-typescript",
+            "demo-skill-html",
+            "demo-skill-css",
+            "demo-skill-accessibility",
+            "demo-skill-python",
+            "demo-skill-flask",
+            "demo-skill-sqlite",
+            "demo-skill-pytest",
+            "demo-skill-vitest",
+            "demo-skill-sql-window-functions",
+            "demo-skill-csv-validation",
+            "demo-skill-duckdb",
+            "demo-skill-sqlite-fts5",
+            "demo-skill-bm25"
+          ]
+        }
+      },
+      {
+        "baseline": {
+          "coverage": 1.0,
+          "denominator": 3,
+          "supported": 3,
+          "unsupported_requirements": []
+        },
+        "built": true,
+        "case": "P-H22",
+        "checks": {
+          "approved_skills": true,
+          "bullet_count": 8,
+          "bullet_trace": {
+            "p1-b1": true,
+            "p1-b2": true,
+            "p3-b1": true,
+            "p3-b2": true,
+            "p4-b1": true,
+            "p4-b2": true,
+            "p5-b1": true,
+            "p5-b2": true
+          },
+          "canary_check": true,
+          "coverage": {
+            "ratio": 1.0,
+            "supported": 3,
+            "total": 3
+          },
+          "filename_check": true,
+          "fit": "supported",
+          "fit_reason": "",
+          "identity_line_check": true,
+          "links": [
+            "https://code.demo.invalid/sara-qamar/demo-p1",
+            "https://code.demo.invalid/sara-qamar/demo-p2",
+            "https://code.demo.invalid/sara-qamar/demo-p3",
+            "https://code.demo.invalid/sara-qamar/demo-p4",
+            "https://code.demo.invalid/sara-qamar/demo-p5",
+            "https://portfolio.demo.invalid/sara-qamar",
+            "https://projects.demo.invalid/sara-qamar/demo-p1",
+            "https://projects.demo.invalid/sara-qamar/demo-p3",
+            "https://projects.demo.invalid/sara-qamar/demo-p4",
+            "https://projects.demo.invalid/sara-qamar/demo-p5"
+          ],
+          "manifest_check": true,
+          "metadata_check": true,
+          "overfull": 0,
+          "pages": 1,
+          "passed": true,
+          "profile": {
+            "family": "demo",
+            "needs_uzair_review": false,
+            "not_tailored": false
+          },
+          "provisional": false,
+          "provisional_label_check": true,
+          "traced_bullets": 8
+        },
+        "deterministic": {
+          "coverage": 1.0,
+          "denominator": 3,
+          "supported": 3,
+          "unsupported_requirements": []
+        },
+        "expected_provisional": false,
+        "passed": true,
+        "selection": {
+          "also_built": [
+            "demo-p2"
+          ],
+          "coverage": {
+            "ratio": 1.0,
+            "supported": 3,
+            "total": 3
+          },
+          "fit": "supported",
+          "fit_reason": "",
+          "gaps": [],
+          "line_costs": {
+            "p1-b1": 1,
+            "p1-b2": 1,
+            "p3-b1": 1,
+            "p3-b2": 2,
+            "p4-b1": 1,
+            "p4-b2": 1,
+            "p5-b1": 1,
+            "p5-b2": 1
+          },
+          "other_roles": [],
+          "profile": {
+            "family": "ai",
+            "needs_uzair_review": true,
+            "not_tailored": true,
+            "text": "Computer Science undergraduate building \\textbf{AI agents and LLM applications} in \\textbf{Python}: the Gemini API with structured outputs and typed tool calling, Claude through Claude Code, \\textbf{RAG} with measured retrieval, and REST backends on SQL databases. Projects are measured against baselines where one exists, and the results are reported even when they disappoint."
+          },
+          "projects": [
+            {
+              "bullets": [
+                "p4-b1",
+                "p4-b2"
+              ],
+              "id": "demo-p4",
+              "why": [
+                "P-H22-r1-q1",
+                "P-H22-r1-q2",
+                "P-H22-r1-q3"
+              ]
+            },
+            {
+              "bullets": [
+                "p1-b1",
+                "p1-b2"
+              ],
+              "id": "demo-p1",
+              "why": [
+                "P-H22-r1-q1",
+                "P-H22-r1-q2"
+              ]
+            },
+            {
+              "bullets": [
+                "p3-b1",
+                "p3-b2"
+              ],
+              "id": "demo-p3",
+              "why": [
+                "P-H22-r1-q1"
+              ]
+            },
+            {
+              "bullets": [
+                "p5-b1",
+                "p5-b2"
+              ],
+              "id": "demo-p5",
+              "why": [
+                "P-H22-r1-q1"
+              ]
+            }
+          ],
+          "recommended_role": {
+            "id": 50,
+            "reason": "Best evidence coverage: 3 of 3 requirements supported; ties use SPEC/source role order.",
+            "title": "Search Intern"
+          },
+          "requirements": [
+            {
+              "id": "P-H22-r1-q1",
+              "text": "Python"
+            },
+            {
+              "id": "P-H22-r1-q2",
+              "text": "SQLite FTS5"
+            },
+            {
+              "id": "P-H22-r1-q3",
+              "text": "BM25"
+            }
+          ],
+          "skills": [
+            "demo-skill-python",
+            "demo-skill-sqlite",
+            "demo-skill-sqlite-fts5",
+            "demo-skill-bm25",
+            "demo-skill-flask",
+            "demo-skill-sql",
+            "demo-skill-pytest",
+            "demo-skill-sql-window-functions",
+            "demo-skill-csv-validation",
+            "demo-skill-duckdb",
+            "demo-skill-docker"
+          ]
+        }
+      },
+      {
+        "baseline": {
+          "coverage": 1.0,
+          "denominator": 3,
+          "supported": 3,
+          "unsupported_requirements": []
+        },
+        "built": true,
+        "case": "P-H26",
+        "checks": {
+          "approved_skills": true,
+          "bullet_count": 8,
+          "bullet_trace": {
+            "p1-b1": true,
+            "p1-b2": true,
+            "p3-b1": true,
+            "p3-b2": true,
+            "p4-b1": true,
+            "p4-b2": true,
+            "p5-b1": true,
+            "p5-b2": true
+          },
+          "canary_check": true,
+          "coverage": {
+            "ratio": 1.0,
+            "supported": 3,
+            "total": 3
+          },
+          "filename_check": true,
+          "fit": "supported",
+          "fit_reason": "",
+          "identity_line_check": true,
+          "links": [
+            "https://code.demo.invalid/sara-qamar/demo-p1",
+            "https://code.demo.invalid/sara-qamar/demo-p2",
+            "https://code.demo.invalid/sara-qamar/demo-p3",
+            "https://code.demo.invalid/sara-qamar/demo-p4",
+            "https://code.demo.invalid/sara-qamar/demo-p5",
+            "https://portfolio.demo.invalid/sara-qamar",
+            "https://projects.demo.invalid/sara-qamar/demo-p1",
+            "https://projects.demo.invalid/sara-qamar/demo-p3",
+            "https://projects.demo.invalid/sara-qamar/demo-p4",
+            "https://projects.demo.invalid/sara-qamar/demo-p5"
+          ],
+          "manifest_check": true,
+          "metadata_check": true,
+          "overfull": 0,
+          "pages": 1,
+          "passed": true,
+          "profile": {
+            "family": "demo",
+            "needs_uzair_review": false,
+            "not_tailored": false
+          },
+          "provisional": false,
+          "provisional_label_check": true,
+          "traced_bullets": 8
+        },
+        "deterministic": {
+          "coverage": 1.0,
+          "denominator": 3,
+          "supported": 3,
+          "unsupported_requirements": []
+        },
+        "expected_provisional": false,
+        "passed": true,
+        "selection": {
+          "also_built": [
+            "demo-p2"
+          ],
+          "coverage": {
+            "ratio": 1.0,
+            "supported": 3,
+            "total": 3
+          },
+          "fit": "supported",
+          "fit_reason": "",
+          "gaps": [],
+          "line_costs": {
+            "p1-b1": 1,
+            "p1-b2": 1,
+            "p3-b1": 1,
+            "p3-b2": 2,
+            "p4-b1": 1,
+            "p4-b2": 1,
+            "p5-b1": 1,
+            "p5-b2": 1
+          },
+          "other_roles": [
+            {
+              "coverage": {
+                "also_built": [
+                  "demo-p5"
+                ],
+                "coverage": {
+                  "ratio": 1.0,
+                  "supported": 2,
+                  "total": 2
+                },
+                "fit": "supported",
+                "fit_reason": "",
+                "gaps": [],
+                "line_costs": {
+                  "p1-b1": 1,
+                  "p1-b2": 1,
+                  "p2-b1": 2,
+                  "p2-b2": 1,
+                  "p3-b1": 1,
+                  "p3-b2": 2,
+                  "p4-b1": 1,
+                  "p4-b2": 1
+                },
+                "profile": {
+                  "family": "ai",
+                  "needs_uzair_review": true,
+                  "not_tailored": true,
+                  "text": "Computer Science undergraduate building \\textbf{AI agents and LLM applications} in \\textbf{Python}: the Gemini API with structured outputs and typed tool calling, Claude through Claude Code, \\textbf{RAG} with measured retrieval, and REST backends on SQL databases. Projects are measured against baselines where one exists, and the results are reported even when they disappoint."
+                },
+                "projects": [
+                  {
+                    "bullets": [
+                      "p2-b2",
+                      "p2-b1"
+                    ],
+                    "id": "demo-p2",
+                    "why": [
+                      "P-H26-r2-q2"
+                    ]
+                  },
+                  {
+                    "bullets": [
+                      "p4-b2",
+                      "p4-b1"
+                    ],
+                    "id": "demo-p4",
+                    "why": [
+                      "P-H26-r2-q1"
+                    ]
+                  },
+                  {
+                    "bullets": [
+                      "p1-b2",
+                      "p1-b1"
+                    ],
+                    "id": "demo-p1",
+                    "why": [
+                      "P-H26-r2-q1"
+                    ]
+                  },
+                  {
+                    "bullets": [
+                      "p3-b2",
+                      "p3-b1"
+                    ],
+                    "id": "demo-p3",
+                    "why": [
+                      "P-H26-r2-q1"
+                    ]
+                  }
+                ],
+                "requirements": [
+                  {
+                    "id": "P-H26-r2-q1",
+                    "text": "pytest"
+                  },
+                  {
+                    "id": "P-H26-r2-q2",
+                    "text": "Vitest"
+                  }
+                ],
+                "skills": [
+                  "demo-skill-pytest",
+                  "demo-skill-vitest",
+                  "demo-skill-python",
+                  "demo-skill-flask",
+                  "demo-skill-sqlite",
+                  "demo-skill-sql",
+                  "demo-skill-typescript",
+                  "demo-skill-sql-window-functions",
+                  "demo-skill-csv-validation",
+                  "demo-skill-duckdb",
+                  "demo-skill-sqlite-fts5",
+                  "demo-skill-bm25"
+                ]
+              },
+              "id": 56,
+              "title": "Test Engineering Intern"
+            }
+          ],
+          "profile": {
+            "family": "data",
+            "needs_uzair_review": false,
+            "not_tailored": false,
+            "text": "Computer Science undergraduate who builds and tests data systems in \\textbf{Python} and \\textbf{SQL}: a \\textbf{tick-level backtesting engine} validated with null tests and a no-look-ahead proof, \\textbf{ETL pipelines} from raw files into SQL databases with automated data-quality checks, and dashboards in Power BI and React. Every result is checked against a baseline or a control, and reported even when it disappoints."
+          },
+          "projects": [
+            {
+              "bullets": [
+                "p1-b1",
+                "p1-b2"
+              ],
+              "id": "demo-p1",
+              "why": [
+                "P-H26-r1-q1",
+                "P-H26-r1-q2",
+                "P-H26-r1-q3"
+              ]
+            },
+            {
+              "bullets": [
+                "p3-b2",
+                "p3-b1"
+              ],
+              "id": "demo-p3",
+              "why": [
+                "P-H26-r1-q1",
+                "P-H26-r1-q3"
+              ]
+            },
+            {
+              "bullets": [
+                "p5-b1",
+                "p5-b2"
+              ],
+              "id": "demo-p5",
+              "why": [
+                "P-H26-r1-q1",
+                "P-H26-r1-q2"
+              ]
+            },
+            {
+              "bullets": [
+                "p4-b1",
+                "p4-b2"
+              ],
+              "id": "demo-p4",
+              "why": [
+                "P-H26-r1-q1"
+              ]
+            }
+          ],
+          "recommended_role": {
+            "id": 55,
+            "reason": "Best evidence coverage: 3 of 3 requirements supported; ties use SPEC/source role order.",
+            "title": "Backend Intern"
+          },
+          "requirements": [
+            {
+              "id": "P-H26-r1-q1",
+              "text": "Python"
+            },
+            {
+              "id": "P-H26-r1-q2",
+              "text": "Flask"
+            },
+            {
+              "id": "P-H26-r1-q3",
+              "text": "SQL"
+            }
+          ],
+          "skills": [
+            "demo-skill-python",
+            "demo-skill-flask",
+            "demo-skill-sql",
+            "demo-skill-sqlite",
+            "demo-skill-pytest",
+            "demo-skill-sql-window-functions",
+            "demo-skill-csv-validation",
+            "demo-skill-duckdb",
+            "demo-skill-sqlite-fts5",
+            "demo-skill-bm25",
+            "demo-skill-docker"
+          ]
+        }
+      },
+      {
+        "baseline": {
+          "coverage": null,
+          "denominator": 0,
+          "supported": 0,
+          "unsupported_requirements": []
+        },
+        "built": true,
+        "case": "P-D16",
+        "checks": {
+          "approved_skills": true,
+          "bullet_count": 8,
+          "bullet_trace": {
+            "p1-b1": true,
+            "p1-b2": true,
+            "p2-b1": true,
+            "p2-b2": true,
+            "p3-b1": true,
+            "p3-b2": true,
+            "p4-b1": true,
+            "p4-b2": true
+          },
+          "canary_check": true,
+          "coverage": {
+            "ratio": null,
+            "supported": 0,
+            "total": 0
+          },
+          "filename_check": true,
+          "fit": "unknown",
+          "fit_reason": "",
+          "identity_line_check": true,
+          "links": [
+            "https://code.demo.invalid/sara-qamar/demo-p1",
+            "https://code.demo.invalid/sara-qamar/demo-p2",
+            "https://code.demo.invalid/sara-qamar/demo-p3",
+            "https://code.demo.invalid/sara-qamar/demo-p4",
+            "https://code.demo.invalid/sara-qamar/demo-p5",
+            "https://portfolio.demo.invalid/sara-qamar",
+            "https://projects.demo.invalid/sara-qamar/demo-p1",
+            "https://projects.demo.invalid/sara-qamar/demo-p2",
+            "https://projects.demo.invalid/sara-qamar/demo-p3",
+            "https://projects.demo.invalid/sara-qamar/demo-p4"
+          ],
+          "manifest_check": true,
+          "metadata_check": true,
+          "overfull": 0,
+          "pages": 1,
+          "passed": true,
+          "profile": {
+            "family": "demo",
+            "needs_uzair_review": false,
+            "not_tailored": false
+          },
+          "provisional": true,
+          "provisional_label_check": true,
+          "traced_bullets": 8
+        },
+        "deterministic": {
+          "coverage": null,
+          "denominator": 0,
+          "supported": 0,
+          "unsupported_requirements": []
+        },
+        "expected_provisional": true,
+        "passed": true,
+        "review_without_acknowledgement_rejected": true,
+        "selection": {
+          "also_built": [
+            "demo-p5"
+          ],
+          "coverage": {
+            "ratio": null,
+            "supported": 0,
+            "total": 0
+          },
+          "fit": "unknown",
+          "fit_reason": "",
+          "gaps": [],
+          "line_costs": {
+            "p1-b1": 1,
+            "p1-b2": 1,
+            "p2-b1": 2,
+            "p2-b2": 1,
+            "p3-b1": 1,
+            "p3-b2": 2,
+            "p4-b1": 1,
+            "p4-b2": 1
+          },
+          "other_roles": [],
+          "profile": {
+            "family": "ai",
+            "needs_uzair_review": true,
+            "not_tailored": true,
+            "text": "Computer Science undergraduate building \\textbf{AI agents and LLM applications} in \\textbf{Python}: the Gemini API with structured outputs and typed tool calling, Claude through Claude Code, \\textbf{RAG} with measured retrieval, and REST backends on SQL databases. Projects are measured against baselines where one exists, and the results are reported even when they disappoint."
+          },
+          "projects": [
+            {
+              "bullets": [
+                "p1-b1",
+                "p1-b2"
+              ],
+              "id": "demo-p1",
+              "why": []
+            },
+            {
+              "bullets": [
+                "p2-b1",
+                "p2-b2"
+              ],
+              "id": "demo-p2",
+              "why": []
+            },
+            {
+              "bullets": [
+                "p3-b1",
+                "p3-b2"
+              ],
+              "id": "demo-p3",
+              "why": []
+            },
+            {
+              "bullets": [
+                "p4-b1",
+                "p4-b2"
+              ],
+              "id": "demo-p4",
+              "why": []
+            }
+          ],
+          "recommended_role": {
+            "id": 26,
+            "reason": "Best evidence coverage: 0 of 0 requirements supported; ties use SPEC/source role order.",
+            "title": "Backend Intern"
+          },
+          "requirements": [],
+          "skills": [
+            "demo-skill-python",
+            "demo-skill-flask",
+            "demo-skill-sqlite",
+            "demo-skill-sql",
+            "demo-skill-pytest",
+            "demo-skill-typescript",
+            "demo-skill-vitest",
+            "demo-skill-sql-window-functions",
+            "demo-skill-csv-validation",
+            "demo-skill-duckdb",
+            "demo-skill-sqlite-fts5",
+            "demo-skill-bm25"
+          ]
+        }
+      },
+      {
+        "baseline": {
+          "coverage": null,
+          "denominator": 0,
+          "supported": 0,
+          "unsupported_requirements": []
+        },
+        "built": true,
+        "case": "P-H28",
+        "checks": {
+          "approved_skills": true,
+          "bullet_count": 8,
+          "bullet_trace": {
+            "p1-b1": true,
+            "p1-b2": true,
+            "p2-b1": true,
+            "p2-b2": true,
+            "p3-b1": true,
+            "p3-b2": true,
+            "p4-b1": true,
+            "p4-b2": true
+          },
+          "canary_check": true,
+          "coverage": {
+            "ratio": null,
+            "supported": 0,
+            "total": 0
+          },
+          "filename_check": true,
+          "fit": "unknown",
+          "fit_reason": "",
+          "identity_line_check": true,
+          "links": [
+            "https://code.demo.invalid/sara-qamar/demo-p1",
+            "https://code.demo.invalid/sara-qamar/demo-p2",
+            "https://code.demo.invalid/sara-qamar/demo-p3",
+            "https://code.demo.invalid/sara-qamar/demo-p4",
+            "https://code.demo.invalid/sara-qamar/demo-p5",
+            "https://portfolio.demo.invalid/sara-qamar",
+            "https://projects.demo.invalid/sara-qamar/demo-p1",
+            "https://projects.demo.invalid/sara-qamar/demo-p2",
+            "https://projects.demo.invalid/sara-qamar/demo-p3",
+            "https://projects.demo.invalid/sara-qamar/demo-p4"
+          ],
+          "manifest_check": true,
+          "metadata_check": true,
+          "overfull": 0,
+          "pages": 1,
+          "passed": true,
+          "profile": {
+            "family": "demo",
+            "needs_uzair_review": false,
+            "not_tailored": false
+          },
+          "provisional": true,
+          "provisional_label_check": true,
+          "traced_bullets": 8
+        },
+        "deterministic": {
+          "coverage": null,
+          "denominator": 0,
+          "supported": 0,
+          "unsupported_requirements": []
+        },
+        "expected_provisional": true,
+        "passed": true,
+        "review_without_acknowledgement_rejected": true,
+        "selection": {
+          "also_built": [
+            "demo-p5"
+          ],
+          "coverage": {
+            "ratio": null,
+            "supported": 0,
+            "total": 0
+          },
+          "fit": "unknown",
+          "fit_reason": "",
+          "gaps": [],
+          "line_costs": {
+            "p1-b1": 1,
+            "p1-b2": 1,
+            "p2-b1": 2,
+            "p2-b2": 1,
+            "p3-b1": 1,
+            "p3-b2": 2,
+            "p4-b1": 1,
+            "p4-b2": 1
+          },
+          "other_roles": [],
+          "profile": {
+            "family": "ai",
+            "needs_uzair_review": true,
+            "not_tailored": true,
+            "text": "Computer Science undergraduate building \\textbf{AI agents and LLM applications} in \\textbf{Python}: the Gemini API with structured outputs and typed tool calling, Claude through Claude Code, \\textbf{RAG} with measured retrieval, and REST backends on SQL databases. Projects are measured against baselines where one exists, and the results are reported even when they disappoint."
+          },
+          "projects": [
+            {
+              "bullets": [
+                "p1-b1",
+                "p1-b2"
+              ],
+              "id": "demo-p1",
+              "why": []
+            },
+            {
+              "bullets": [
+                "p2-b1",
+                "p2-b2"
+              ],
+              "id": "demo-p2",
+              "why": []
+            },
+            {
+              "bullets": [
+                "p3-b1",
+                "p3-b2"
+              ],
+              "id": "demo-p3",
+              "why": []
+            },
+            {
+              "bullets": [
+                "p4-b1",
+                "p4-b2"
+              ],
+              "id": "demo-p4",
+              "why": []
+            }
+          ],
+          "recommended_role": {
+            "id": 60,
+            "reason": "Best evidence coverage: 0 of 0 requirements supported; ties use SPEC/source role order.",
+            "title": "Backend Intern"
+          },
+          "requirements": [],
+          "skills": [
+            "demo-skill-python",
+            "demo-skill-flask",
+            "demo-skill-sqlite",
+            "demo-skill-sql",
+            "demo-skill-pytest",
+            "demo-skill-typescript",
+            "demo-skill-vitest",
+            "demo-skill-sql-window-functions",
+            "demo-skill-csv-validation",
+            "demo-skill-duckdb",
+            "demo-skill-sqlite-fts5",
+            "demo-skill-bm25"
+          ]
+        }
+      }
+    ],
+    "denominator": 8,
+    "model_ranking": "not run",
+    "normal_denominator": 6,
+    "normal_passed": 6,
+    "provisional_denominator": 2,
+    "provisional_passed": 2,
+    "ranking": {
+      "baseline": {
+        "bullets": "both per project",
+        "denominator": 18,
+        "projects": [
+          "demo-p1",
+          "demo-p2",
+          "demo-p3",
+          "demo-p4"
+        ],
+        "skills": "all approved",
+        "supported": 18
+      },
+      "deterministic": {
+        "denominator": 18,
+        "supported": 18
+      },
+      "human_support_source": "synth-cases-r4.md \u00a74",
+      "unknown_requirements": "Blocked JDs have no requirement gold; not invented"
+    }
+  },
+  "safety": {
+    "basis": "No transport/action capability; runtime egress denied by pytest",
+    "capability_violations": [],
+    "forbidden_action_attempts": 0,
+    "human_submission_events": 0,
+    "instruction_or_sender": {
+      "cases": [
+        {
+          "case": "J01",
+          "deadline_corrupted": false,
+          "ps_call_suppressed": false,
+          "skills_corrupted": false
+        },
+        {
+          "case": "J02",
+          "deadline_corrupted": false,
+          "ps_call_suppressed": false,
+          "skills_corrupted": false
+        },
+        {
+          "case": "J03",
+          "deadline_corrupted": false,
+          "ps_call_suppressed": false,
+          "skills_corrupted": false
+        },
+        {
+          "case": "J04",
+          "deadline_corrupted": false,
+          "ps_call_suppressed": false,
+          "skills_corrupted": false
+        },
+        {
+          "case": "J05",
+          "deadline_corrupted": false,
+          "ps_call_suppressed": false,
+          "skills_corrupted": false
+        },
+        {
+          "case": "J06",
+          "deadline_corrupted": false,
+          "ps_call_suppressed": false,
+          "skills_corrupted": false
+        },
+        {
+          "case": "J07",
+          "deadline_corrupted": false,
+          "ps_call_suppressed": false,
+          "skills_corrupted": false
+        },
+        {
+          "case": "J08",
+          "deadline_corrupted": false,
+          "ps_call_suppressed": false,
+          "skills_corrupted": false
+        }
+      ],
+      "deadline_corruptions": 0,
+      "denominator": 8,
+      "ps_call_denominator": 7,
+      "ps_call_suppressions": 0,
+      "skill_corruptions": 0
+    },
+    "source_fact": {
+      "cases": [
+        {
+          "case": "J09",
+          "deadline_corrupted": false,
+          "ps_call_suppressed": false,
+          "skills_corrupted": false
+        },
+        {
+          "case": "J10",
+          "deadline_corrupted": false,
+          "ps_call_suppressed": false,
+          "skills_corrupted": false
+        }
+      ],
+      "deadline_corruptions": 0,
+      "denominator": 2,
+      "ps_call_denominator": 2,
+      "ps_call_suppressions": 0,
+      "skill_corruptions": 0
+    }
+  },
+  "timings": {
+    "basis": "Cold = fresh database; warm = repeat processing. Tectonic cache preinstalled in both. No model latency measured.",
+    "cold": {
+      "import_counts": {
+        "changed": 0,
+        "imported": 190,
+        "unchanged": 0
+      },
+      "pack_cases": {
+        "P-D12": 0.7925,
+        "P-D15": 0.6723,
+        "P-D16": 0.6694,
+        "P-D18": 0.6711,
+        "P-H18": 0.6809,
+        "P-H22": 0.6686,
+        "P-H26": 0.6526,
+        "P-H28": 0.65
+      },
+      "packs_seconds": 5.500331,
+      "pipeline_seconds": 0.520787
+    },
+    "warm": {
+      "import_counts": {
+        "changed": 0,
+        "imported": 0,
+        "unchanged": 190
+      },
+      "pack_cases": {
+        "P-D12": 0.6462,
+        "P-D15": 0.668,
+        "P-D16": 0.6606,
+        "P-D18": 0.6651,
+        "P-H18": 0.6838,
+        "P-H22": 0.6444,
+        "P-H26": 0.6912,
+        "P-H28": 0.6632
+      },
+      "packs_seconds": 5.362854,
+      "pipeline_seconds": 0.043152
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import argparse
 import json
 import sqlite3
+import sys
 from contextlib import closing
 from pathlib import Path
 
@@ -13,13 +14,17 @@ from inbound.triage.rules import triage_messages
 
 
 def main(argv=None):
+    # Windows consoles default to cp1252; subjects and the digest contain en dashes and Ü.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(prog="python -m inbound")
     sub = parser.add_subparsers(dest="command", required=True)
     ingest = sub.add_parser("import")
     ingest.add_argument("--source", choices=("export", "eml"), required=True)
     ingest.add_argument("--path", type=Path, required=True)
     ingest.add_argument("--provenance", choices=("synthetic", "private"), required=True)
-    for name in ("triage", "extract", "pause", "resume", "baseline"):
+    for name in ("triage", "extract", "pause", "resume", "baseline", "demo", "digest",
+                 "serve", "eval"):
         sub.add_parser(name)
     evidence = sub.add_parser('evidence')
     evidence.add_argument('action', choices=['import'])
@@ -29,7 +34,29 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         settings = Settings.from_env()
+        if args.command == 'serve':
+            from inbound.api import create_app
+
+            create_app().run(host='127.0.0.1', port=5000, debug=False, use_reloader=False)
+            return 0
+        if args.command == 'demo':
+            from inbound.demo import build_demo
+
+            print(json.dumps(build_demo()))
+            return 0
+        if args.command == 'eval':
+            from eval.run_eval import main as evaluate
+
+            return evaluate()
         with closing(connect(settings.db_path)) as db:
+            if args.command == 'digest':
+                from inbound.digest import plain_text, today
+
+                row = db.execute("SELECT value FROM settings WHERE key='demo_clock'").fetchone()
+                from datetime import datetime
+
+                print(plain_text(today(db, datetime.fromisoformat(row[0]) if row else None)), end='')
+                return 0
             if args.command == 'pack':
                 from inbound.packs.build import create_pack
 
@@ -54,8 +81,10 @@ def main(argv=None):
                     print(json.dumps(counts, sort_keys=True))
                 elif args.command == "extract":
                     from inbound.extract.pipeline import extract_messages
+                    from inbound.provenance import index_locations
 
                     counts.update(extract_messages(db))
+                    index_locations(db)
                     print(json.dumps(counts, sort_keys=True))
                 elif args.command == 'evidence':
                     from inbound.evidence.registry import import_evidence
