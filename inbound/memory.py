@@ -25,12 +25,16 @@ def current_snapshot(db):
     return db.execute("SELECT * FROM memory_snapshots ORDER BY version DESC LIMIT 1").fetchone()
 
 
-def guard(db):
+def guard(db, expected_generation=None):
     check(db)
     if db.execute(
         "SELECT 1 FROM runs WHERE status='running' AND operation_key='import'"
     ).fetchone():
         raise MemoryConflict("Import is running; refresh memory after publication")
+    if expected_generation is not None and db.execute(
+        'SELECT generation FROM domain_generation WHERE id=1'
+    ).fetchone()[0] != expected_generation:
+        raise MemoryConflict('Stored information changed; ask again before confirming')
 
 
 def readable_title(document):
@@ -303,7 +307,8 @@ def replace_file(root, name, payload):
         temporary.unlink(missing_ok=True)
 
 
-def mutate(db, settings, action, *, expected_version, memory_id=None, document=None):
+def mutate(db, settings, action, *, expected_version, memory_id=None, document=None,
+           expected_generation=None):
     from inbound.steps import identifier
 
     if not isinstance(action, str) or action not in {"add", "edit", "forget", "disable", "enable"}:
@@ -317,7 +322,7 @@ def mutate(db, settings, action, *, expected_version, memory_id=None, document=N
     db.execute("BEGIN IMMEDIATE")
     local_path, previous_bytes, touched = None, None, False
     try:
-        guard(db)
+        guard(db, expected_generation)
         last = current_snapshot(db)
         if (last["version"] if last else 0) != expected_version:
             raise MemoryConflict("Memory changed; refresh before saving")
