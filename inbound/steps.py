@@ -13,6 +13,8 @@ from inbound.triage.taxonomy import CATEGORIES
 
 
 class Kind(StrEnum):
+    MEMORY_PUBLISHED = "memory.published"
+    MEMORY_CHANGED = "action.memory_changed"
     GMAIL_STARTED = "gmail.started"
     GMAIL_FETCHED = "gmail.fetched"
     GMAIL_FAILED = "gmail.failed"
@@ -88,11 +90,17 @@ class Alert:
 class Reference:
     entity_type: str
     entity_id: int | str
+    version: int | None = None
+
+
+@dataclass(frozen=True)
+class MemoryPublication:
+    count: int
 
 
 _CONTEXT = ContextVar("agent_step_context", default=None)
 STAGES = {"queued", "import", "triage", "extraction", "provenance", "snapshot", "pack"}
-ENTITIES = {"message", "opportunity", "pack", "run", "snapshot"}
+ENTITIES = {"message", "opportunity", "pack", "run", "snapshot", "memory", "memory_snapshot"}
 FACT_TYPES = {k: Empty for k in Kind}
 FACT_TYPES.update(
     {
@@ -106,6 +114,8 @@ FACT_TYPES.update(
         Kind.ALERT_ELIGIBLE: Alert,
         Kind.ALERT_REQUESTED: Alert,
         Kind.ALERT_SUPPRESSED: Alert,
+        Kind.MEMORY_PUBLISHED: MemoryPublication,
+        Kind.MEMORY_CHANGED: MemoryPublication,
     }
 )
 PROGRESS = {
@@ -134,7 +144,11 @@ def identifier(value):
 
 
 def provenance(db, entity_type, entity_id):
-    if entity_type == "message":
+    if entity_type == "memory":
+        rows = db.execute("SELECT source FROM memories WHERE id=?", (entity_id,)).fetchall()
+    elif entity_type == "memory_snapshot":
+        rows = db.execute("SELECT source FROM memories WHERE version<=?", (entity_id,)).fetchall()
+    elif entity_type == "message":
         rows = db.execute("SELECT source FROM messages WHERE id=?", (entity_id,)).fetchall()
     elif entity_type in {"opportunity", "pack"}:
         oid = entity_id
@@ -177,7 +191,7 @@ def emit(
         raise ValueError("Unknown category")
     if isinstance(facts, Stage) and facts.stage not in STAGES:
         raise ValueError("Unknown stage")
-    if isinstance(facts, (Snapshot, Fetch)) and any(
+    if isinstance(facts, (Snapshot, Fetch, MemoryPublication)) and any(
         type(v) is not int or not 0 <= v <= 10000000 for v in asdict(facts).values()
     ):
         raise ValueError("Nonnegative bounded counts required")
@@ -200,6 +214,8 @@ def emit(
             type(ref) is not Reference
             or ref.entity_type not in ENTITIES
             or not identifier(ref.entity_id)
+            or (ref.entity_type == "memory" and (type(ref.version) is not int or ref.version < 1))
+            or (ref.entity_type != "memory" and ref.version is not None)
         ):
             raise ValueError("Typed source reference required")
     context = _CONTEXT.get() or {}
@@ -243,7 +259,13 @@ def emit(
     )
     refs = list(references)
     if entity_type:
-        refs.insert(0, Reference(entity_type, entity_id))
+        if entity_type == "memory":
+            row = db.execute("SELECT version FROM memories WHERE id=?", (entity_id,)).fetchone()
+            if row is None:
+                raise ValueError("Known memory required")
+            refs.insert(0, Reference(entity_type, entity_id, row[0]))
+        else:
+            refs.insert(0, Reference(entity_type, entity_id))
     now = timestamp()
     db.execute(
         "INSERT INTO agent_steps(occurred_at,recorded_at,actor,kind,run_id,correlation_id,"
@@ -264,7 +286,7 @@ def emit(
             phase,
             outcome,
             json.dumps(asdict(facts)),
-            json.dumps([asdict(r) for r in refs]),
+            json.dumps([{k: v for k, v in asdict(r).items() if v is not None} for r in refs]),
             dedupe_key,
             source,
         ),
@@ -273,6 +295,8 @@ def emit(
 
 
 TEMPLATES = {
+    Kind.MEMORY_PUBLISHED: "I refreshed the saved memory snapshot.",
+    Kind.MEMORY_CHANGED: "You changed a saved memory.",
     Kind.GMAIL_STARTED: "I started a Gmail check.",
     Kind.GMAIL_FAILED: "My Gmail check failed. Your saved information is available.",
     Kind.GMAIL_FINISHED: "I finished this Gmail check.",
@@ -369,6 +393,8 @@ def project(row):
         op = next((r for r in refs if r["entity_type"] == "opportunity"), None)
         if op:
             href = f"/opportunity/{op['entity_id']}#pack"
+    if entity in {"memory", "memory_snapshot"}:
+        href = f"/memory#memory-{identity}" if entity == "memory" else "/memory"
     return result | {"facts": facts, "source_refs": refs, "text": text, "href": href}
 
 

@@ -64,6 +64,9 @@ def main(argv=None):
                 with closing(connect(settings.db_path)) as db:
                     interrupt_runs(db)
                 Poller(settings).start()
+                from inbound.memory import Poller as MemoryPoller
+
+                MemoryPoller(settings).start()
             create_app().run(host='127.0.0.1', port=5000, debug=False, use_reloader=False)
             return 0
         if args.command == 'watch':

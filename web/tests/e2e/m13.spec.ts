@@ -1,0 +1,38 @@
+import { expect } from '@playwright/test';
+import { audit, test, theme } from './helpers.js';
+
+test('memory sources, safe Markdown, local additions and persistent imported forgetting', async ({ page }, info) => {
+    await theme(page, info.project.name.endsWith('-dark'));
+    await page.goto('/memory');
+    await expect(page.getByRole('heading', { name: 'What I know about you' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Learned rules' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Reading list' })).toBeVisible();
+    expect(await page.locator('main script, main img, main iframe').count()).toBe(0);
+    expect(await page.locator('a[href^="javascript:"]').count()).toBe(0);
+    const title = `Fictional memory ${info.project.name}`;
+    await page.getByRole('button', { name: 'Add memory', exact: true }).click();
+    await page.getByRole('textbox', { name: 'Name', exact: true }).fill(title);
+    await page.getByRole('textbox', { name: 'Description', exact: true }).fill('Synthetic browser note');
+    await page.getByRole('textbox', { name: 'Content', exact: true }).fill('A fictional local note.');
+    await page.getByRole('button', { name: 'Save memory' }).click();
+    const card = page.getByRole('article', { name: title });
+    await expect(card).toContainText('Saved locally');
+    await card.getByRole('button', { name: `Edit ${title}`, exact: true }).click();
+    await page.getByRole('textbox', { name: 'Content', exact: true }).fill('An edited fictional local note.');
+    await page.getByRole('button', { name: 'Save memory' }).click();
+    await expect(card).toContainText('An edited fictional local note.');
+    await card.getByRole('button', { name: `Disable ${title}`, exact: true }).click();
+    await expect(card).toContainText('Disabled');
+    await card.getByRole('button', { name: `Enable ${title}`, exact: true }).click();
+    const imported = `Curated ${info.project.name}`;
+    await page.getByRole('button', { name: `Forget ${imported}`, exact: true }).click();
+    await expect(page.getByText(/original curated file remains/i)).toBeVisible();
+    await page.getByRole('button', { name: 'Confirm forget' }).click();
+    await expect(page.getByRole('heading', { name: imported, exact: true })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Refresh snapshot' }).click();
+    await page.reload();
+    await expect(page.getByRole('heading', { name: imported, exact: true })).toHaveCount(0);
+    await expect(card).toBeVisible();
+    await audit(page);
+    await page.screenshot({ path: info.outputPath('memory.png'), fullPage: true });
+});

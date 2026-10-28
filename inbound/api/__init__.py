@@ -101,6 +101,10 @@ def create_app(config=None):
 
     register(app, db, output, settings)
 
+    from inbound.api.memory import register as register_memory
+
+    register_memory(app, db, output, settings)
+
     @app.teardown_appcontext
     def close_db(error=None):
         connection = g.pop("db", None)
@@ -644,6 +648,7 @@ def create_app(config=None):
             # Domain mutations include evidence and, in their future migrations, memories
             # and rules. Journal-only writes still refresh progress via the journal cursor.
             connection.execute("SELECT generation FROM domain_generation WHERE id=1").fetchone()[0],
+            connection.execute("SELECT error FROM memory_scan_state WHERE id=1").fetchone()[0],
             connection.execute("SELECT COALESCE(MAX(id),0) FROM agent_steps").fetchone()[0]
             if app.config['APP_MODE'] != 'replay' else connection.execute(
                 "SELECT COALESCE(MAX(id),0) FROM agent_steps WHERE source='synthetic'"
