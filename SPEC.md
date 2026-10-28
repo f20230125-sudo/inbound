@@ -176,3 +176,7 @@ Agreed with Codex (planning round r6). Built in this order; each keeps Pause, CS
 5. **Deadline calendar file (M9, if time).** Download one supported timed deadline as `.ics` (stable UID, version bumps on amendment, escaped text); unknown/conflicting deadlines cannot export.
 
 Backlog (not now): preference fit, tailoring-vs-general-CV comparison with fresh labels, weekly review page, live model comparison.
+
+**Amendment 3a (28 Oct 2026, 06:45):** Uzair asked for real-time mail reading. Live Gmail read-only sync moves ahead of items 4-5 (built as M9). It is the explicit networking exception §13 anticipated: scope exactly `gmail.readonly`, hosts limited to Google OAuth and the Gmail API, GET-only for mail data, token stored under the private data root, polling off until Uzair turns it on in the desk, Pause stops it, and connecting is a step Uzair performs himself.
+
+**Amendment 3b (28 Oct 2026, 06:50): everything live.** Uzair: "every single feature should be real time". Gmail sync polls every 2 min (min 1) once he turns it on; new mail runs the whole pipeline automatically; the desk updates itself over Server-Sent Events; draft packs build automatically for supported calls; opt-in local browser alerts; CV evidence changes are detected; application updates are suggested for linking as they arrive. Order: M8 (JD recovery, running), M9 (Gmail sync + auto pipeline), M9b (live desk, auto packs, alerts, live evidence, update suggestions), M10 (calendar file + remaining real-format fix).

@@ -118,6 +118,7 @@ def staged_import(db, settings, run_id, root, source, provenance, clock):
                     "merge_suggestions",
                     "packs",
                     "attachment_locations",
+                    "attachment_recoveries",
                     "snapshots",
                 ):
                     db.execute(

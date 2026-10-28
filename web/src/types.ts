@@ -90,6 +90,7 @@ export interface Event {
     details: Record<string, unknown>;
 }
 export interface PackRef {
+    content_version?: number;
     id: string;
     revision_id: number;
     status: string;
@@ -97,6 +98,8 @@ export interface PackRef {
     provisional: number;
 }
 export interface Opportunity {
+    content_version?: number;
+    attachment_recoveries?: { id: number; attachment_id: number; original_filename: string; sha256: string; supplier: string; recorded_at: string; parse_status: string; reason: string }[];
     outside_application?: ApplicationActivity | null;
     display_title?: string;
     city_display?: string;

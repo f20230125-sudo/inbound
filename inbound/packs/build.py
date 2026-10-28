@@ -123,7 +123,7 @@ def create_pack(db, opportunity_id, *, demo=False, pack_root=None, settings=None
         with db:
             db.execute(
                 "INSERT INTO packs(id,opportunity_id,role_id,revision_id,status,created_at,"
-                "provisional,demo) VALUES (?,?,?,?,?,?,?,?)",
+                "provisional,demo,content_version) VALUES (?,?,?,?,?,?,?,?,?)",
                 (
                     pack_id,
                     opportunity_id,
@@ -133,6 +133,7 @@ def create_pack(db, opportunity_id, *, demo=False, pack_root=None, settings=None
                     timestamp(),
                     int(provisional),
                     int(demo),
+                    state["content_version"],
                 ),
             )
             if not provisional:
@@ -225,7 +226,9 @@ def set_status(db, pack_id, status, *, acknowledge_blocker=False):
         raise ValueError("Unknown pack")
     if status in {"reviewed", "submitted_by_me"}:
         revision = latest_revision(db, pack["opportunity_id"])
-        if revision["id"] != pack["revision_id"]:
+        version = db.execute("SELECT content_version FROM opportunities WHERE id=?",
+                             (pack["opportunity_id"],)).fetchone()[0]
+        if revision["id"] != pack["revision_id"] or version != pack["content_version"]:
             raise ValueError("Pack revision is stale; rebuild before review")
         if not json.loads(pack["checks_json"]).get("passed"):
             raise ValueError("Pack verification must pass before review")

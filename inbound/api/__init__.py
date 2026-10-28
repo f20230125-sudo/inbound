@@ -12,11 +12,23 @@ from io import BytesIO
 from pathlib import Path
 from threading import Lock
 
-from flask import Flask, abort, g, jsonify, request, send_file, send_from_directory, session
+from flask import (
+    Flask,
+    Request,
+    abort,
+    g,
+    jsonify,
+    request,
+    send_file,
+    send_from_directory,
+    session,
+)
+from itsdangerous import BadSignature, URLSafeSerializer
 from werkzeug.exceptions import HTTPException
 
 from inbound.api import data
 from inbound.application_activity import ActivityConflict, applied_time, latest, record
+from inbound.attachment_recovery import RecoveryConflict, TooLarge, confirm, preview
 from inbound.db import connect
 from inbound.digest import today
 from inbound.extract.pipeline import latest_revision
@@ -29,8 +41,15 @@ from inbound.work import execute, start_run
 _PREVIEW_LOCK = Lock()
 
 
+class MemoryUploads(Request):
+    def _get_file_stream(self, *args, **kwargs):
+        # Bounded recovery uploads never spool attachment bytes into an OS temp directory.
+        return BytesIO()
+
+
 def create_app(config=None):
     app = Flask(__name__, static_folder=None)
+    app.request_class = MemoryUploads
     app.config.update(
         APP_MODE=os.environ.get("APP_MODE", "local"),
         SETTINGS=Settings.from_env(),
@@ -87,13 +106,18 @@ def create_app(config=None):
         if ":" in request.host and not 1 <= int(request.host.rsplit(":", 1)[1]) <= 65535:
             abort(403, "Invalid local port")
         if request.method == "POST":
+            recovery = request.endpoint in {"attachment_preview", "attachment_confirm"}
+            if recovery:
+                request.max_content_length = 10 * 1024 * 1024 + 65536
+                request.max_form_memory_size = 128 * 1024
+                request.max_form_parts = 12
             if app.config["APP_MODE"] != "local":
                 abort(405, "Read-only replay")
             token = session.get("csrf_token", "")
             supplied = request.headers.get("X-CSRF-Token", "")
             if not token or not hmac.compare_digest(token.encode(), supplied.encode()):
                 abort(403, "CSRF token required")
-            value = body()
+            value = {} if recovery and request.mimetype == "multipart/form-data" else body()
             if request.path == "/api/settings" and (
                 set(value) != {"paused"} or type(value.get("paused")) is not bool
             ):
@@ -130,6 +154,14 @@ def create_app(config=None):
     @app.errorhandler(ValueError)
     def invalid_error(exc):
         return jsonify(error="invalid_request"), 400
+
+    @app.errorhandler(RecoveryConflict)
+    def recovery_conflict(exc):
+        return jsonify(error="conflict", message=str(exc)), 409
+
+    @app.errorhandler(TooLarge)
+    def recovery_too_large(exc):
+        return jsonify(error="too_large", message=str(exc)), 413
 
     @app.errorhandler(sqlite3.IntegrityError)
     def busy_error(exc):
@@ -287,7 +319,9 @@ def create_app(config=None):
     def applied(oid):
         value = body()
         required = {"applied_at", "human_submission", "expected_revision_id", "expected_activity_id"}
-        if not required <= set(value) or set(value) - required - {"note", "follow_up"}:
+        if not required <= set(value) or set(value) - required - {
+            "note", "follow_up", "expected_content_version"
+        }:
             abort(400, "Expected revision, activity and human declaration required")
         try:
             result = record(db(), oid, **value, mode=app.config["APP_MODE"])
@@ -303,6 +337,73 @@ def create_app(config=None):
             "created_at,details_json) VALUES (?,?,?,?,?,?)",
             (oid, revision_id, pid, action, timestamp(), json.dumps(details or {})),
         )
+
+    def recovery_input():
+        if request.mimetype == "multipart/form-data":
+            value = request.form.to_dict()
+            if set(request.files) != {"file"} or any(
+                len(request.form.getlist(k)) != 1 for k in request.form
+            ) or len(request.files.getlist("file")) != 1:
+                abort(400, "Supply exactly one JD file")
+            uploaded = request.files["file"]
+            document = {"payload": uploaded.stream.read(10 * 1024 * 1024 + 1),
+                        "filename": uploaded.filename, "mime": uploaded.mimetype}
+        else:
+            value = body().copy()
+            if not isinstance(value.get("path"), str):
+                abort(400, "Supply a path under the data root")
+            document = {"path": value.pop("path")}
+        for name in ("attachment_id", "expected_revision_id", "expected_content_version"):
+            if name in value:
+                if (type(value[name]) is not int and
+                    not (isinstance(value[name], str) and value[name].isdigit())):
+                    abort(400, "Preview versions must be integers")
+                value[name] = int(value[name])
+        return value, document
+
+    def receipt(value, oid):
+        return {k: value[k] for k in ("attachment_id", "content_hash", "original_filename", "mime",
+                                     "expected_revision_id", "expected_content_version")} | {
+            "opportunity_id": oid}
+
+    @app.post("/api/opportunities/<int:oid>/attachments/preview")
+    def attachment_preview(oid):
+        value, document = recovery_input()
+        if set(value) != {"attachment_id"}:
+            abort(400, "Select one missing attachment")
+        try:
+            result = preview(db(), settings, oid, **value, **document, mode=app.config["APP_MODE"])
+        except LookupError:
+            abort(404)
+        result["preview_token"] = URLSafeSerializer(
+            app.secret_key, salt="attachment-preview"
+        ).dumps(receipt(result, oid))
+        return output(result)
+
+    @app.post("/api/opportunities/<int:oid>/attachments/confirm")
+    def attachment_confirm(oid):
+        value, document = recovery_input()
+        if set(value) != {"attachment_id", "content_hash", "expected_revision_id",
+                          "expected_content_version", "preview_token"}:
+            abort(400, "Preview hash, receipt and current call versions required")
+        try:
+            signed = URLSafeSerializer(app.secret_key, salt="attachment-preview").loads(
+                value.pop("preview_token"))
+        except (BadSignature, TypeError):
+            abort(409, "Preview receipt changed; preview the file again")
+        if any(signed.get(k) != v for k, v in value.items()) or signed.get("opportunity_id") != oid:
+            abort(409, "Preview does not match this file and call; preview again")
+        from inbound.attachment_recovery import read_document
+
+        payload, filename, mime = read_document(settings, **document)
+        if filename != signed.get("original_filename") or mime != signed.get("mime"):
+            abort(409, "File differs from the preview; preview again")
+        try:
+            result = confirm(db(), settings, oid, **value, payload=payload, filename=filename,
+                             mime=mime, mode=app.config["APP_MODE"])
+        except LookupError:
+            abort(404)
+        return output(result)
 
     @app.post("/api/opportunities/<int:oid>/status")
     def opportunity_status(oid):
@@ -373,6 +474,7 @@ def create_app(config=None):
             "status",
             "expected_pack_id",
             "expected_revision_id",
+            "expected_content_version",
             "acknowledge_blocker",
             "human_submission",
         }:
@@ -392,6 +494,9 @@ def create_app(config=None):
             ).fetchone():
                 abort(409, "Pack work is still active")
             revision = latest_revision(connection, pack["opportunity_id"])
+            version = connection.execute(
+                "SELECT content_version FROM opportunities WHERE id=?", (pack["opportunity_id"],)
+            ).fetchone()[0]
             latest_pack = connection.execute(
                 "SELECT id FROM packs WHERE opportunity_id=? "
                 "ORDER BY created_at DESC,id DESC LIMIT 1",
@@ -403,6 +508,8 @@ def create_app(config=None):
                 or type(value.get("expected_revision_id")) is not int
                 or value["expected_revision_id"] != revision["id"]
                 or pack["revision_id"] != revision["id"]
+                or value.get("expected_content_version", 0) != version
+                or pack["content_version"] != version
             ):
                 abort(
                     409,

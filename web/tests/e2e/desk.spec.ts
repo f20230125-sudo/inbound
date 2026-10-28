@@ -68,7 +68,8 @@ test('keyboard founder demo: provenance, revisions, provisional, conflicts and r
     await expect(page.getByText('Deadline conflicting · No countdown', { exact: true })).toBeVisible();
     await keyboardActivate(page, page.getByRole('link', { name: 'Back to Today / Inbox', exact: true }));
     await expect(page).toHaveURL(/all=1/);
-    await expect(page.locator('#inbox [data-case]')).toHaveCount(190);
+    // 190 frozen fixtures + 4 blocked recovery calls the e2e server adds (one per project).
+    await expect(page.locator('#inbox [data-case]')).toHaveCount(194);
     await expect(page.locator(`#message-${ids.J06.id}`)).toContainText('No exact PS-office sender match.');
     await keyboardActivate(page, page.locator(`#message-link-${ids['P-H21'].id}`));
     const mlRole = page.locator('#roles summary').filter({ hasText: 'Machine' }).first();
