@@ -184,6 +184,8 @@ export interface Snapshot {
     } | null;
 }
 export interface Today {
+    decision_queue: Entry[];
+    past_deadlines: Entry[];
     outside_applications?: { id: number; display_title: string; outside_application: ApplicationActivity }[];
     now: string;
     snapshot: Snapshot;
@@ -193,6 +195,19 @@ export interface Today {
     uncertain_deadlines: Entry[];
     new_calls: Entry[];
     admin_tasks: Entry[];
+}
+export type ScoutMood = 'idle' | 'working' | 'needs_decision' | 'draft_ready' | 'failed' | 'paused' | 'disconnected';
+export interface AgentState {
+    mood: ScoutMood;
+    status: string;
+    working: boolean;
+    paused: boolean;
+    failed: boolean;
+    gmail_connected: boolean;
+    briefing: { text: string; href: string }[];
+    counts: { decisions: number; drafts: number };
+    decisions: { id: string; title: string; reason: string; action: string; href: string; deadline?: Field }[];
+    freshness: { uncertain: boolean; gmail_success_at: string | null; snapshot_at: string | null; next_check_at: string | null };
 }
 export interface ApplicationActivity {
     id: number;

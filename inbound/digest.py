@@ -67,17 +67,21 @@ def today(db, now=None):
         "new_calls": [],
         "admin_tasks": [],
         "outside_applications": [],
+        "decision_queue": [],
+        "past_deadlines": [],
     }
     entries = []
     for row in db.execute("SELECT id FROM opportunities"):
         state = opportunity_state(db, row["id"], clock=lambda: now)
         activity = latest(db, row["id"])
         if activity:
-            result["outside_applications"].append({
-                "id": state["id"],
-                **opportunity_labels(db, state, state["normalized_subject"]),
-                "outside_application": activity,
-            })
+            result["outside_applications"].append(
+                {
+                    "id": state["id"],
+                    **opportunity_labels(db, state, state["normalized_subject"]),
+                    "outside_application": activity,
+                }
+            )
             continue
         if state["status"] in {"submitted_by_me", "skipped"}:
             continue
@@ -159,6 +163,22 @@ def today(db, now=None):
             if entry["conflicts"]
             else entry["deadline_label"]
         )
+        if group == "overdue":
+            result["past_deadlines"].append(entry)
+        else:
+            # Decision priority is independent of evidence/preference fit. A conflicting
+            # candidate is never a supported date, even if its candidate date has passed.
+            entry["decision_priority"] = (
+                0
+                if group in {"timed", "date_only"}
+                else 1
+                if entry["blocked_reason"] or entry["conflicts"]
+                else 2
+                if group == "uncertain"
+                else 3
+            )
+            if entry["kind"] == "call" or entry["deadline"]:
+                result["decision_queue"].append(entry)
         if (
             entry["blocked_reason"]
             or entry["conflicts"]
@@ -192,6 +212,14 @@ def today(db, now=None):
         return (1, -datetime.fromisoformat(due(entry)).timestamp(), str(entry["id"]))
 
     result["attention"].sort(key=attention_order)
+    result["decision_queue"].sort(
+        key=lambda e: (
+            e["decision_priority"],
+            due(e) if e["deadline_group"] != "uncertain" else "9999",
+            *received(e),
+        )
+    )
+    result["past_deadlines"].sort(key=lambda e: (due(e), *received(e)), reverse=True)
     result["outside_applications"].sort(
         key=lambda e: (e["outside_application"]["follow_up"] or "9999", e["id"])
     )
@@ -254,7 +282,6 @@ def plain_text(summary):
             value = (row["deadline"] or {}).get("normalized")
             deadline = display(value) if value else "Unknown"
             lines.append(
-                f"{row['kind']} · {row['display_title']} · {deadline} · "
-                f"{row['attention_reason']}"
+                f"{row['kind']} · {row['display_title']} · {deadline} · {row['attention_reason']}"
             )
     return "\n".join(lines) + "\n"

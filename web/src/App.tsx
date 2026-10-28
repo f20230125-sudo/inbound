@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { Link, NavLink, Route, Routes, useLocation } from 'react-router';
+import { Link, Navigate, NavLink, Route, Routes, useLocation } from 'react-router';
 import type { Run, Settings } from './types';
 import { request } from './lib/api';
 import { date } from './lib/format';
@@ -10,6 +10,8 @@ import { Button } from './components/ui/button';
 import TodayPage from './pages/Today';
 import OpportunityPage from './pages/Opportunity';
 import SettingsPage from './pages/Settings';
+import DeskPage from './pages/Desk';
+import { ScoutFace } from './components/scout';
 interface Desk {
     settings: Settings;
     refresh: () => Promise<void>;
@@ -17,7 +19,14 @@ interface Desk {
 }
 const Context = createContext<Desk | null>(null);
 export function useDesk() { return useContext(Context)!; }
-const titles = ['Today / Inbox', 'Opportunity / Pack', 'Settings / Runs'];
+function LegacyRoute({ to, hash }: { to: string; hash?: string }) {
+    const location = useLocation();
+    return <Navigate replace to={`${to}${location.search}${location.hash || hash || ''}`} state={location.state} />;
+}
+function DeskRoute() {
+    const location = useLocation();
+    return location.search || /^#(inbox|message-|source-)/.test(location.hash) ? <LegacyRoute to="/work" /> : <DeskPage />;
+}
 export default function App() {
     const [settings, setSettings] = useState<Settings>();
     const clock = useServerClock(settings?.clock || '', settings?.frozen_clock ?? true);
@@ -27,7 +36,7 @@ export default function App() {
     const location = useLocation();
     const initialRoute = useRef(true);
     const previousPath = useRef(location.pathname);
-    const title = location.pathname.startsWith('/opportunity') ? titles[1] : location.pathname.startsWith('/settings') ? titles[2] : titles[0];
+    const title = location.pathname.startsWith('/opportunity') ? 'Opportunity / Pack' : location.pathname.startsWith('/settings') ? 'Settings' : location.pathname === '/memory' ? 'Memory' : location.pathname === '/work' ? 'Work' : 'Desk';
     const refresh = useCallback(async () => { try {
         setSettings(await request<Settings>('/settings'));
         setError(false);
@@ -90,6 +99,24 @@ export default function App() {
     async function savePause(paused: boolean) { const result = await request<{
         paused: boolean;
     }>('/settings', settings?.csrf_token, { paused }); setSettings(v => v && { ...v, paused: result.paused }); }
-    const todayLink = `/${sessionStorage.getItem('inbound-inbox-query') || ''}`;
-    return <><a className="skip-link" href="#main">Skip to content</a><header className="app-header"><div><Link to="/" className="brand">Inbound</Link><p>{settings?.mode === 'replay' ? 'Synthetic replay · Read-only' : 'Local'}{settings?.mode !== 'replay' && <span className="live-status"> · {live.status === 'live' ? `Live · updated ${live.checkedAt?.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}` : live.status === 'reconnecting' ? 'Reconnecting…' : 'Connecting…'}</span>}</p></div><div className="header-actions">{settings && <PauseControl paused={settings.paused} replay={settings.mode === 'replay'} save={savePause} active={activeWork}/>}<Button variant="outline" aria-pressed={dark} onClick={() => { setDark(v => !v); localStorage.setItem('inbound-theme', dark ? 'light' : 'dark'); }}>Dark mode</Button></div></header><div className="desk-shell"><nav aria-label="Primary"><NavLink to={todayLink} end>{titles[0]}</NavLink><NavLink to={sessionStorage.getItem('inbound-last-opportunity') || '/opportunity'}>{titles[1]}</NavLink><NavLink to="/settings">{titles[2]}</NavLink></nav><main id="main" tabIndex={-1}><h1 id="page-title" tabIndex={-1}>{title}</h1><div className="meta clock"><p>Dubai time · UTC+04:00</p>{settings?.frozen_clock && <p>Frozen synthetic clock: {date(settings.clock)} · Dubai</p>}</div><div role="status" className="sr-only">{title}</div>{error ? <Failure text="Settings could not be loaded." retry={() => void refresh()}/> : !settings ? <Loading text="Loading settings…"/> : <Context.Provider value={{ settings: { ...settings, clock }, refresh, savePause }}><Routes><Route path="/" element={<TodayPage />}/><Route path="/opportunity/:id?" element={<OpportunityPage />}/><Route path="/settings" element={<SettingsPage />}/><Route path="*" element={<p>Choose a call from <Link to="/">Today / Inbox</Link></p>}/></Routes></Context.Provider>}</main></div></>;
+    const workLink = `/work${sessionStorage.getItem('inbound-inbox-query') || ''}`;
+    return <><a className="skip-link" href="#main">Skip to content</a>
+        <header className="app-header"><div><Link to="/" className="brand">Inbound</Link><p>{settings?.mode === 'replay' ? 'Synthetic replay · Read-only' : 'Local'}{settings?.mode !== 'replay' && <span className="live-status"> · {live.status === 'live' ? `Live · updated ${live.checkedAt?.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}` : live.status === 'reconnecting' ? 'Reconnecting…' : 'Connecting…'}</span>}</p></div>
+            <div className="header-actions">{settings && <PauseControl paused={settings.paused} replay={settings.mode === 'replay'} save={savePause} active={activeWork}/>}<Button variant="outline" aria-pressed={dark} onClick={() => { setDark(v => !v); localStorage.setItem('inbound-theme', dark ? 'light' : 'dark'); }}>Dark mode</Button></div>
+        </header>
+        <div className="desk-shell"><nav aria-label="Primary"><NavLink to="/" end>Desk</NavLink><NavLink to={workLink}>Work</NavLink><NavLink to="/memory">Memory</NavLink><NavLink to="/settings">Settings</NavLink></nav>
+            <main id="main" tabIndex={-1}><h1 id="page-title" tabIndex={-1}>{title}</h1><div className="meta clock"><p>Dubai time · UTC+04:00</p>{settings?.frozen_clock && <p>Frozen synthetic clock: {date(settings.clock)} · Dubai</p>}</div><div role="status" className="sr-only">{title}</div>
+                {error && !settings && location.pathname === '/' && <section className="scout-presence" aria-label="Scout"><ScoutFace mood="disconnected" /><div><h2>Scout</h2><p role="status">I can't reach the local service.</p></div></section>}
+                {error && <Failure text="Settings could not be loaded." retry={() => void refresh()}/>}
+                {!settings ? !error && <Loading text="Loading settings…"/> : <Context.Provider value={{ settings: { ...settings, clock }, refresh, savePause }}><Routes>
+                    <Route path="/" element={<DeskRoute />}/><Route path="/desk" element={<LegacyRoute to="/" />}/>
+                    <Route path="/work" element={<TodayPage />}/>
+                    <Route path="/today" element={<LegacyRoute to="/work" />}/><Route path="/inbox" element={<LegacyRoute to="/work" />}/><Route path="/applications" element={<LegacyRoute to="/work" />}/>
+                    <Route path="/opportunity" element={<LegacyRoute to="/work" />}/><Route path="/opportunity/:id" element={<OpportunityPage />}/>
+                    <Route path="/settings" element={<SettingsPage />}/><Route path="/runs" element={<LegacyRoute to="/settings" hash="#runs" />}/>
+                    <Route path="/memory" element={<section className="memory-placeholder"><h2>What Scout knows about you</h2><p>Memory arrives in M13. No memories have been imported or learned in this view.</p></section>}/>
+                    <Route path="*" element={<p>Choose a call from <Link to="/work">Work</Link></p>}/>
+                </Routes></Context.Provider>}
+            </main>
+        </div></>;
 }

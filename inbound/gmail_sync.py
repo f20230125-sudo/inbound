@@ -30,6 +30,11 @@ SKIP_LABELS = {"SPAM", "TRASH", "DRAFT"}
 _SYNC_LOCK = threading.Lock()
 
 
+def is_syncing():
+    """Expose actual ongoing work without starting a check."""
+    return _SYNC_LOCK.locked()
+
+
 def mail_dir(settings):
     return gmail_dir(settings) / "mail"
 

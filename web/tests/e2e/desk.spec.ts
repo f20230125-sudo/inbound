@@ -1,19 +1,19 @@
 import { expect } from '@playwright/test';
 import { audit, identities, keyboardActivate, test, theme } from './helpers.js';
-for (const view of ['Today / Inbox', 'Opportunity / Pack', 'Settings / Runs']) {
+for (const view of ['Work', 'Opportunity / Pack', 'Settings']) {
     test(`${view}: axe, console, overflow`, async ({ page }, info) => {
         await theme(page, info.project.name.endsWith('-dark'));
         const ids = await identities(page);
-        await page.goto(view === 'Today / Inbox' ? '/' : view === 'Settings / Runs' ? '/settings' : `/opportunity/${ids['P-D12'].opportunity_id}`);
+        await page.goto(view === 'Work' ? '/work' : view === 'Settings' ? '/settings' : `/opportunity/${ids['P-D12'].opportunity_id}`);
         await expect(page.getByRole('heading', { level: 1, name: view })).toBeVisible();
-        await expect(page.getByText(view === 'Today / Inbox' ? 'Inbox' : view === 'Settings / Runs' ? 'Payload policy — read-only' : 'Selected projects', { exact: true })).toBeVisible();
+        await expect(page.getByText(view === 'Work' ? 'Inbox' : view === 'Settings' ? 'Payload policy — read-only' : 'Selected projects', { exact: true })).toBeVisible();
         await expect(page.locator('html')).toHaveClass(info.project.name.endsWith('-dark') ? 'dark' : '');
         await audit(page);
         await page.screenshot({ path: info.outputPath('view.png'), fullPage: true });
     });
 }
 test('light-first theme persists explicit toggle and skip link is first', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/work');
     await expect(page.locator('html')).not.toHaveClass('dark');
     await page.keyboard.press('Tab');
     await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
@@ -26,8 +26,9 @@ test('light-first theme persists explicit toggle and skip link is first', async 
 test('keyboard founder demo: provenance, revisions, provisional, conflicts and roles', async ({ page }, info) => {
     await theme(page, info.project.name.endsWith('-dark'));
     const ids = await identities(page);
-    await page.goto('/');
-    const overdue = page.locator('[data-slot=card]').filter({ has: page.getByRole('heading', { name: 'Overdue / blocked', exact: true }) });
+    await page.goto('/work');
+    await keyboardActivate(page, page.locator('#past-deadlines > summary'));
+    const overdue = page.locator('[data-slot=card]').filter({ has: page.getByRole('heading', { name: 'Past deadlines', exact: true }) });
     await keyboardActivate(page, overdue.getByRole('button', { name: /View all/ }));
     await expect(overdue.locator('[data-case="P-D06"]')).toContainText('Deadline passed before receipt');
     await expect(page.locator('[data-case="P-D21"]').first()).toContainText('Time not stated');
@@ -48,25 +49,25 @@ test('keyboard founder demo: provenance, revisions, provisional, conflicts and r
     await keyboardActivate(page, page.getByRole('button', { name: 'Copy answer', exact: true }).first());
     await expect(page.getByText('Copied', { exact: true }).first()).toBeVisible();
     await audit(page);
-    await keyboardActivate(page, page.getByRole('link', { name: 'Back to Today / Inbox', exact: true }));
+    await keyboardActivate(page, page.getByRole('link', { name: 'Back to Work', exact: true }));
     await expect(page).toHaveURL(/category=ps_call/);
     await expect(page.locator(`#message-link-${ids['P-D12'].id}`)).toBeFocused();
     await keyboardActivate(page, page.locator(`#message-link-${ids['P-D02'].id}`));
     await expect(page.locator('#facts')).toContainText('29 Oct 2026, 08:00');
     await expect(page.locator('#facts')).toContainText('28 Oct 2026, 00:20');
     await expect(page.getByRole('heading', { name: 'Revision history', exact: true })).toBeVisible();
-    await keyboardActivate(page, page.getByRole('link', { name: 'Back to Today / Inbox', exact: true }));
+    await keyboardActivate(page, page.getByRole('link', { name: 'Back to Work', exact: true }));
     await keyboardActivate(page, page.locator(`#message-link-${ids['P-D16'].id}`));
     await expect(page.getByText('Provisional preview', { exact: true }).first()).toBeVisible();
     await expect(page.getByRole('button', { name: 'Mark reviewed', exact: true })).toBeDisabled();
     await audit(page);
-    await keyboardActivate(page, page.getByRole('link', { name: 'Back to Today / Inbox', exact: true }));
+    await keyboardActivate(page, page.getByRole('link', { name: 'Back to Work', exact: true }));
     await page.getByLabel('Category:', { exact: true }).selectOption('');
     await keyboardActivate(page, page.getByRole('button', { name: /^Show all / }));
     await keyboardActivate(page, page.locator(`#message-link-${ids.J09.id}`));
     await expect(page.locator('#facts')).toContainText('Conflicting');
     await expect(page.getByText('Deadline conflicting · No countdown', { exact: true })).toBeVisible();
-    await keyboardActivate(page, page.getByRole('link', { name: 'Back to Today / Inbox', exact: true }));
+    await keyboardActivate(page, page.getByRole('link', { name: 'Back to Work', exact: true }));
     await expect(page).toHaveURL(/all=1/);
     // 190 frozen fixtures + 4 blocked recovery calls the e2e server adds (one per project).
     await expect(page.locator('#inbox [data-case]')).toHaveCount(194);
@@ -78,7 +79,7 @@ test('keyboard founder demo: provenance, revisions, provisional, conflicts and r
     await expect(page.locator('#roles')).toContainText('PyTorch');
     await expect(page.locator('#roles')).toContainText('TensorFlow');
     await expect(page.getByRole('cell', { name: 'Gap: no approved evidence', exact: true }).first()).toBeVisible();
-    await keyboardActivate(page, page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Settings / Runs' }));
+    await keyboardActivate(page, page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Settings' }));
     await expect(page.getByText('Offline mode — live model calls are disabled.', { exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Run ledger', exact: true })).toBeVisible();
     await audit(page);
@@ -87,11 +88,11 @@ test('keyboard founder demo: provenance, revisions, provisional, conflicts and r
 test('Inbox starts with recent messages and expands by keyboard, retaining filters and return focus', async ({ page }, info) => {
     await theme(page, info.project.name.endsWith('-dark'));
     const messages = await (await page.request.get('/api/messages')).json();
-    await page.goto('/');
+    await page.goto('/work');
     const inbox = page.locator('#inbox');
     await expect(inbox.locator('[data-case]')).toHaveCount(25);
     expect(await inbox.locator('[data-case]').evaluateAll(nodes => nodes.map(n => n.getAttribute('data-case')))).toEqual(messages.slice(0, 25).map((m: { provider_id: string }) => m.provider_id));
-    const summary = page.getByRole('heading', { name: 'Overdue / blocked', exact: true });
+    const summary = page.getByRole('heading', { name: 'Needs your decision', exact: true });
     expect((await summary.boundingBox())!.y).toBeLessThan((await inbox.boundingBox())!.y);
     await keyboardActivate(page, page.getByRole('button', { name: `Show all ${messages.length}`, exact: true }));
     await expect(inbox.locator('[data-case]')).toHaveCount(messages.length);
@@ -104,7 +105,7 @@ test('Inbox starts with recent messages and expands by keyboard, retaining filte
     const last = inbox.locator('a[id^="message-link-"]').last();
     const id = await last.getAttribute('id');
     await keyboardActivate(page, last);
-    await keyboardActivate(page, page.getByRole('link', { name: 'Back to Today / Inbox', exact: true }));
+    await keyboardActivate(page, page.getByRole('link', { name: 'Back to Work', exact: true }));
     await expect(page).toHaveURL(/category=ps_call.*all=1/);
     await expect(page.locator(`#${id}`)).toBeFocused();
     await keyboardActivate(page, page.getByRole('button', { name: 'Show fewer messages' }));
