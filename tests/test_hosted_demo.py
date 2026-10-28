@@ -51,3 +51,14 @@ def test_hosted_app_serves_the_fictional_desk_and_refuses_changes(hosted):
     assert client.post("/api/import", json={}, headers=HOST).status_code == 405
     assert client.post("/api/gmail/sync", json={}, headers=HOST).status_code == 405
     assert client.get("/api/gmail", headers=HOST).json["available"] is False
+
+
+def test_passed_settings_are_used_without_building_defaults(tmp_path, monkeypatch):
+    # On a host without D:, building default settings would fail before the passed ones apply.
+    def refuse():
+        raise AssertionError("defaults must not be built when settings are passed")
+
+    monkeypatch.setattr(Settings, "from_env", staticmethod(refuse))
+    app = create_app({"APP_MODE": "replay",
+                      "SETTINGS": Settings(data_root=tmp_path, hosted_replay=True)})
+    assert app.config["SETTINGS"].data_root == tmp_path.resolve()
